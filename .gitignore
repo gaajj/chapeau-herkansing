@@ -1,0 +1,45 @@
+# .NET SDK files
+/.vs/
+/bin/
+/obj/
+
+# User-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# ASP.NET Core files
+appsettings.Development.json
+appsettings.Staging.json
+appsettings.Production.json
+appsettings.*.json
+appsettings.json
+
+# Dotnet publish output
+publish/
+
+# IIS Express folder
+/IISExpress/
+
+# Windows Installer files
+*.cab
+*.msi
+*.msm
+*.msp
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+
+# Environment variables
+.env
+
+# User-specific IDE files (Visual Studio, VSCode, etc.)
+.vscode/
+.idea/
+
+# Project files
+ChapeauHerkansing.csproj
