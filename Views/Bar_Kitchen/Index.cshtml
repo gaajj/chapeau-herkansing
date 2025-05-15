@@ -25,18 +25,18 @@
                 <th>Description</th>
                 <th colspan="2">Change order status</th>
             </tr>
-        </thead>
+        </thead> <!--
         <tbody>
-            @foreach (var order in Model)
+            oreach (Order order in Model)
             {
                 <tr>
-                    <td>@order.OrderID</td>
-                    <td>@order.TableID</td>
-                    <td>@order.Feedback</td>
-                    <td>@order.IsDeleted</td>
+                    <td>order.OrderID</td>
+                    <td>order.Table</td>
+                    <td>order.Feedback</td>
+                    <td>order.IsDeleted</td>
                     <td>
                         <div class="d-flex justify-content-center align-items-center gap-2">
-                            <input type="text" value="@order.TableID" class="form-control text-center w-50" readonly />
+                            <input type="text" value="order.Table" class="form-control text-center w-50" readonly />
                             <button class="btn btn-warning">Prepared</button>
                             <button class="btn btn-success">Served</button>
                         </div>
@@ -52,6 +52,6 @@
                     </div>
                 </td>
             </tr>
-        </tbody>
+        </tbody> -->
     </table>
 </div>

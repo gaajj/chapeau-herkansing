@@ -2,7 +2,7 @@ using ChapeauHerkansing.Models;
 
 public interface IRepository
 {
-    List<User> GetAll();
+    List<Staff> GetAll();
     // User? GetById(int id);
     // void Add(User user);
     // void Update(User user);
