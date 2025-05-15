@@ -7,9 +7,9 @@ namespace ChapeauHerkansing.Controllers;
 public class HomeController : Controller
 {
     private readonly ILogger<HomeController> _logger;
-    private readonly IUsersRepository _repo;
+    private readonly IRepository _repo;
 
-    public HomeController(ILogger<HomeController> logger, IUsersRepository repo)
+    public HomeController(ILogger<HomeController> logger, IRepository repo)
     {
         _logger = logger;
         _repo = repo;

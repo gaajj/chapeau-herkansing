@@ -3,7 +3,7 @@ using Microsoft.Data.SqlClient;
 
 namespace ChapeauHerkansing.Repositories
 {
-  public class UsersRepository : IUsersRepository
+  public class UsersRepository : IRepository
   {
     private readonly string _connectionString;
 
@@ -18,7 +18,7 @@ namespace ChapeauHerkansing.Repositories
 
       using (var connection = new SqlConnection(_connectionString))
       {
-        string query = "SELECT userID, firstName, lastName, username, password, role FROM dbo.Users";
+        string query = "SELECT staffID, firstName, lastName, username, password, role FROM dbo.staff";
         SqlCommand command = new SqlCommand(query, connection);
 
         connection.Open();
