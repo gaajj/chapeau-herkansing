@@ -3,22 +3,22 @@ using Microsoft.Data.SqlClient;
 
 namespace ChapeauHerkansing.Repositories
 {
-  public class UsersRepository : IUsersRepository
+  public class StaffRepository : IRepository
   {
     private readonly string _connectionString;
 
-    public UsersRepository(IConfiguration configuration)
+    public StaffRepository(IConfiguration configuration)
     {
       _connectionString = configuration.GetConnectionString("ChapeauDatabase");
     }
 
-    public List<User> GetAll()
+    public List<Staff> GetAll()
     {
-      var users = new List<User>();
+       List<Staff> users = new List<Staff>();
 
-      using (var connection = new SqlConnection(_connectionString))
+      using (SqlConnection connection = new SqlConnection(_connectionString))
       {
-        string query = "SELECT userID, firstName, lastName, username, password, role FROM dbo.Users";
+        string query = "SELECT iD, firstName, lastName, username, password, role FROM dbo.staff";
         SqlCommand command = new SqlCommand(query, connection);
 
         connection.Open();
@@ -26,14 +26,14 @@ namespace ChapeauHerkansing.Repositories
 
         while (reader.Read())
         {
-          User user = ReadUser(reader);
+          Staff user = ReadUser(reader);
           users.Add(user);
         }
       }
       return users;
     }
 
-    private User ReadUser(SqlDataReader reader) {
+    private Staff ReadUser(SqlDataReader reader) {
       int id = reader.GetInt32(0);
       string firstName = reader.GetString(1);
       string lastName = reader.GetString(2);
@@ -41,7 +41,7 @@ namespace ChapeauHerkansing.Repositories
       string password = reader.GetString(4);
       string role = reader.GetString(5);
 
-      return new User(id, firstName, lastName, username, password, role);
+      return new Staff(id, firstName, lastName, username, password, role);
     }
   }
 }
