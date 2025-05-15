@@ -4,9 +4,9 @@ namespace ChapeauHerkansing.Controllers
 {
     public class UsersController : Controller
     {
-        private readonly IUsersRepository _userRepository;
+        private readonly IRepository _userRepository;
 
-        public UsersController(IUsersRepository userRepository)
+        public UsersController(IRepository userRepository)
         {
             _userRepository = userRepository;
         }
