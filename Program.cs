@@ -7,6 +7,7 @@ builder.Services.AddScoped<IUsersRepository, UsersRepository>();
 
 
 builder.Services.AddControllersWithViews();
+builder.Services.AddScoped<TableRepository>();
 builder.Services.AddScoped<IRepository, StaffRepository>();
 
 var app = builder.Build();

@@ -18,7 +18,7 @@ namespace ChapeauHerkansing.Repositories
 
       using (SqlConnection connection = new SqlConnection(_connectionString))
       {
-        string query = "SELECT staffID, firstName, lastName, username, password, role FROM dbo.staff";
+        string query = "SELECT id, firstName, lastName, username, password, role FROM dbo.staff";
         SqlCommand command = new SqlCommand(query, connection);
 
         connection.Open();

@@ -1,7 +1,23 @@
-﻿@{
+﻿@model List<ChapeauHerkansing.Models.Table>
+@{
     ViewData["Title"] = "Table Overview";
 }
 
-<h2 style="font-family:Tahoma">Tafeloverzicht</h2>
+<h2 style="font-family:Tahoma; color:darkorange">Table Overview</h2>
 
-<p>Welkom, ober! Hier komt het tafeloverzicht.</p>
+<div style="display: flex; flex-wrap: wrap; gap: 10px;">
+    @foreach (var table in Model)
+    {
+        var color = table.Status switch
+        {
+            ChapeauHerkansing.Models.TableStatus.Free => "background-color: rgb(138, 210, 176);",       // groen
+            ChapeauHerkansing.Models.TableStatus.Occupied => "background-color: rgb(255, 179, 71);",    // oranje
+            ChapeauHerkansing.Models.TableStatus.Reserved => "background-color: rgb(255, 128, 128);",   // rood
+            _ => "background-color: rgb(196, 196, 196);"                                                 // grijs als fallback
+        };
+
+        <button style="width:100px; height:100px; font-family:Tahoma; font-weight:bold; @color" onclick="alert('Table @table.TableID clicked')">
+            Table @table.TableID
+        </button>
+    }
+</div>
