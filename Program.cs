@@ -3,6 +3,8 @@ using ChapeauHerkansing.Repositories;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Configuration.AddEnvironmentVariables();
+builder.Services.AddScoped<IUsersRepository, UsersRepository>();
+
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<IRepository, StaffRepository>();
@@ -25,7 +27,7 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    pattern: "{controller=Login}/{action=Index}/{id?}");
 
 app.MapControllerRoute(
     name: "Bar_Kitchen",

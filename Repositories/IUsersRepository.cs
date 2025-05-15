@@ -3,6 +3,8 @@ using ChapeauHerkansing.Models;
 public interface IUsersRepository
 {
     List<User> GetAll();
+    User? GetByLoginCredentials(string username, string password);
+
     // User? GetById(int id);
     // void Add(User user);
     // void Update(User user);
