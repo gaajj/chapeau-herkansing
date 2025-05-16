@@ -5,9 +5,9 @@ namespace ChapeauHerkansing.Controllers
 {
     public class StaffController : Controller
     {
-        private readonly IRepository _userRepository;
-        private List<Staff> staff;
-        public StaffController(IRepository userRepository)
+        private readonly IRepository<Staff> _userRepository;
+      
+        public StaffController(IRepository<Staff> userRepository)
         {
             _userRepository = userRepository;
         }
