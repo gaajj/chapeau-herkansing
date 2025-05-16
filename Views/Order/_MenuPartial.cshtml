@@ -1,0 +1,23 @@
+﻿@model ChapeauHerkansing.Models.Menu
+
+<div>
+    @foreach (var category in Model.MenuItems.GroupBy(i => i.Category))
+    {
+        <h3 class="text-lg font-semibold mt-4">@category.Key</h3>
+        <ul>
+            @foreach (var item in category)
+            {
+                <li class="flex justify-between py-2 border-b">
+                    <div>
+                        <span>@item.Name</span>
+                        @if (item.IsAlcoholic)
+                        {
+                            <span class="ml-2 px-2 py-1 text-xs font-semibold text-white bg-red-500 rounded">Alcoholic</span>
+                        }
+                    </div>
+                    <span>€ @item.Price.ToString("0.00")</span>
+                </li>
+            }
+        </ul>
+    }
+</div>
