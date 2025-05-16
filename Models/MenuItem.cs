@@ -17,5 +17,10 @@ namespace ChapeauHerkansing.Models
             Category = category;
             IsAlcoholic = isAlcoholic;
         }
+        public MenuItem(int menuItemID, string name)
+        {
+            MenuItemID = menuItemID;
+            Name = name;
+        }
     }
 }

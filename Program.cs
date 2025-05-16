@@ -1,11 +1,13 @@
 using ChapeauHerkansing.Repositories;
+using ChapeauHerkansing.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Configuration.AddEnvironmentVariables();
 
 builder.Services.AddControllersWithViews();
-builder.Services.AddScoped<IUsersRepository, UsersRepository>();
+builder.Services.AddScoped<IRepository<Staff>, StaffRepository>();
+builder.Services.AddScoped<IRepository<Order>, OrderRepository>();
 
 var app = builder.Build();
 
@@ -18,6 +20,7 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseStaticFiles();
 app.UseRouting();
 
 app.UseAuthorization();
@@ -25,5 +28,10 @@ app.UseAuthorization();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+
+app.MapControllerRoute(
+    name: "Bar_Kitchen",
+    pattern: "Bar/{action=Index}/{id?}",
+    defaults: new { controller = "Bar_Kitchen" });
 
 app.Run();

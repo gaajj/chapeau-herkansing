@@ -1,6 +1,6 @@
 namespace ChapeauHerkansing.Models
 {
-    public class User
+    public class Staff
     {
         public int Id { get; set; }
         public string FirstName { get; set; }
@@ -9,7 +9,7 @@ namespace ChapeauHerkansing.Models
         public string Password { get; set; }
         public string Role { get; set; }
 
-        public User(int id, string firstName, string lastName, string username, string password, string role) {
+        public Staff(int id, string firstName, string lastName, string username, string password, string role) {
           this.Id = id;
           this.FirstName = firstName;
           this.LastName = lastName;
