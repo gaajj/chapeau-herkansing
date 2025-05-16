@@ -1,3 +1,5 @@
+using ChapeauHerkansing.Models.Enums;
+
 namespace ChapeauHerkansing.Models
 {
     public class MenuItem
@@ -5,17 +7,13 @@ namespace ChapeauHerkansing.Models
         public int MenuItemID { get; set; }
         public string Name { get; set; }
         public decimal Price { get; set; }
-        public string Category { get; set; }
+        public MenuCategory Category { get; set; }
         public bool IsAlcoholic { get; set; }
+        public bool? IsDeleted { get; set; }
 
-        // Basic Constructor
-        public MenuItem(int menuItemID, string name, decimal price, string category, bool isAlcoholic)
-        {
-            MenuItemID = menuItemID;
-            Name = name;
-            Price = price;
-            Category = category;
-            IsAlcoholic = isAlcoholic;
-        }
+        public int StockID { get; set; }       // FK naar stock (bijv. voor voorraad)
+        public int? StockAmount { get; set; }
+
+        public MenuType MenuType { get; set; } // FK naar menu (bij JOIN opgehaald)
     }
 }

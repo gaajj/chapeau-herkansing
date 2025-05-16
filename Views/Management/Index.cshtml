@@ -1,0 +1,84 @@
+﻿@model ChapeauHerkansing.ViewModels.Management.MenuManagementViewModel
+
+@{
+    ViewData["Title"] = "Manage Menu";
+}
+
+<h2>Manage Menu</h2>
+
+@if (TempData["Message"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["Message"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @TempData["Error"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+
+
+<form method="get" asp-controller="Management" asp-action="Index">
+    <label>Menu Type:</label>
+    <select name="menuType" asp-for="SelectedMenuType" asp-items="Html.GetEnumSelectList<MenuType>()" class="form-select">
+        <option value="">-- Select menu type --</option>
+    </select>
+
+    <label>Category:</label>
+    <select name="category" asp-for="SelectedCategory" asp-items="Html.GetEnumSelectList<MenuCategory>()" class="form-select">
+        <option value="">-- All categories --</option>
+    </select>
+
+    <button type="submit" class="btn btn-primary mt-2">Filter</button>
+</form>
+
+<a class="btn btn-success mb-3" asp-controller="Management" asp-action="Create">
+    + Add Menu Item
+</a>
+
+
+<table class="table table-bordered mt-4">
+    <thead class="table-dark">
+        <tr>
+            <th>Name</th>
+            <th>Price</th>
+            <th>Category</th>
+            <th>Alcoholic</th>
+            <th>Stock</th>
+            <th>Actions</th>
+
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.MenuItems)
+        {
+            var rowClass = item.IsDeleted == true ? "table-secondary text-muted" : "";
+
+            <tr class="@rowClass">
+                <td>@item.Name</td>
+                <td>€ @item.Price</td>
+                <td>@item.Category</td>
+                <td>@(item.IsAlcoholic ? "Yes" : "No")</td>
+                <td>@item.StockAmount</td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.MenuItemID" class="btn btn-sm btn-primary">Edit</a>
+                    @if (item.IsDeleted == true)
+                    {
+                        <a asp-action="ToggleActive" asp-route-id="@item.MenuItemID" class="btn btn-sm btn-success ms-1">Activate</a>
+                    }
+                    else
+                    {
+                        <a asp-action="ToggleActive" asp-route-id="@item.MenuItemID" class="btn btn-sm btn-danger ms-1">Deactivate</a>
+                    }
+                </td>
+            </tr>
+        }
+
+    </tbody>
+</table>
