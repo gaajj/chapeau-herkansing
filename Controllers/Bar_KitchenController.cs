@@ -5,18 +5,18 @@ namespace ChapeauHerkansing.Controllers
 {
     public class Bar_KitchenController : Controller
     {
+      private readonly IRepository<Order> _orderRepository;
+
+        public Bar_KitchenController(IRepository<Order> orderRepository)
+        {
+            _orderRepository = orderRepository;
+        }
+
         public IActionResult Index()
         {
-       /*     List<Order> orders = new List<Order>
-        {
-            new Order (1, 1, null, null),
-            new Order (2, 2, null , null),
-            new Order (3, 3, null, null),
-            new Order ( 4, 4, null, null),
-            new Order (5, 5, null, null)
-        }; */
+            List<Order> orders = _orderRepository.GetAll();
 
-            return View("~/Views/Bar_Kitchen/Index.cshtml");
+            return View("~/Views/Bar_Kitchen/Index.cshtml", orders);
         }
     }
 }

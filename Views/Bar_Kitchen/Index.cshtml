@@ -4,9 +4,6 @@
 
 @model List<ChapeauHerkansing.Models.Order>
 
-<div class="text-center">
-<h1 class="display-4">Welcome</h1>
-</div>
 
 
 <div class="container mt-4 p-3 border border-primary rounded">
@@ -25,24 +22,25 @@
                 <th>Description</th>
                 <th colspan="2">Change order status</th>
             </tr>
-        </thead> <!--
+        </thead> 
         <tbody>
-            oreach (Order order in Model)
+            @foreach (Order order in Model)
+
             {
+                foreach (OrderLine orderline in order.OrderLines) { 
                 <tr>
-                    <td>order.OrderID</td>
-                    <td>order.Table</td>
-                    <td>order.Feedback</td>
-                    <td>order.IsDeleted</td>
+                        <td>@order.OrderID</td>
+                    <td>@orderline.OrderLineID</td>
+                    <td>@orderline.Amount x</td>
                     <td>
                         <div class="d-flex justify-content-center align-items-center gap-2">
-                            <input type="text" value="order.Table" class="form-control text-center w-50" readonly />
+                            <input type="text" value="@orderline.MenuItem.Name" class="form-control text-center w-50" readonly />
                             <button class="btn btn-warning">Prepared</button>
                             <button class="btn btn-success">Served</button>
                         </div>
                     </td>
                 </tr>
-            }
+            }}
             <tr>
                 <td colspan="4" class="bg-warning text-dark text-center fw-bold">View order status</td>
                 <td colspan="2" class="text-start">
@@ -52,6 +50,6 @@
                     </div>
                 </td>
             </tr>
-        </tbody> -->
+        </tbody>
     </table>
 </div>
