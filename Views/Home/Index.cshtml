@@ -1,4 +1,4 @@
-﻿@model IEnumerable<ChapeauHerkansing.Models.User>
+﻿@model IEnumerable<ChapeauHerkansing.Models.Staff>
 
 @{
     ViewData["Title"] = "Users List";
@@ -16,13 +16,13 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (var user in Model)
+        @foreach (Staff staff in Model)
         {
             <tr>
-                <td>@user.FirstName</td>
-                <td>@user.LastName</td>
-                <td>@user.Username</td>
-                <td>@user.Role</td>
+                <td>@staff.FirstName</td>
+                <td>@staff.LastName</td>
+                <td>@staff.Username</td>
+                <td>@staff.Role</td>
             </tr>
         }
     </tbody>
