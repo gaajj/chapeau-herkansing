@@ -3,22 +3,24 @@ using Microsoft.Data.SqlClient;
 
 namespace ChapeauHerkansing.Repositories
 {
-  public class StaffRepository : IRepository
-  {
-    private readonly string _connectionString;
-
-    public StaffRepository(IConfiguration configuration)
+    public class StaffRepository : IRepository<Staff>
     {
-      _connectionString = configuration.GetConnectionString("ChapeauDatabase");
-    }
+        private readonly string _connectionString;
 
-    public List<Staff> GetAll()
-    {
-       List<Staff> users = new List<Staff>();
+        public StaffRepository(IConfiguration configuration)
+        {
+            _connectionString = configuration.GetConnectionString("ChapeauDatabase");
+        }
+
+        public List<Staff> GetAll()
+        { 
+
+
+        List<Staff> staffList = new List<Staff>(); 
 
       using (SqlConnection connection = new SqlConnection(_connectionString))
       {
-        string query = "SELECT iD, firstName, lastName, username, password, role FROM dbo.staff";
+        string query = "SELECT id, firstName, lastName, username, password, role, isDeleted FROM dbo.staff";
         SqlCommand command = new SqlCommand(query, connection);
 
         connection.Open();
@@ -26,14 +28,14 @@ namespace ChapeauHerkansing.Repositories
 
         while (reader.Read())
         {
-          Staff user = ReadUser(reader);
-          users.Add(user);
+          Staff staff = ReadTable(reader);
+          staffList.Add(staff);
         }
       }
-      return users;
+      return staffList;
     }
 
-    private Staff ReadUser(SqlDataReader reader) {
+    private Staff ReadTable(SqlDataReader reader) {
       int id = reader.GetInt32(0);
       string firstName = reader.GetString(1);
       string lastName = reader.GetString(2);
@@ -42,6 +44,6 @@ namespace ChapeauHerkansing.Repositories
       string role = reader.GetString(5);
 
       return new Staff(id, firstName, lastName, username, password, role);
-    }
+    } 
   }
 }

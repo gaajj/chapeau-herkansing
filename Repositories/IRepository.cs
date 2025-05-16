@@ -1,10 +1,11 @@
 using ChapeauHerkansing.Models;
+using Microsoft.Data.SqlClient;
 
-public interface IRepository
+public interface IRepository<T> where T : class
 {
-    List<Staff> GetAll();
-    // User? GetById(int id);
-    // void Add(User user);
-    // void Update(User user);
+    List<T> GetAll();
+    // T GetById(int id);
+    // void Add(T class);
+    // void Update(T class);
     // void Delete(int id);
 }
