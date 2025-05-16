@@ -1,8 +1,13 @@
+using ChapeauHerkansing.Models;
 using ChapeauHerkansing.Repositories;
-
+using Microsoft.AspNetCore.Identity;
+using BCrypt.Net;
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Configuration.AddEnvironmentVariables();
+
+builder.Services.AddSingleton<IPasswordHasher<User>, PasswordHasher<User>>();
+
+builder.Configuration.AddEnvironmentVari    ables();
 builder.Services.AddScoped<IUsersRepository, UsersRepository>();
 
 

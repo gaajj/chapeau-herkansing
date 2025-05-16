@@ -36,28 +36,20 @@ namespace ChapeauHerkansing.Repositories
             return userList;
         }
 
-        public User? GetByLoginCredentials(string username, string password)
+        public User? GetByUsername(string username)
         {
-            using (var connection = new SqlConnection(_connectionString))
-            {
-                string query = @"SELECT ID, firstName, lastName, username, password, role 
-                                 FROM dbo.staff 
-                                 WHERE username = @username AND password = @password";
-                SqlCommand command = new SqlCommand(query, connection);
-                command.Parameters.AddWithValue("@username", username);
-                command.Parameters.AddWithValue("@password", password);
-
-                connection.Open();
-                SqlDataReader reader = command.ExecuteReader();
-
-                if (reader.Read())
-                {
-                    return ReadUser(reader);
-                }
-            }
-
+            using var conn = new SqlConnection(_connectionString);
+            const string sql = @"SELECT ID, firstName, lastName, username, password, role
+                         FROM dbo.staff
+                         WHERE username = @username";
+            using var cmd = new SqlCommand(sql, conn);
+            cmd.Parameters.AddWithValue("@username", username);
+            conn.Open();
+            using var rdr = cmd.ExecuteReader();
+            if (rdr.Read()) return ReadUser(rdr);
             return null;
         }
+
 
         private User ReadUser(SqlDataReader reader)
         {
