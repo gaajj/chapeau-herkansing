@@ -8,7 +8,12 @@ builder.Configuration.AddEnvironmentVariables();
 builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<StaffRepository>();
 builder.Services.AddScoped<OrderRepository>();
+builder.Services.AddScoped<MenuItemRepository>();
+builder.Services.AddScoped<StockRepository>();
 builder.Services.AddScoped<MenuRepository>();
+builder.Services.AddScoped<StockService>();
+builder.Services.AddScoped<MenuService>();
+builder.Services.AddScoped<StaffService>();
 
 var app = builder.Build();
 

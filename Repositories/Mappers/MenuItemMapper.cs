@@ -10,17 +10,17 @@ namespace ChapeauHerkansing.Repositories.Mappers
         public static MenuItem FromReader(SqlDataReader reader)
         {
             return new MenuItem
-            {
-                MenuItemID = reader.GetInt32(reader.GetOrdinal("MenuItemID")),
-                Name = reader.GetString(reader.GetOrdinal("itemName")),
-                Price = reader.GetDecimal(reader.GetOrdinal("price")),
-                Category = ParseCategory(reader.GetString(reader.GetOrdinal("category"))),
-                IsAlcoholic = reader.GetBoolean(reader.GetOrdinal("isAlcoholic")),
-                IsDeleted = reader.IsDBNull(reader.GetOrdinal("isDeleted")) ? null : reader.GetBoolean(reader.GetOrdinal("isDeleted")),
-                StockID = reader.GetInt32(reader.GetOrdinal("stockId")),
-                StockAmount = reader.IsDBNull(reader.GetOrdinal("StockAmount")) ? null : reader.GetInt32(reader.GetOrdinal("StockAmount")),
-                MenuType = ParseMenuType(reader.GetString(reader.GetOrdinal("menuType")))
-            };
+            (
+                reader.GetInt32(reader.GetOrdinal("MenuItemID")),
+                reader.GetString(reader.GetOrdinal("itemName")),
+                reader.GetDecimal(reader.GetOrdinal("price")),
+                ParseCategory(reader.GetString(reader.GetOrdinal("category"))),
+                reader.GetBoolean(reader.GetOrdinal("isAlcoholic")),
+                reader.IsDBNull(reader.GetOrdinal("isDeleted")) ? null : reader.GetBoolean(reader.GetOrdinal("isDeleted")),
+                 reader.GetInt32(reader.GetOrdinal("stockId")),
+               reader.IsDBNull(reader.GetOrdinal("StockAmount")) ? null : reader.GetInt32(reader.GetOrdinal("StockAmount")),
+               ParseMenuType(reader.GetString(reader.GetOrdinal("menuType")))
+            );
         }
 
         private static MenuCategory ParseCategory(string category)

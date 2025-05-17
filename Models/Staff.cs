@@ -13,7 +13,7 @@ namespace ChapeauHerkansing.Models
         public Role Role { get; set; }
         public bool IsDeleted { get; set; }
 
-        public Staff(int id, string firstName, string lastName, string username, string password, string role)
+        public Staff(int id, string firstName, string lastName, string username, string password, Role role)
         {
             this.Id = id;
             this.FirstName = firstName;

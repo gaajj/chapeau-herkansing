@@ -1,4 +1,5 @@
 ﻿using ChapeauHerkansing.Models;
+using ChapeauHerkansing.Models.Enums;
 using Microsoft.Data.SqlClient;
 
 namespace ChapeauHerkansing.Repositories.Readers
@@ -13,8 +14,11 @@ namespace ChapeauHerkansing.Repositories.Readers
                 reader.GetString(reader.GetOrdinal("lastName")),
                 reader.GetString(reader.GetOrdinal("username")),
                 reader.GetString(reader.GetOrdinal("password")),
-                reader.GetString(reader.GetOrdinal("role"))
-            );
+               
+             Enum.TryParse<Role>(reader.GetString(reader.GetOrdinal("role")), out var parsedRole)
+                ? parsedRole
+                : throw new Exception($"Ongeldige rolwaarde in database: {reader.GetString(reader.GetOrdinal("role"))}"));
+            
         }
     }
 }
