@@ -5,18 +5,48 @@
 
 <h2 style="font-family:Tahoma; color:darkorange">Table Overview</h2>
 
-<div style="display: flex; flex-wrap: wrap; gap: 10px;">
+<!-- Ververs-knop -->
+<div style="margin-bottom:20px;">
+    <button type="button"
+            style="font-family:Tahoma; padding:8px 12px; background-color:#007bff; color:#fff; border:none; border-radius:4px; cursor:pointer;"
+            onclick="window.location.href='@Url.Action("Index", "TableOverview")'">
+        Refresh
+    </button>
+</div>
+
+<!-- Legenda -->
+<div style="font-family:Tahoma; margin-bottom: 20px;">
+    <span style="display:inline-flex; align-items:center; margin-right:15px;">
+        <span style="width:16px; height:16px; background-color: rgb(138, 210, 176); display:inline-block; margin-right:5px;"></span>
+        Free
+    </span>
+    <span style="display:inline-flex; align-items:center; margin-right:15px;">
+        <span style="width:16px; height:16px; background-color: rgb(255, 179, 71); display:inline-block; margin-right:5px;"></span>
+        Occupied
+    </span>
+    <span style="display:inline-flex; align-items:center; margin-right:15px;">
+        <span style="width:16px; height:16px; background-color: rgb(255, 128, 128); display:inline-block; margin-right:5px;"></span>
+        Reserved
+    </span>
+    <span style="display:inline-flex; align-items:center;">
+        <span style="width:16px; height:16px; background-color: rgb(196, 196, 196); display:inline-block; margin-right:5px;"></span>
+        Unknown
+    </span>
+</div>
+
+<div style="display: flex; flex-wrap: wrap; gap: 10px;" id="tableContainer">
     @foreach (var table in Model)
     {
         var color = table.Status switch
         {
-            ChapeauHerkansing.Models.TableStatus.Free => "background-color: rgb(138, 210, 176);",       // groen
-            ChapeauHerkansing.Models.TableStatus.Occupied => "background-color: rgb(255, 179, 71);",    // oranje
-            ChapeauHerkansing.Models.TableStatus.Reserved => "background-color: rgb(255, 128, 128);",   // rood
-            _ => "background-color: rgb(196, 196, 196);"                                                 // grijs als fallback
+            ChapeauHerkansing.Models.TableStatus.Free => "background-color: rgb(138, 210, 176);",
+            ChapeauHerkansing.Models.TableStatus.Occupied => "background-color: rgb(255, 179, 71);",
+            ChapeauHerkansing.Models.TableStatus.Reserved => "background-color: rgb(255, 128, 128);",
+            _ => "background-color: rgb(196, 196, 196);"
         };
 
-        <button style="width:100px; height:100px; font-family:Tahoma; font-weight:bold; @color" onclick="alert('Table @table.TableID clicked')">
+        <button style="width:100px; height:100px; font-family:Tahoma; font-weight:bold; @color"
+                onclick="alert('Table @table.TableID clicked')">
             Table @table.TableID
         </button>
     }
