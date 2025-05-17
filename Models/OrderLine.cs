@@ -10,7 +10,6 @@ namespace ChapeauHerkansing.Models
         public DateTime? OrderTime { get; set; }
         public string Note { get; set; }
 
-        // Basic Constructor
         public OrderLine(int orderLineID, Order order, MenuItem menuItem, Staff staff, int? amount, DateTime? orderTime, string note)
         {
             OrderLineID = orderLineID;

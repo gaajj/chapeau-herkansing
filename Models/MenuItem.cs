@@ -8,7 +8,6 @@ namespace ChapeauHerkansing.Models
         public string Category { get; set; }
         public bool IsAlcoholic { get; set; }
 
-        // Basic Constructor
         public MenuItem(int menuItemID, string name, decimal price, string category, bool isAlcoholic)
         {
             MenuItemID = menuItemID;

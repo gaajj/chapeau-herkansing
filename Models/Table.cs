@@ -7,7 +7,6 @@ namespace ChapeauHerkansing.Models
         public int? Seats { get; set; }
         public string? Status { get; set; }
 
-        // Basic Constructor
         public Table(int tableID, Staff? staff, int? seats, string? status)
         {
             TableID = tableID;

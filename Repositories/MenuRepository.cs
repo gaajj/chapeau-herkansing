@@ -1,4 +1,5 @@
 ﻿using ChapeauHerkansing.Models;
+using ChapeauHerkansing.Repositories.Readers;
 using Microsoft.Data.SqlClient;
 
 namespace ChapeauHerkansing.Repositories
@@ -17,14 +18,14 @@ namespace ChapeauHerkansing.Repositories
         {
             string query = @"
                 SELECT 
-                    m.id AS MenuID, 
-                    m.menuType AS Type,
-                    mi.id AS MenuItemID,
-                    mi.itemName AS Name,
-                    mi.price AS Price,
-                    mi.category AS Category,
-                    mi.isAlcoholic AS IsAlcoholic,
-                    s.amount AS StockAmount
+                    m.id AS menuID, 
+                    m.menuType,
+                    mi.id AS menuItemID,
+                    mi.itemName,
+                    mi.price,
+                    mi.category,
+                    mi.isAlcoholic,
+                    s.amount
                 FROM 
                     dbo.menu m
                 LEFT JOIN 
@@ -50,31 +51,20 @@ namespace ChapeauHerkansing.Repositories
 
         private Menu ReadMenuWithItems(SqlDataReader reader)
         {
-            int menuId = reader.GetInt32(reader.GetOrdinal("MenuID"));
-            string type = reader.GetString(reader.GetOrdinal("Type"));
+            int menuId = reader.GetInt32(reader.GetOrdinal("menuID"));
+            string type = reader.GetString(reader.GetOrdinal("menuType"));
             Menu menu = new Menu(menuId, type);
 
             do
             {
-                if (!reader.IsDBNull(reader.GetOrdinal("MenuItemID")))
+                if (!reader.IsDBNull(reader.GetOrdinal("menuItemID")))
                 {
-                    MenuItem menuItem = ReadMenuItem(reader);
+                    MenuItem menuItem = MenuItemReader.Read(reader);
                     menu.MenuItems.Add(menuItem);
                 }
-            } while (reader.Read() && reader.GetInt32(reader.GetOrdinal("MenuID")) == menuId);
+            } while (reader.Read() && reader.GetInt32(reader.GetOrdinal("menuID")) == menuId);
 
             return menu;
-        }
-
-        private MenuItem ReadMenuItem(SqlDataReader reader)
-        {
-            return new MenuItem(
-                reader.GetInt32(reader.GetOrdinal("MenuItemID")),
-                reader.GetString(reader.GetOrdinal("Name")),
-                reader.GetDecimal(reader.GetOrdinal("Price")),
-                reader.GetString(reader.GetOrdinal("Category")),
-                reader.GetBoolean(reader.GetOrdinal("IsAlcoholic"))
-                );
         }
     }
 }

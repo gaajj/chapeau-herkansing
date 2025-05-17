@@ -2,8 +2,8 @@
 
 <h2 class="text-center">Order Summary for Table @Model.Table.TableID</h2>
 
-<!-- Toggleable Menu Buttons (Form Submission) -->
 <div class="container mt-4" style="max-width: 800px;">
+    <!-- Menu Type Buttons -->
     <div class="d-flex justify-content-center mb-3">
         <form method="get" asp-action="Index" class="w-100">
             <input type="hidden" name="tableId" value="@Model.Table.TableID" />
@@ -15,18 +15,18 @@
         </form>
     </div>
 
-    <!-- Order Items (Styled like Menu Items) -->
+    <!-- Order Items -->
     <h3 class="text-center">Current Order</h3>
     <ul class="list-group">
         @foreach (OrderLine line in Model.OrderLines)
         {
             <li class="list-group-item d-flex justify-content-between align-items-center">
-                <!-- Amount (All the way left) -->
+                <!-- Amount -->
                 <div class="d-flex align-items-center me-3">
                     <span class="badge bg-primary rounded-pill me-2">@line.Amount</span>
                 </div>
 
-                <!-- Item Name and Note (Middle) -->
+                <!-- Item Name and Note -->
                 <div class="flex-grow-1 text-wrap me-3" style="min-width: 0;">
                     <div class="fw-bold">@line.MenuItem.Name</div>
                     @if (!string.IsNullOrEmpty(line.Note))
@@ -35,7 +35,7 @@
                     }
                 </div>
 
-                <!-- Edit Button (Only if Note) and Remove Button (Right) -->
+                <!-- Action Buttons -->
                 <div class="d-flex align-items-center">
                     @if (!string.IsNullOrEmpty(line.Note))
                     {

@@ -68,7 +68,7 @@ namespace ChapeauHerkansing.Repositories
 
         private void AddParameters(SqlCommand command, Dictionary<string, object>? parameters)
         {
-            if(parameters != null)
+            if (parameters != null)
             {
                 foreach (var param in parameters)
                 {

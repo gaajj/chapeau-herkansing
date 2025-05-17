@@ -8,7 +8,6 @@ namespace ChapeauHerkansing.Models
         public string PaymentMethod { get; set; }
         public decimal? Tip { get; set; }
 
-        // Basic Constructor
         public Payment(int paymentID, Order order, decimal? amountPaid, string paymentMethod, decimal? tip)
         {
             PaymentID = paymentID;
