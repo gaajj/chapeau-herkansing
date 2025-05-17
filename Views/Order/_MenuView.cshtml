@@ -1,27 +1,34 @@
 ﻿@model ChapeauHerkansing.Models.Menu
 
-<h3 class="text-center mb-3">@ViewData["MenuType"] Menu</h3>
-<ul class="list-group shadow-sm rounded">
-    @foreach (MenuItem item in Model.MenuItems)
+<div class="menu-categories mt-4">
+    @foreach (var categoryGroup in Model.MenuItems.GroupBy(i => i.Category))
     {
-        <li class="list-group-item d-flex justify-content-between align-items-center py-2 px-3">
-            <!-- Name and Alcoholic Tag -->
-            <div class="d-flex align-items-center flex-grow-1 text-wrap" style="min-width: 0;">
-                <span class="fw-bold me-2">@item.Name</span>
-                @if (item.IsAlcoholic)
+        <div class="category-section mb-4">
+            <h4 class="text-primary fw-bold text-capitalize">@categoryGroup.Key</h4>
+            <ul class="list-group shadow-sm rounded">
+                @foreach (MenuItem item in Model.MenuItems)
                 {
-                    <span class="badge bg-danger ms-2">Alcoholic</span>
-                }
-            </div>
+                    <li class="list-group-item d-flex justify-content-between align-items-center py-2 px-3">
+                        <!-- Name and Alcoholic Tag -->
+                        <div class="d-flex align-items-center flex-grow-1 text-wrap" style="min-width: 0;">
+                            <span class="fw-bold me-2">@item.Name</span>
+                            @if (item.IsAlcoholic)
+                            {
+                                <span class="badge bg-danger ms-2">Alcoholic</span>
+                            }
+                        </div>
 
-            <!-- Price and Add Button -->
-            <div class="d-flex align-items-center text-nowrap">
-                <span class="text-muted me-3">€ @item.Price.ToString("0.00")</span>
-                <form method="post" asp-action="AddMenuItemToOrder" class="d-inline">
-                    <input type="hidden" name="menuItemId" value="@item.MenuItemID" />
-                    <button type="submit" class="btn btn-success btn-sm">Add</button>
-                </form>
-            </div>
-        </li>
+                        <!-- Price and Add Button -->
+                        <div class="d-flex align-items-center text-nowrap">
+                            <span class="text-muted me-3">€ @item.Price.ToString("0.00")</span>
+                            <form method="post" asp-action="AddMenuItemToOrder" class="d-inline">
+                                <input type="hidden" name="menuItemId" value="@item.MenuItemID" />
+                                <button type="submit" class="btn btn-success btn-sm">Add</button>
+                            </form>
+                        </div>
+                    </li>
+                }
+            </ul>
+        </div>
     }
-</ul>
+</div>

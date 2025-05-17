@@ -1,37 +1,66 @@
-﻿@model ChapeauHerkansing.Models.Order
-@{
-    ViewData["Title"] = "Order and Menu";
-    var filteredMenu = ViewData["FilteredMenu"] as ChapeauHerkansing.Models.Menu;
-}
+﻿@model ChapeauHerkansing.Models.Order  
+@{  
+    Menu menu = (Menu)ViewData["Menu"];  
+    string category = (string)ViewData["Category"] ?? "";  
+    List<string> categories = (List<string>)ViewData["Categories"];  
+}  
 
-<h2 class="text-center">Order and Menu</h2>
+@if (menu == null)  
+{
+    <h2 class="text-center text-capitalize">@ViewData["Title"]</h2>
+}  
+else  
+{  
+    <h3 class="text-center mb-3">@ViewData["MenuType"] Menu</h3>  
+}  
 
-<div class="container mt-4" style="max-width: 800px;">
-    <!-- Toggleable Menu Buttons -->
-    <div class="d-flex justify-content-center mb-4">
-        <form method="get" asp-action="Index" class="w-100">
-            <input type="hidden" name="tableId" value="@Model.Table.TableID" />
-            <div class="btn-group w-100" role="group">
-                <button type="submit" name="menuType" value="lunch" class="btn btn-primary">Lunch</button>
-                <button type="submit" name="menuType" value="dinner" class="btn btn-primary">Dinner</button>
-                <button type="submit" name="menuType" value="drinks" class="btn btn-primary">Drinks</button>
-                @if (filteredMenu != null)
-                {
-                    <button type="submit" class="btn btn-secondary" name="menuType" value="">Back to Order</button>
-                }
+<div class="container mt-4" style="max-width: 800px;">  
+    <!-- Menu Buttons -->  
+    <div class="d-flex justify-content-center mb-4">  
+        <form method="get" asp-action="Index" class="w-100">  
+            <input type="hidden" name="tableId" value="@Model.Table.TableID" />  
+            <div class="btn-group w-100" role="group">  
+                <button type="submit" name="menuType" value="lunch" class="btn btn-primary">Lunch</button>  
+                <button type="submit" name="menuType" value="dinner" class="btn btn-primary">Dinner</button>  
+                <button type="submit" name="menuType" value="drinks" class="btn btn-primary">Drinks</button>  
+                @if (menu != null)  
+                {  
+                    <button type="submit" class="btn btn-secondary" name="menuType" value="">Back to Order</button>  
+                }  
             </div>
-        </form>
+        </form>  
     </div>
 
-    <!-- Content Section -->
+    <!-- Category Filter -->
+    @if (menu != null)
+    {
+        <form method="get" asp-action="Index" class="d-flex justify-content-center">
+            <input type="hidden" name="tableId" value="@Model.Table.TableID" />
+            <input type="hidden" name="menuType" value="@ViewData["MenuType"]" />
+            <select name="category" class="form-select w-auto" onchange="this.form.submit()">
+                <option value="">All Categories</option>
+                @foreach (string item in categories)
+                {
+                    <option value="@item" selected="@(category == item ? "selected" : null)">@item</option>
+                }
+            </select>
+        </form>
+    }
+
     <div id="contentSection">
-        @if (filteredMenu != null)
+        @if (menu == null)
         {
-            <partial name="_MenuView" model="filteredMenu" />
+            <partial name="_OrderView" />
+        }
+        else if (menu.MenuItems.Count > 0)
+        {
+            <partial name="_MenuView" model="menu" />
         }
         else
         {
-            <partial name="_OrderView" />
+            <div class="alert alert-warning text-center" role="alert">
+                No items available for the selected category.
+            </div>
         }
     </div>
 </div>

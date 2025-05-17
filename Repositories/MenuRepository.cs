@@ -8,13 +8,7 @@ namespace ChapeauHerkansing.Repositories
     {
         public MenuRepository(IConfiguration configuration) : base(configuration) { }
 
-        public List<Menu> GetAll()
-        {
-            List<Menu> menus = new List<Menu>();
-            return menus;
-        }
-
-        public Menu? GetFilteredMenu(string menuType)
+        public Menu? GetFilteredMenu(string menuType, string category = "")
         {
             string query = @"
                 SELECT 
@@ -36,6 +30,7 @@ namespace ChapeauHerkansing.Repositories
                     dbo.stock s ON s.id = mi.stockid
                 WHERE 
                     m.menuType = @MenuType 
+                    AND (@Category = '' OR mi.category = @Category)
                     AND mi.isDeleted = 0
                 ORDER BY 
                     mi.category, mi.itemName;
@@ -43,10 +38,26 @@ namespace ChapeauHerkansing.Repositories
 
             var parameters = new Dictionary<string, object>
             {
-                { "@MenuType", menuType }
+                { "@MenuType", menuType },
+                { "@Category", category }
             };
 
             return ExecuteQuery(query, ReadMenuWithItems, parameters).FirstOrDefault();
+        }
+
+        public List<string> GetAllCategories()
+        {
+            string query = @"
+                SELECT DISTINCT 
+                    mi.category
+                FROM 
+                    dbo.menuItems mi
+                WHERE 
+                    mi.isDeleted = 0
+                ORDER BY 
+                    mi.category;
+            ";
+            return ExecuteQuery(query, reader => reader.GetString(0));
         }
 
         private Menu ReadMenuWithItems(SqlDataReader reader)
