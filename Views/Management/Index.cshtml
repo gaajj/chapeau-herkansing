@@ -4,6 +4,16 @@
     ViewData["Title"] = "Manage Menu";
 }
 
+<ul class="nav nav-tabs mb-3">
+    <li class="nav-item">
+        <a class="nav-link active" asp-controller="Management" asp-action="Index">Menu</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" asp-controller="Staff" asp-action="Index">Employees</a>
+    </li>
+</ul>
+
+
 <h2>Manage Menu</h2>
 
 @if (TempData["Message"] != null)

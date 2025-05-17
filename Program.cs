@@ -6,7 +6,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Configuration.AddEnvironmentVariables();
 
 builder.Services.AddControllersWithViews();
-builder.Services.AddScoped<IStaffRepository, StaffRepository>();
+builder.Services.AddScoped<StaffRepository>();
+builder.Services.AddScoped<StaffService>();
 builder.Services.AddScoped<MenuItemRepository>();
 builder.Services.AddScoped<MenuService>();
 builder.Services.AddScoped<StockRepository>();
