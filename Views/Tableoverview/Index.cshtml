@@ -1,0 +1,142 @@
+﻿@model ChapeauHerkansing.Models.TableOverviewViewModel
+
+@{
+    ViewData["Title"] = "Table Overview";
+}
+
+<h2 style="font-family:Tahoma; color:darkorange">Table Overview</h2>
+
+@if (!string.IsNullOrEmpty(Model.ErrorMessage))
+{
+    <div style="color:red; font-family:Tahoma; font-weight:bold; margin-bottom:15px;">
+        @Model.ErrorMessage
+    </div>
+}
+
+<div style="margin-bottom:20px;">
+    <button type="button"
+            style="font-family:Tahoma; padding:8px 12px; background-color:#007bff; color:#fff; border:none; border-radius:4px; cursor:pointer;"
+            onclick="window.location.href='@Url.Action("Index", "TableOverview")'">
+        Refresh
+    </button>
+</div>
+
+<div style="font-family:Tahoma; margin-bottom:20px;">
+    <span style="display:inline-flex; align-items:center; margin-right:15px;">
+        <span style="width:16px; height:16px; background-color:#8AD2B0; display:inline-block; margin-right:5px;"></span>
+        Free
+    </span>
+    <span style="display:inline-flex; align-items:center; margin-right:15px;">
+        <span style="width:16px; height:16px; background-color:#FFB347; display:inline-block; margin-right:5px;"></span>
+        Occupied
+    </span>
+    <span style="display:inline-flex; align-items:center; margin-right:15px;">
+        <span style="width:16px; height:16px; background-color:#FF8080; display:inline-block; margin-right:5px;"></span>
+        Reserved
+    </span>
+</div>
+
+<div style="display:flex; flex-wrap:wrap; gap:10px;">
+    @foreach (var table in Model.Tables)
+    {
+        var color = table.Status switch
+        {
+            ChapeauHerkansing.Models.TableStatus.Free => "background-color:#8AD2B0;",
+            ChapeauHerkansing.Models.TableStatus.Occupied => "background-color:#FFB347;",
+            ChapeauHerkansing.Models.TableStatus.Reserved => "background-color:#FF8080;",
+            _ => "background-color:#C4C4C4;"
+        };
+        var ready = Model.ReadyOrderCounts.ContainsKey(table.TableID)
+        ? Model.ReadyOrderCounts[table.TableID]
+        : 0;
+        <div style="position:relative; text-align:center; width:100px;">
+            <button type="button"
+                    style="width:100px; height:100px; font-family:Tahoma; font-weight:bold; @color; border:none; border-radius:8px;"
+                    onclick="openStatusModal(@table.TableID, '@table.Status')">
+                Table @table.TableID
+                @if (ready > 0)
+                {
+                    <span style="position:absolute; top:-5px; right:-5px; background:red; color:white; border-radius:50%; padding:4px 8px; font-size:12px; font-family:Tahoma;">
+                        @ready
+                    </span>
+                }
+            </button>
+
+            <!-- Hier voegen we de dynamische order-statussen toe -->
+            <p style="font-family:Tahoma; font-size:12px; margin-top:6px; color:#333;">
+                Order status:
+                @{
+                    var statuses = Model.RunningOrderStatuses.ContainsKey(table.TableID)
+                    ? Model.RunningOrderStatuses[table.TableID]
+                    : new List<string>();
+                }
+                @if (statuses.Any())
+                {
+                    @string.Join(", ", statuses)
+                }
+                else
+                {
+                    <em>none</em>
+                }
+            </p>
+
+            @if (statuses.Contains("ready"))
+            {
+                <form asp-action="ServeOrders" method="post" style="margin-top:5px;">
+                    <input type="hidden" name="tableId" value="@table.TableID" />
+                    <button type="submit"
+                            style="background-color:#8AD2B0; border:none; padding:6px 8px; border-radius:6px; font-size:12px; font-family:Tahoma; cursor:pointer;">
+                        Mark as served
+                    </button>
+                </form>
+            }
+
+        </div>
+
+    }
+</div>
+
+<div id="statusModal" style="
+        display:none;
+        position:fixed;
+        top:0; left:0; right:0; bottom:0;
+        background:rgba(0,0,0,0.5);
+        align-items:center;
+        justify-content:center;
+    ">
+    <div style="
+            background:white;
+            padding:20px;
+            border-radius:8px;
+            width:280px;
+            font-family:Tahoma;
+        ">
+        <h3 style="margin-top:0;">Change Table Status</h3>
+        <form asp-controller="TableOverview" asp-action="SetTableStatus" method="post">
+            <input type="hidden" id="modalTableId" name="tableId" />
+            <div style="margin-bottom:15px;">
+                <label><input type="radio" name="newStatus" value="Free" /> Free</label><br />
+                <label><input type="radio" name="newStatus" value="Occupied" /> Occupied</label><br />
+                <label><input type="radio" name="newStatus" value="Reserved" /> Reserved</label>
+            </div>
+            <div style="text-align:right;">
+                <button type="button" onclick="closeStatusModal()" style="margin-right:10px; padding:6px 12px; font-family:Tahoma;">Cancel</button>
+                <button type="submit" style="padding:6px 12px; background:#007bff; color:white; border:none; border-radius:4px; font-family:Tahoma;">Save</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function openStatusModal(id, current) {
+            document.getElementById('modalTableId').value = id;
+            var radios = document.getElementsByName('newStatus');
+            radios.forEach(r => r.checked = r.value === current);
+            document.getElementById('statusModal').style.display = 'flex';
+        }
+        function closeStatusModal() {
+            document.getElementById('statusModal').style.display = 'none';
+        }
+    </script>
+}
