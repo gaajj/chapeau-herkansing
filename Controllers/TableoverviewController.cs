@@ -1,24 +1,59 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using ChapeauHerkansing.Repositories;
 using ChapeauHerkansing.Models;
+using ChapeauHerkansing.Repositories;
+using System.Linq;
 
 namespace ChapeauHerkansing.Controllers
 {
     public class TableOverviewController : Controller
     {
-        private readonly TableRepository _tableRepository;
-
-        // Constructor voor ophalen van repository via dependency injection
-        public TableOverviewController(TableRepository tableRepository)
+        private readonly TableRepository _tableRepo;
+        public TableOverviewController(TableRepository tableRepo)
         {
-            _tableRepository = tableRepository;
+            _tableRepo = tableRepo;
         }
 
-        // Haalt alle tafels op en toont deze in de view
+        [HttpGet]
         public IActionResult Index()
         {
-            List<Table> tables = _tableRepository.GetAllTables();
-            return View(tables);
+            var tables = _tableRepo.GetAllTables();
+            var counts = tables
+                .ToDictionary(t => t.TableID,
+                              t => _tableRepo.GetReadyOrdersCount(t.TableID));
+
+            var vm = new TableOverviewViewModel
+            {
+                Tables = tables,
+                ReadyOrderCounts = counts,
+                ErrorMessage = TempData["ErrorMessage"] as string
+            };
+            return View(vm);
         }
+
+        [HttpPost]
+        public IActionResult ServeOrders(int tableId)
+        {
+            _tableRepo.ServeOrdersForTable(tableId);
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost]
+        public IActionResult SetTableStatus(int tableId, string newStatus)
+        {
+            if (!Enum.TryParse<TableStatus>(newStatus, true, out var status))
+            {
+                TempData["ErrorMessage"] = "Invalid status.";
+                return RedirectToAction("Index");
+            }
+            if (status == TableStatus.Free && _tableRepo.HasUnfinishedOrders(tableId))
+            {
+                TempData["ErrorMessage"] = "Cannot free table with unfinished orders.";
+                return RedirectToAction("Index");
+            }
+            _tableRepo.UpdateTableStatus(tableId, status);
+            return RedirectToAction("Index");
+        }
+
+
     }
 }
