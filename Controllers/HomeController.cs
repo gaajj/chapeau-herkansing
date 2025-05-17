@@ -1,34 +1,35 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using ChapeauHerkansing.Models;
+using System.Collections.Generic;
 
-namespace ChapeauHerkansing.Controllers;
-
-public class HomeController : Controller
+namespace ChapeauHerkansing.Controllers
 {
-    private readonly ILogger<HomeController> _logger;
-   private readonly IRepository<Staff> _repo;
-
-    public HomeController(ILogger<HomeController> logger, IRepository<Staff> repo)
+    public class HomeController : Controller
     {
-        _logger = logger;
-        _repo = repo;
+        private readonly ILogger<HomeController> _logger;
+
+        public HomeController(ILogger<HomeController> logger)
+        {
+            _logger = logger;
+        }
+
+        public IActionResult Index()
+        {
+            return View(); // gewoon de homepagina zonder personeel
+        }
+
+        public IActionResult Privacy()
+        {
+            return View();
+        }
+
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        public IActionResult Error()
+        {
+            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        }
     }
 
-    public IActionResult Index()
-    {
-        var users = _repo.GetAll();
-        return View(users);
-    }
-
-    public IActionResult Privacy()
-    {
-        return View();
-    }
-
-    [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-    public IActionResult Error()
-    {
-        return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-    }
 }

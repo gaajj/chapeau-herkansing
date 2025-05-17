@@ -1,12 +1,12 @@
 using ChapeauHerkansing.Repositories;
-using ChapeauHerkansing.Models;
+using ChapeauHerkansing.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Configuration.AddEnvironmentVariables();
 
 builder.Services.AddControllersWithViews();
-builder.Services.AddScoped<IRepository<Staff>, StaffRepository>();
+builder.Services.AddScoped<StaffRepository>();
 builder.Services.AddScoped<OrderRepository>();
 builder.Services.AddScoped<MenuRepository>();
 
