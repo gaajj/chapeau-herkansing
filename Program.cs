@@ -7,7 +7,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddSingleton<IPasswordHasher<User>, PasswordHasher<User>>();
 
-builder.Configuration.AddEnvironmentVari    ables();
+builder.Configuration.AddEnvironmentVariables();
 builder.Services.AddScoped<IUsersRepository, UsersRepository>();
 
 
