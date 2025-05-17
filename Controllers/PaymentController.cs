@@ -18,7 +18,7 @@ namespace ChapeauHerkansing.Controllers
 
         public IActionResult Create(int orderId)
         {
-            var order = _orderRepo.GetAll().FirstOrDefault(o => o.OrderID == orderId);
+            var order = _orderRepo.GetAll().Last();
             if (order == null)
                 return NotFound();
 

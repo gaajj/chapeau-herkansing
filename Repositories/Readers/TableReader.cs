@@ -9,7 +9,7 @@ namespace ChapeauHerkansing.Repositories.Readers
         {
             return new Table(
                 reader.GetInt32(reader.GetOrdinal("tableId")),
-                StaffReader.Read(reader),
+              null,
                 reader.GetInt32(reader.GetOrdinal("seats")),
                 reader.GetString(reader.GetOrdinal("tableStatus"))
             );
