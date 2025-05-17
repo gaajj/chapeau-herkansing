@@ -21,11 +21,12 @@ namespace ChapeauHerkansing.Controllers
             {
                 Menu? menu = _menuRepository.GetFilteredMenu(menuType);
                 ViewData["MenuType"] = menuType;
-                return View("MenuView", menu);
+                ViewData["FilteredMenu"] = menu;
+                return View(_orderRepository.GetOrderByTable(tableId));
             }
 
             Order? order = _orderRepository.GetOrderByTable(tableId);
-            return View("OrderView", order);
+            return View(order);
         }
     }
 }
