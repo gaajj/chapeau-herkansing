@@ -12,23 +12,29 @@ namespace ChapeauHerkansing.Controllers
         {
             _tableRepo = tableRepo;
         }
-
         [HttpGet]
         public IActionResult Index()
         {
             var tables = _tableRepo.GetAllTables();
-            var counts = tables
-                .ToDictionary(t => t.TableID,
-                              t => _tableRepo.GetReadyOrdersCount(t.TableID));
+            var readyCounts = tables.ToDictionary(
+                t => t.TableID,
+                t => _tableRepo.GetReadyOrdersCount(t.TableID)
+            );
+            var statuses = tables.ToDictionary(
+                t => t.TableID,
+                t => _tableRepo.GetRunningOrderStatuses(t.TableID)
+            );
 
             var vm = new TableOverviewViewModel
             {
                 Tables = tables,
-                ReadyOrderCounts = counts,
+                ReadyOrderCounts = readyCounts,
+                RunningOrderStatuses = statuses,
                 ErrorMessage = TempData["ErrorMessage"] as string
             };
             return View(vm);
         }
+
 
         [HttpPost]
         public IActionResult ServeOrders(int tableId)
@@ -53,6 +59,8 @@ namespace ChapeauHerkansing.Controllers
             _tableRepo.UpdateTableStatus(tableId, status);
             return RedirectToAction("Index");
         }
+
+
 
 
     }

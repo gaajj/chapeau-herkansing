@@ -49,28 +49,38 @@
         var ready = Model.ReadyOrderCounts.ContainsKey(table.TableID)
         ? Model.ReadyOrderCounts[table.TableID]
         : 0;
-        <div>
+        <div style="position:relative; text-align:center; width:100px;">
             <button type="button"
-                    style="width:100px; height:100px; font-family:Tahoma; font-weight:bold; @color; border:none; border-radius:8px; position:relative;"
+                    style="width:100px; height:100px; font-family:Tahoma; font-weight:bold; @color; border:none; border-radius:8px;"
                     onclick="openStatusModal(@table.TableID, '@table.Status')">
                 Table @table.TableID
                 @if (ready > 0)
                 {
-                    <span style="
-                        position:absolute;
-                        top:-5px;
-                        right:-5px;
-                        background:red;
-                        color:white;
-                        border-radius:50%;
-                        padding:4px 8px;
-                        font-size:12px;
-                        font-family:Tahoma;">
+                    <span style="position:absolute; top:-5px; right:-5px; background:red; color:white; border-radius:50%; padding:4px 8px; font-size:12px; font-family:Tahoma;">
                         @ready
                     </span>
                 }
             </button>
+
+            <!-- Hier voegen we de dynamische order-statussen toe -->
+            <p style="font-family:Tahoma; font-size:12px; margin-top:6px; color:#333;">
+                Order status:
+                @{
+                    var statuses = Model.RunningOrderStatuses.ContainsKey(table.TableID)
+                    ? Model.RunningOrderStatuses[table.TableID]
+                    : new List<string>();
+                }
+                @if (statuses.Any())
+                {
+                    @string.Join(", ", statuses)
+                }
+                else
+                {
+                    <em>none</em>
+                }
+            </p>
         </div>
+
     }
 </div>
 

@@ -94,5 +94,26 @@ namespace ChapeauHerkansing.Repositories
             cmd.ExecuteNonQuery();
         }
 
+        public List<string> GetRunningOrderStatuses(int tableId)
+        {
+            const string sql = @"
+        SELECT DISTINCT ol.orderStatus
+          FROM dbo.orderLines ol
+          JOIN dbo.orders o ON ol.orderId = o.id
+         WHERE o.tableId      = @tableId
+           AND ol.orderStatus <> 'served'
+           AND ol.isDeleted   = 0";
+            using var conn = new SqlConnection(_connectionString);
+            using var cmd = new SqlCommand(sql, conn);
+            cmd.Parameters.AddWithValue("@tableId", tableId);
+            conn.Open();
+            using var reader = cmd.ExecuteReader();
+            var list = new List<string>();
+            while (reader.Read())
+                list.Add(reader.GetString(0));
+            return list;
+        }
+
+
     }
 }
