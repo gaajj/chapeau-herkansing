@@ -11,8 +11,9 @@ namespace ChapeauHerkansing.Repositories.Readers
                 reader.GetInt32(reader.GetOrdinal("tableId")),
               null,
                 reader.GetInt32(reader.GetOrdinal("seats")),
-                reader.GetString(reader.GetOrdinal("tableStatus"))
-            );
-        }
+                 Enum.Parse<TableStatus>(reader.GetString(reader.GetOrdinal("tableStatus")), true)); }
+          
+           
+        
     }
 }

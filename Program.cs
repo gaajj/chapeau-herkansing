@@ -22,7 +22,7 @@ builder.Services.AddScoped<StockService>();
 builder.Services.AddScoped<MenuService>();
 builder.Services.AddScoped<StaffService>();
 builder.Services.AddScoped<TableRepository>();
-builder.Services.AddScoped<IRepository, StaffRepository>();
+
 
 var app = builder.Build();
 
