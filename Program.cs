@@ -7,7 +7,8 @@ builder.Configuration.AddEnvironmentVariables();
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<IRepository<Staff>, StaffRepository>();
-builder.Services.AddScoped<IRepository<Order>, OrderRepository>();
+builder.Services.AddScoped<OrderRepository>();
+builder.Services.AddScoped<MenuRepository>();
 
 var app = builder.Build();
 
@@ -32,6 +33,6 @@ app.MapControllerRoute(
 app.MapControllerRoute(
     name: "Bar_Kitchen",
     pattern: "Bar/{action=Index}/{id?}",
-    defaults: new { controller = "Bar_Kitchen" });
+    defaults: new { controller = "Bar_Kitchen" });    
 
 app.Run();

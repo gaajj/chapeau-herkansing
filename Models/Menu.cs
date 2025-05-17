@@ -7,7 +7,6 @@ namespace ChapeauHerkansing.Models
 
         public List<MenuItem> MenuItems { get; set; } = new List<MenuItem>();
 
-        // Basic Constructor
         public Menu(int menuID, string type)
         {
             MenuID = menuID;

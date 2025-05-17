@@ -1,71 +1,123 @@
 ﻿using ChapeauHerkansing.Models;
+using ChapeauHerkansing.Repositories.Readers;
 using Microsoft.Data.SqlClient;
 
 namespace ChapeauHerkansing.Repositories
 {
-    public class OrderRepository : IRepository<Order>
+    public class OrderRepository : BaseRepository
     {
 
         private readonly string _connectionString;
 
-        public OrderRepository(IConfiguration configuration)
-        {
-            _connectionString = configuration.GetConnectionString("ChapeauDatabase");
-        }
+        public OrderRepository(IConfiguration configuration) : base(configuration) { }
 
         public List<Order> GetAll()
         {
-            List<Order> orders = new List<Order>();
-            Dictionary<int, Order> orderDictionary = new Dictionary<int, Order>();
+            string query = @"
+                SELECT
+                    o.id AS orderId,
+                    o.isDeleted,
+                    t.id AS tableId,
+                    t.seats,
+                    t.tableStatus,
+                    s.id AS staffId,
+                    s.firstName,
+                    s.lastName,
+                    s.username,
+                    s.password,
+                    s.role,
+                    ol.id AS orderLineId,
+                    ol.amount,
+                    ol.orderTime,
+                    ol.note,
+                    ol.orderStatus,
+                    mi.id AS menuItemId,
+                    mi.itemName,
+                    mi.price,
+                    mi.category,
+                    mi.isAlcoholic
+                FROM
+                    dbo.orders o
+                INNER JOIN
+                    dbo.tables t ON o.tableId = t.id
+                LEFT JOIN
+                    dbo.orderLines ol ON o.id = ol.orderId
+                LEFT JOIN
+                    dbo.menuItems mi ON ol.menuItemId = mi.id
+                LEFT JOIN
+                    dbo.staff s ON ol.staffId = s.id
+                WHERE
+                    o.isDeleted = 0
+                ORDER BY
+                    ol.orderTime;
+            ";
 
-            using (SqlConnection connection = new SqlConnection(_connectionString))
+            return ExecuteQuery(query, ReadOrderWithLines, null);
+        }
+
+        public Order? GetOrderByTable(int tableId)
+        {
+            string query = @"
+                SELECT
+                    o.id AS orderId,
+                    o.isDeleted,
+                    t.id AS tableId,
+                    t.seats,
+                    t.tableStatus,
+                    s.id AS staffId,
+                    s.firstName,
+                    s.lastName,
+                    s.username,
+                    s.password,
+                    s.role,
+                    ol.id AS orderLineId,
+                    ol.amount,
+                    ol.orderTime,
+                    ol.note,
+                    ol.orderStatus,
+                    mi.id AS menuItemId,
+                    mi.itemName,
+                    mi.price,
+                    mi.category,
+                    mi.isAlcoholic
+                FROM
+                    dbo.orders o
+                INNER JOIN
+                    dbo.tables t ON o.tableId = t.id
+                LEFT JOIN
+                    dbo.orderLines ol ON o.id = ol.orderId
+                LEFT JOIN
+                    dbo.menuItems mi ON ol.menuItemId = mi.id
+                LEFT JOIN
+                    dbo.staff s ON ol.staffId = s.id
+                WHERE
+                    o.tableId = @tableId AND o.isDeleted = 0
+                ORDER BY
+                    ol.orderTime;
+            ";
+
+            var parameters = new Dictionary<string, object>
             {
-                string query = "SELECT orders.id as orderId, orders.tableId, orders.isdeleted, orderLines.id as orderlineId, orderLines.amount, orderLines.ordertime, orderLines.note,orderlines.orderStatus, menuItems.id as menuItemId,  menuItems.itemName FROM dbo.orders LEFT JOIN  dbo.orderLines ON orders.id = orderLines.orderId LEFT JOIN dbo.menuItems ON orderLines.menuItemId = menuItems.id order by orderLines.ordertime;";
-                SqlCommand command = new SqlCommand(query, connection);
+                { "@tableId", tableId }
+            };
 
-                connection.Open();
-                SqlDataReader reader = command.ExecuteReader();
-
-                while (reader.Read())
-                {
-
-                    int orderId = reader.GetInt32(0);
-                    if (!orderDictionary.ContainsKey(orderId))
-                    {
-                        Order order = ReadOrder(reader);
-                        orderDictionary.Add(orderId, order);
-                    }
-
-                    if (!reader.IsDBNull(4))
-                    { orderDictionary[orderId].OrderLines.Add(ReadOrderLine(reader, orderDictionary[orderId])); }
-                }
-                orders = orderDictionary.Values.ToList();
-                foreach (Order order in orders)
-                {
-                    order.OrderLines = order.OrderLines.OrderBy(ol => ol.OrderTime).ToList();
-                }
-            }
-                return orders;
-           }
-        private Order ReadOrder(SqlDataReader reader)
-        {
-            int id = reader.GetInt32(0);
-            Table table = new Table(reader.GetInt32(1), null, null, null);
-            bool isdeleted = reader.GetBoolean(2);
-
-
-            return new Order(id, table, isdeleted);
+            return ExecuteQuery(query, ReadOrderWithLines, parameters).FirstOrDefault();
         }
 
-        private OrderLine ReadOrderLine(SqlDataReader reader, Order order)
+        private Order ReadOrderWithLines(SqlDataReader reader)
         {
-            int orderLineId = reader.GetInt32(3);
-            int amount = reader.GetInt32(4);
-            DateTime orderTime = reader.GetDateTime(5);
-            string note = reader.IsDBNull(6) ? null : reader.GetString(6);
-            string orderStatus = reader.GetString(7);
-            MenuItem menuItem = new MenuItem(reader.GetInt32(8), reader.GetString(9));
-            
-            return new OrderLine(orderLineId, order, menuItem, null, amount, orderTime, note);
+            Order order = OrderReader.Read(reader);
+
+            do
+            {
+                if (!reader.IsDBNull(reader.GetOrdinal("orderLineId")))
+                {
+                    OrderLine orderLine = OrderLineReader.Read(reader, order);
+                    order.OrderLines.Add(orderLine);
+                }
+            } while (reader.Read() && reader.GetInt32(reader.GetOrdinal("orderId")) == order.OrderID);
+
+            return order;
         }
-    } }
+    }
+}

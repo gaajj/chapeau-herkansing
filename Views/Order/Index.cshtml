@@ -1,0 +1,37 @@
+﻿@model ChapeauHerkansing.Models.Order
+@{
+    ViewData["Title"] = "Order and Menu";
+    var filteredMenu = ViewData["FilteredMenu"] as ChapeauHerkansing.Models.Menu;
+}
+
+<h2 class="text-center">Order and Menu</h2>
+
+<div class="container mt-4" style="max-width: 800px;">
+    <!-- Toggleable Menu Buttons -->
+    <div class="d-flex justify-content-center mb-4">
+        <form method="get" asp-action="Index" class="w-100">
+            <input type="hidden" name="tableId" value="@Model.Table.TableID" />
+            <div class="btn-group w-100" role="group">
+                <button type="submit" name="menuType" value="lunch" class="btn btn-primary">Lunch</button>
+                <button type="submit" name="menuType" value="dinner" class="btn btn-primary">Dinner</button>
+                <button type="submit" name="menuType" value="drinks" class="btn btn-primary">Drinks</button>
+                @if (filteredMenu != null)
+                {
+                    <button type="submit" class="btn btn-secondary" name="menuType" value="">Back to Order</button>
+                }
+            </div>
+        </form>
+    </div>
+
+    <!-- Content Section -->
+    <div id="contentSection">
+        @if (filteredMenu != null)
+        {
+            <partial name="_MenuView" model="filteredMenu" />
+        }
+        else
+        {
+            <partial name="_OrderView" />
+        }
+    </div>
+</div>
