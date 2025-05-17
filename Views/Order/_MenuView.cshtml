@@ -1,5 +1,7 @@
 ﻿@model ChapeauHerkansing.Models.Menu
 
+<h3 class="text-center mb-3 text-capitalize">@ViewData["MenuType"] Menu</h3>
+
 <div class="menu-categories mt-4">
     @foreach (var categoryGroup in Model.MenuItems.GroupBy(i => i.Category))
     {

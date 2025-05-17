@@ -17,15 +17,15 @@ namespace ChapeauHerkansing.Controllers
 
         public IActionResult Index(string menuType = "", int tableId = 2, string category = "")
         {
-            Order? order = _orderRepository.GetOrderByTable(tableId);
+            Order order = _orderRepository.GetOrderByTable(tableId) ?? new Order(0, new Table(tableId, null, null, null), false);
+            Menu? menu = null;
+            List<string> categories = _menuRepository.GetAllCategories();
 
             if (!string.IsNullOrEmpty(menuType))
             {
-                Menu? menu = _menuRepository.GetFilteredMenu(menuType, category);
+                menu = _menuRepository.GetFilteredMenu(menuType, category);
                 ViewData["MenuType"] = menuType;
-                ViewData["Menu"] = menu;
                 ViewData["Category"] = category;
-                ViewData["Categories"] = _menuRepository.GetAllCategories();
 
                 if (menu == null || (menu.MenuItems.Count == 0 && !string.IsNullOrEmpty(category)))
                 {
@@ -34,13 +34,11 @@ namespace ChapeauHerkansing.Controllers
                     ViewData["Menu"] = menu;
                 }
             }
-            else
-            {
-                ViewData["Menu"] = null;
-                ViewData["Categories"] = null;
-            }
 
+            ViewData["Menu"] = menu;
+            ViewData["Categories"] = categories;
             ViewData["Title"] = $"Order of Table #{tableId}";
+
             return View(order);
         }
     }
