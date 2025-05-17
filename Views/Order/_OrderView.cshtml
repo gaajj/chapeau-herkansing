@@ -1,5 +1,7 @@
 ﻿@model ChapeauHerkansing.Models.Order
 
+<h3 class="text-center mb-3">Order Summary</h3>
+
 <ul class="list-group">
     @foreach (OrderLine line in Model.OrderLines)
     {
@@ -9,12 +11,15 @@
                 <span class="badge bg-primary rounded-pill me-2">@line.Amount</span>
             </div>
 
-            <!-- Item Name and Note -->
+            <!-- Item Name, Note, and Price -->
             <div class="flex-grow-1 text-wrap me-3">
-                <div class="fw-bold">@line.MenuItem.Name</div>
+                <div class="fw-bold d-flex justify-content-between align-items-center">
+                    <span>@line.MenuItem.Name</span>
+                    <span class="text-muted">€ @(line.MenuItem.Price* line.Amount)</span>
+                </div>
                 @if (!string.IsNullOrEmpty(line.Note))
                 {
-                    <small class="text-muted">@line.Note</small>
+                    <small class="text-muted d-block">@line.Note</small>
                 }
             </div>
 
@@ -31,4 +36,16 @@
             </div>
         </li>
     }
+
+    <!-- Total Price and Pay Button -->
+    <li class="list-group-item d-flex justify-content-between align-items-center">
+        <strong>Total:</strong>
+        <strong class="text-primary">
+            € @(Model.OrderLines.Sum(line => (decimal)(line.MenuItem.Price * line.Amount)))
+        </strong>
+        <form method="post" asp-action="PayOrder" class="ms-3">
+            <input type="hidden" name="orderId" value="@Model.OrderID" />
+            <button type="submit" class="btn btn-success">Pay</button>
+        </form>
+    </li>
 </ul>
