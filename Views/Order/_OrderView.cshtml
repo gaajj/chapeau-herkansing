@@ -20,13 +20,10 @@
 
             <!-- Action Buttons -->
             <div class="d-flex align-items-center">
-                @if (!string.IsNullOrEmpty(line.Note))
-                {
-                    <form method="post" asp-action="EditOrderLine" class="d-inline me-2">
-                        <input type="hidden" name="orderLineId" value="@line.OrderLineID" />
-                        <button type="submit" class="btn btn-warning btn-sm">Edit</button>
-                    </form>
-                }
+                <form method="post" asp-action="EditOrderLineNote" class="d-inline me-2">
+                    <input type="hidden" name="orderLineId" value="@line.OrderLineID" />
+                    <button type="submit" class="btn btn-warning btn-sm">Edit Note</button>
+                </form>
                 <form method="post" asp-action="RemoveOrderLine" class="d-inline">
                     <input type="hidden" name="orderLineId" value="@line.OrderLineID" />
                     <button type="submit" class="btn btn-danger btn-sm">Remove</button>
