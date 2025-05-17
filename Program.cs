@@ -7,7 +7,7 @@ builder.Configuration.AddEnvironmentVariables();
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<IRepository<Staff>, StaffRepository>();
-builder.Services.AddScoped<IRepository<Order>, OrderRepository>();
+builder.Services.AddScoped<OrderRepository>();
 builder.Services.AddScoped<MenuRepository>();
 
 var app = builder.Build();

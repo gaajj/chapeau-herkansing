@@ -5,15 +5,15 @@ namespace ChapeauHerkansing.Models
         public int TableID { get; set; }
         public Staff? Staff { get; set; }
         public int? Seats { get; set; }
-        public bool? IsReserved { get; set; }
+        public string? Status { get; set; }
 
         // Basic Constructor
-        public Table(int tableID, Staff? staff, int? seats, bool? isReserved)
+        public Table(int tableID, Staff? staff, int? seats, string? status)
         {
             TableID = tableID;
             Staff = staff;
             Seats = seats;
-            IsReserved = isReserved;
+            Status = status;
         }
     }
 }

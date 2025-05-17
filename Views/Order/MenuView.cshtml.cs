@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace ChapeauHerkansing.Views.Order
 {
-    public class _MenuPartialModel : PageModel
+    public class MenuViewModel : PageModel
     {
         public void OnGet()
         {
