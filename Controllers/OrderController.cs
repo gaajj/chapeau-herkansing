@@ -1,5 +1,7 @@
 ﻿using ChapeauHerkansing.Models;
+using ChapeauHerkansing.Models.Enums;
 using ChapeauHerkansing.Repositories;
+using ChapeauHerkansing.ViewModels.Ordering;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ChapeauHerkansing.Controllers
@@ -24,22 +26,57 @@ namespace ChapeauHerkansing.Controllers
             if (!string.IsNullOrEmpty(menuType))
             {
                 menu = _menuRepository.GetFilteredMenu(menuType, category);
-                ViewData["MenuType"] = menuType;
-                ViewData["Category"] = category;
-
-                if (menu == null || (menu.MenuItems.Count == 0 && !string.IsNullOrEmpty(category)))
-                {
-                    // Force empty menu warning
-                    menu = new Menu(0, menuType);
-                    ViewData["Menu"] = menu;
-                }
             }
 
-            ViewData["Menu"] = menu;
-            ViewData["Categories"] = categories;
-            ViewData["Title"] = $"Order of Table #{tableId}";
+            var model = new MenuViewModel
+            {
+                Order = order,
+                Menu = menu,
+                Categories = categories,
+                SelectedCategory = category,
+                MenuType = menuType     
+            };
 
-            return View(order);
+            ViewData["Title"] = $"Order of table #{model.Order.Table.TableID}";
+            return View(model);
+        }
+
+        [HttpPost]
+        public IActionResult AddMenuItemToOrder(int orderId, int menuItemId, int amount)
+        {
+            Order order = _orderRepository.GetOrderById(orderId);
+            MenuItem menuItem = _menuRepository.GetMenuItemById(menuItemId);
+            Staff staff = new Staff(2, "", "", "", "", Role.Waiter);
+            try
+            {
+                OrderLine? existingLine = null;
+                
+                foreach (OrderLine line in order.OrderLines)
+                {
+                    if (line.MenuItem.MenuItemID == menuItemId)
+                    {
+                        existingLine = line;
+                        break;
+                    }
+                }
+
+                if (existingLine != null)
+                {
+                    _orderRepository.UpdateOrderLineAmount(existingLine.OrderLineID, existingLine.Amount + amount);
+                }
+                else
+                {
+                    _orderRepository.AddMenuItemToOrder(order, menuItem, staff, amount);
+                }
+
+                TempData["Message"] = "Menu item successfully added.";
+            }
+            catch
+            {
+                TempData["Error"] = "An error occurred while adding the menu item to the order.";
+            }
+
+            return RedirectToAction("Index", new { tableId = order.Table.TableID });
         }
     }
 }

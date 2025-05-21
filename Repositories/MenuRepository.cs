@@ -10,6 +10,32 @@ namespace ChapeauHerkansing.Repositories
     {
         public MenuRepository(IConfiguration configuration) : base(configuration) { }
 
+        public MenuItem GetMenuItemById(int menuItemId)
+        {
+            string query = @"
+                SELECT mi.id AS menuItemId,
+                mi.itemName,
+                mi.price,
+                mi.category,
+                mi.isAlcoholic,
+                mi.isDeleted,
+                s.id AS stockId,
+                s.amount
+                FROM
+                    menuItems mi
+                LEFT JOIN
+                    stock s ON mi.id = s.id
+                WHERE
+                    mi.id = @menuItemId;";
+
+            var parameters = new Dictionary<string, object>
+            {
+                { "@menuItemId", menuItemId }
+            };
+
+            return ExecuteSingle(query, MenuItemReader.Read, parameters);
+        }
+
         public Menu? GetFilteredMenu(string menuType, string category = "")
         {
             string query = @"
