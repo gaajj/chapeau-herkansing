@@ -2,6 +2,7 @@
 
 namespace ChapeauHerkansing.Repositories
 {
+
     public abstract class BaseRepository
     {
         private readonly string _connectionString;
@@ -16,6 +17,7 @@ namespace ChapeauHerkansing.Repositories
             return new SqlConnection(_connectionString);
         }
 
+
         protected void ExecuteNonQuery(string query, Dictionary<string, object>? paraments = null)
         {
             using (SqlConnection connection = GetConnection())
@@ -27,6 +29,13 @@ namespace ChapeauHerkansing.Repositories
                     command.ExecuteNonQuery();
                 }
             }
+        }
+
+
+       
+        protected SqlConnection CreateConnection()
+        {
+            return new SqlConnection(_connectionString);
         }
 
         protected T? ExecuteSingle<T>(string query, Func<SqlDataReader, T> mapFunction, Dictionary<string, object>? parameters = null) where T : class

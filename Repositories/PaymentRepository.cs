@@ -1,0 +1,47 @@
+﻿using ChapeauHerkansing.Models;
+using Microsoft.Data.SqlClient;
+
+namespace ChapeauHerkansing.Repositories
+{
+    public class PaymentRepository
+    {
+        private readonly string _connectionString;
+
+        public PaymentRepository(IConfiguration configuration)
+        {
+            _connectionString = configuration.GetConnectionString("ChapeauDatabase");
+        }
+
+        public void InsertPayment(Payment payment)
+        {
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(_connectionString))
+                {
+                    string query = @"
+                INSERT INTO payments (orderId, amountPaid, paymentMethod, tip, feedback)
+                VALUES (@orderId, @amountPaid, @paymentMethod, @tip, @feedback);";
+
+                    using (SqlCommand command = new SqlCommand(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@orderId", payment.Order.OrderID);
+                        command.Parameters.AddWithValue("@amountPaid", payment.AmountPaid ?? (object)DBNull.Value);
+                        command.Parameters.AddWithValue("@paymentMethod", payment.paymentMethodEnum.ToString());
+                        command.Parameters.AddWithValue("@tip", payment.Tip ?? (object)DBNull.Value);
+                        command.Parameters.AddWithValue("@feedback", payment.Feedback ?? (object)DBNull.Value);
+
+                        connection.Open();
+                        int result = command.ExecuteNonQuery();
+                        Console.WriteLine($"Insert uitgevoerd, rows affected: {result}");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("FOUT bij insert: " + ex.Message);
+            }
+        }
+
+
+    }
+}

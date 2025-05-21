@@ -1,14 +1,28 @@
-using ChapeauHerkansing.Repositories;
 using ChapeauHerkansing.Models;
+using ChapeauHerkansing.Repositories;
+using ChapeauHerkansing.Services;
 
+using Microsoft.AspNetCore.Identity;
+using BCrypt.Net;
 var builder = WebApplication.CreateBuilder(args);
 
+
+builder.Services.AddSingleton<IPasswordHasher<User>, PasswordHasher<User>>();
+
 builder.Configuration.AddEnvironmentVariables();
+builder.Services.AddScoped<IUsersRepository, UsersRepository>();
 
 builder.Services.AddControllersWithViews();
-builder.Services.AddScoped<IRepository<Staff>, StaffRepository>();
+builder.Services.AddScoped<StaffRepository>();
 builder.Services.AddScoped<OrderRepository>();
+builder.Services.AddScoped<MenuItemRepository>();
+builder.Services.AddScoped<StockRepository>();
 builder.Services.AddScoped<MenuRepository>();
+builder.Services.AddScoped<StockService>();
+builder.Services.AddScoped<MenuService>();
+builder.Services.AddScoped<StaffService>();
+builder.Services.AddScoped<TableRepository>();
+
 
 var app = builder.Build();
 
@@ -28,7 +42,7 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    pattern: "{controller=Login}/{action=Index}/{id?}");
 
 app.MapControllerRoute(
     name: "Bar_Kitchen",

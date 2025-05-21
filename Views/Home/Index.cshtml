@@ -1,30 +1,7 @@
-﻿@model IEnumerable<ChapeauHerkansing.Models.Staff>
-
-@{
-    ViewData["Title"] = "Users List";
+﻿@{
+    ViewData["Title"] = "Home";
 }
 
-<h1>@ViewData["Title"]</h1>
-
-<table class="table">
-    <thead>
-        <tr>
-            <th>First Name</th>
-            <th>Last Name</th>
-            <th>Username</th>
-            <th>Role</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (Staff staff in Model)
-        {
-            <tr>
-                <td>@staff.FirstName</td>
-                <td>@staff.LastName</td>
-                <td>@staff.Username</td>
-                <td>@staff.Role</td>
-            </tr>
-        }
-    </tbody>
-</table>
+<h1>Welkom bij Chapeau!</h1>
+<p>Selecteer een functie in het menu hierboven om te beginnen.</p>
 

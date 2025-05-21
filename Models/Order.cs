@@ -3,8 +3,8 @@ namespace ChapeauHerkansing.Models
     public class Order
     {
         public int OrderID { get; set; }
-        public Table Table { get; set; }
-
+        public Table? Table { get; set; }
+     
         public bool IsDeleted { get; set; }
         public List<OrderLine> OrderLines { get; set; } = new List<OrderLine>();
 
@@ -17,5 +17,8 @@ namespace ChapeauHerkansing.Models
 
             OrderLines = new List<OrderLine>();
         }
+
+        public Order() { }
+
     }
 }

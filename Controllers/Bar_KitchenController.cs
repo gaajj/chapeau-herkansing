@@ -1,13 +1,14 @@
 ﻿using ChapeauHerkansing.Models;
+using ChapeauHerkansing.Repositories;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ChapeauHerkansing.Controllers
 {
     public class Bar_KitchenController : Controller
     {
-      private readonly IRepository<Order> _orderRepository;
+      private readonly OrderRepository _orderRepository;
 
-        public Bar_KitchenController(IRepository<Order> orderRepository)
+        public Bar_KitchenController (OrderRepository orderRepository)
         {
             _orderRepository = orderRepository;
         }
