@@ -78,5 +78,29 @@ namespace ChapeauHerkansing.Controllers
 
             return RedirectToAction("Index", new { tableId = order.Table.TableID });
         }
+
+        [HttpPost]
+        public IActionResult RemoveOrderLine(OrderLineUpdateViewModel model)
+        {
+            try
+            {
+                if (model.Amount > 1)
+                {
+                    _orderRepository.UpdateOrderLineAmount(model.OrderLineId, model.Amount - 1);
+                }
+                else
+                {
+                    _orderRepository.RemoveOrderLine(model.OrderLineId);
+                }
+
+                TempData["Message"] = "Item removed from order.";
+            }
+            catch
+            {
+                TempData["Error"] = "An error occurred while removing the item.";
+            }
+
+            return RedirectToAction("Index", new { tableId = model.TableId });
+        }
     }
 }

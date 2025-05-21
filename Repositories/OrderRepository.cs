@@ -185,6 +185,21 @@ namespace ChapeauHerkansing.Repositories
             ExecuteNonQuery(query, parameters);
         }
 
+        public void RemoveOrderLine(int orderLineId)
+        {
+            string query = @"
+                DELETE FROM orderLines
+                WHERE id = @orderLineId;
+            ";
+
+            var parameters = new Dictionary<string, object>
+            {
+                { "@orderLineId", orderLineId }
+            };
+
+            ExecuteNonQuery(query, parameters);
+        }
+
         private Order ReadOrderWithLines(SqlDataReader reader)
         {
             Order order = OrderReader.Read(reader);

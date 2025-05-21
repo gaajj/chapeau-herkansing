@@ -30,7 +30,9 @@
                     <button type="submit" class="btn btn-warning btn-sm">Edit Note</button>
                 </form>
                 <form method="post" asp-action="RemoveOrderLine" class="d-inline">
-                    <input type="hidden" name="orderLineId" value="@line.OrderLineID" />
+                    <input type="hidden" name="OrderLineId" value="@line.OrderLineID" />
+                    <input type="hidden" name="Amount" value="@line.Amount" />
+                    <input type="hidden" name="TableId" value="@Model.Table.TableID" />
                     <button type="submit" class="btn btn-danger btn-sm">Remove</button>
                 </form>
             </div>
