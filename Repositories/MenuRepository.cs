@@ -2,6 +2,7 @@
 using ChapeauHerkansing.Repositories.Readers;
 using ChapeauHerkansing.Repositories.Mappers;
 using Microsoft.Data.SqlClient;
+using ChapeauHerkansing.Repositories.Readers.ChapeauHerkansing.Repositories.Readers;
 
 namespace ChapeauHerkansing.Repositories
 {
@@ -60,7 +61,7 @@ namespace ChapeauHerkansing.Repositories
             {
                 if (!reader.IsDBNull(reader.GetOrdinal("menuItemID")))
                 {
-                    MenuItem menuItem = MenuItemMapper.FromReader(reader);
+                    MenuItem menuItem = MenuItemReader.Read(reader);
                     menu.MenuItems.Add(menuItem);
                 }
             } while (reader.Read() && reader.GetInt32(reader.GetOrdinal("menuID")) == menuId);
