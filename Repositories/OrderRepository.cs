@@ -200,6 +200,23 @@ namespace ChapeauHerkansing.Repositories
             ExecuteNonQuery(query, parameters);
         }
 
+        public void UpdateOrderLineNote(int orderLineId, string note)
+        {
+            string query = @"
+                UPDATE orderLines
+                SET note = @note
+                WHERE id = @orderLineId;
+            ";
+
+            var parameters = new Dictionary<string, object>
+            {
+                { "@note", string.IsNullOrWhiteSpace(note) ? DBNull.Value : note },
+                { "@orderLineId", orderLineId }
+            };
+
+            ExecuteNonQuery(query, parameters);
+        }
+
         private Order ReadOrderWithLines(SqlDataReader reader)
         {
             Order order = OrderReader.Read(reader);

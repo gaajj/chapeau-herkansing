@@ -17,6 +17,7 @@ namespace ChapeauHerkansing.Controllers
             _orderRepository = orderRepository;
         }
 
+        // hard coded table for now
         public IActionResult Index(string menuType = "", int tableId = 2, string category = "")
         {
             Order order = _orderRepository.GetOrderByTable(tableId);
@@ -46,14 +47,14 @@ namespace ChapeauHerkansing.Controllers
         {
             Order order = _orderRepository.GetOrderById(orderId);
             MenuItem menuItem = _menuRepository.GetMenuItemById(menuItemId);
-            Staff staff = new Staff(2, "", "", "", "", Role.Waiter);
+            Staff staff = new Staff(2, "", "", "", "", Role.Waiter); // hard coded for now
             try
             {
                 OrderLine? existingLine = null;
                 
                 foreach (OrderLine line in order.OrderLines)
                 {
-                    if (line.MenuItem.MenuItemID == menuItemId)
+                    if (line.MenuItem.MenuItemID == menuItemId && string.IsNullOrWhiteSpace(line.Note))
                     {
                         existingLine = line;
                         break;
@@ -101,6 +102,22 @@ namespace ChapeauHerkansing.Controllers
             }
 
             return RedirectToAction("Index", new { tableId = model.TableId });
+        }
+
+        [HttpPost]
+        public IActionResult EditOrderLineNote(OrderLineNoteViewModel model)
+        {
+            try
+            {
+                _orderRepository.UpdateOrderLineNote(model.OrderLineId, model.Note);
+                TempData["Message"] = "Note updated.";
+            }
+            catch
+            {
+                TempData["Error"] = "Could not update the note.";
+            }
+
+            return RedirectToAction("Index", new { model.TableId});
         }
     }
 }
