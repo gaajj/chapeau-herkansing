@@ -17,7 +17,7 @@ namespace ChapeauHerkansing.Controllers
 
         public IActionResult Index(string menuType = "", int tableId = 2, string category = "")
         {
-            Order order = _orderRepository.GetOrderByTable(tableId) ?? new Order(0, new Table(tableId, null, null, null), false);
+            Order order = _orderRepository.GetOrderByTable(tableId);
             Menu? menu = null;
             List<string> categories = _menuRepository.GetAllCategories();
 

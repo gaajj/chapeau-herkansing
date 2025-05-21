@@ -55,7 +55,7 @@ namespace ChapeauHerkansing.Repositories
             return ExecuteQuery(query, ReadOrderWithLines, null);
         }
 
-        public Order? GetOrderByTable(int tableId)
+        public Order GetOrderByTable(int tableId)
         {
             string query = @"
                 SELECT
