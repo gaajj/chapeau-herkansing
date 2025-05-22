@@ -16,6 +16,7 @@ namespace ChapeauHerkansing.Repositories
                 SELECT
                     o.id AS orderId,
                     o.isDeleted,
+                    o.timeCreated,
                     t.id AS tableId,
                     t.seats,
                     t.tableStatus,
@@ -169,6 +170,7 @@ namespace ChapeauHerkansing.Repositories
                 { "@staffId", staff.Id },
                 { "@amount", amount }
             };
+        }
         public void ToggleOrderLineStatus(int orderLineId)
         {
             string query = @"
@@ -245,7 +247,7 @@ namespace ChapeauHerkansing.Repositories
             if (!dict.TryGetValue(orderId, out Order order))
             {
                 order = OrderReader.Read(reader);
-                order.OrderLines = new List<OrderLine>();
+                //order.OrderLines = new List<OrderLine>();
                 dict.Add(orderId, order);
             }
 

@@ -13,7 +13,7 @@ namespace ChapeauHerkansing.Models
         public string Note { get; set; }
         public OrderStatus OrderStatus { get; set; }
 
-        public OrderLine(int orderLineID, Order order, MenuItem menuItem, Staff staff, int? amount, DateTime? orderTime, string note, OrderStatus orderStatus)
+        public OrderLine(int orderLineID, Order order, MenuItem menuItem, Staff staff, int amount, DateTime? orderTime, string note, OrderStatus orderStatus)
         {
             OrderLineID = orderLineID;
             Order = order;
