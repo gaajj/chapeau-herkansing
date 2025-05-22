@@ -1,7 +1,7 @@
 ﻿@model List<ChapeauHerkansing.Models.Order>
 
 <div class="row">
-    @foreach (var order in Model)
+    @foreach (Order order in Model)
     {
         <div class="col-md-4 mb-3">
             <div class="card border-warning h-100">
@@ -11,7 +11,7 @@
                         Waiting time: <span class="time-display"></span>
                     </div>
                     <ul class="list-group">
-                        @foreach (var orderline in order.OrderLines)
+                        @foreach (OrderLine orderline in order.OrderLines)
                         {
                             <li class="list-group-item p-0">
                                 <label for="prep_@orderline.OrderLineID" class="d-flex justify-content-between align-items-center w-100 p-3 m-0">

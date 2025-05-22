@@ -1,4 +1,5 @@
 ﻿using ChapeauHerkansing.Models;
+using ChapeauHerkansing.Models.Enums;
 using ChapeauHerkansing.Repositories;
 using Microsoft.AspNetCore.Mvc;
 
@@ -20,9 +21,9 @@ namespace ChapeauHerkansing.Controllers
             return View("~/Views/Bar_Kitchen/Index.cshtml", orders);
         }
 
-        public IActionResult GetOrders()
+        public IActionResult GetOngoingOrders()
         {
-            var orders = _orderRepository.GetAll(); 
+            List<Order> orders = _orderRepository.GetAllNotReady(); 
             return PartialView("_OrdersPartial", orders);
         }
         [HttpPost]
@@ -31,8 +32,22 @@ namespace ChapeauHerkansing.Controllers
                 _orderRepository.ToggleOrderLineStatus(orderlineid);
             return Ok();
         }
-          
 
+        public IActionResult FinishedOrders()
+        {
+            
+
+            List<Order> orders = _orderRepository.GetAllReady();
+
+            return View("FinishedOrders", orders); 
         }
+        public IActionResult GetFinishedOrders()
+        {
+            List<Order> orders = _orderRepository.GetAllReady();
+            return PartialView("_OrdersPartial", orders);
+        }
+
+
+    }
     }
 

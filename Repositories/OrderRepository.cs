@@ -107,6 +107,98 @@ namespace ChapeauHerkansing.Repositories
             return orders;
         }
 
+        public List<Order> GetAllNotReady()
+        {
+            string query = @"
+                SELECT
+                    o.id AS orderId,
+                    o.isDeleted,
+                   o.timeCreated,
+                    t.id AS tableId,
+                    t.seats,
+                    t.tableStatus,
+                    s.id AS staffId,
+                    s.firstName,
+                    s.lastName,
+                    s.username,
+                    s.password,
+                    s.role,
+                    ol.id AS orderLineId,
+                    ol.amount,
+                    ol.orderTime,
+                    ol.note,
+                    ol.orderStatus,
+                    mi.id AS menuItemId,
+                    mi.itemName,
+                    mi.price,
+                    mi.category,
+                    mi.isAlcoholic
+                FROM
+                    dbo.orders o
+                INNER JOIN
+                    dbo.tables t ON o.tableId = t.id
+                inner JOIN
+                    dbo.orderLines ol ON o.id = ol.orderId
+                LEFT JOIN
+                    dbo.menuItems mi ON ol.menuItemId = mi.id
+                LEFT JOIN
+                    dbo.staff s ON ol.staffId = s.id
+                WHERE
+                    o.isDeleted = 0 and ol.orderStatus='BeingPrepared'
+                ORDER BY
+                    o.timeCreated;
+            ";
+
+            List<Order> orders = ExecuteGroupedQuery<Order>(query, MapOrderWithLines, null);
+            return orders;
+        }
+
+        public List<Order> GetAllReady()
+        {
+            string query = @"
+                SELECT
+                    o.id AS orderId,
+                    o.isDeleted,
+                   o.timeCreated,
+                    t.id AS tableId,
+                    t.seats,
+                    t.tableStatus,
+                    s.id AS staffId,
+                    s.firstName,
+                    s.lastName,
+                    s.username,
+                    s.password,
+                    s.role,
+                    ol.id AS orderLineId,
+                    ol.amount,
+                    ol.orderTime,
+                    ol.note,
+                    ol.orderStatus,
+                    mi.id AS menuItemId,
+                    mi.itemName,
+                    mi.price,
+                    mi.category,
+                    mi.isAlcoholic
+                FROM
+                    dbo.orders o
+                INNER JOIN
+                    dbo.tables t ON o.tableId = t.id
+                inner JOIN
+                    dbo.orderLines ol ON o.id = ol.orderId
+                LEFT JOIN
+                    dbo.menuItems mi ON ol.menuItemId = mi.id
+                LEFT JOIN
+                    dbo.staff s ON ol.staffId = s.id
+                WHERE
+                    o.isDeleted = 0 and ol.orderStatus='Ready'
+                ORDER BY
+                    o.timeCreated;
+            ";
+
+            List<Order> orders = ExecuteGroupedQuery<Order>(query, MapOrderWithLines, null);
+            return orders;
+        }
+
         public Order GetOrderByTable(int tableId)
         {
             string query = @"
