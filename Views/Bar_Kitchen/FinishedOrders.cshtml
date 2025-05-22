@@ -1,5 +1,5 @@
 ﻿@{
-    ViewData["Title"] = "Ongoing Bar/Kitchen Orders - Tile View";
+    ViewData["Title"] = "Finished bar/Kitchen Orders - Tile View";
 }
 @model List<ChapeauHerkansing.Models.Order>
 @Html.AntiForgeryToken()
@@ -7,14 +7,14 @@
 <div class="container mt-4 p-3 border border-primary rounded">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <img src="~/images/logo.png" alt="Chapeau" style="height: 50px;">
-        <h2 class="fw-bold text-center flex-grow-1">Ongoing Bar/Kitchen Orders</h2>
+        <h2 class="fw-bold text-center flex-grow-1">Finished bar/Kitchen Orders</h2>
         <div>
-            
+
             <button class="btn btn-warning">Mara</button>
             <button class="btn btn-outline-primary me-2" onclick="loadOrders()">Refresh</button>
         </div>
-        <a href="/Bar_Kitchen/FinishedOrders" class="btn btn-outline-success">Finished Orders</a>
-       
+        <a href="/Bar_Kitchen/Index" class="btn btn-outline-success">Ongoing Orders</a>
+
     </div>
 
     <div id="orders-container">
@@ -24,22 +24,22 @@
 </div>
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-     
+
         loadOrders();
         updateAllWaitingTimes();
 
-       
+
         setInterval(loadOrders, 15000);
-        
+
         setInterval(updateAllWaitingTimes, 1000);
     });
-    
+
     function loadOrders() {
-        fetch('/Bar_Kitchen/GetOngoingOrders')
+        fetch('/Bar_Kitchen/GetFinishedOrders')
             .then(response => response.text())
             .then(html => {
                 document.getElementById("orders-container").innerHTML = html;
-                updateAllWaitingTimes(); 
+                updateAllWaitingTimes();
             })
             .catch(error => console.error('Error fetching orders:', error));
     }
@@ -68,7 +68,7 @@
 
     window.toggleStatus = function (checkbox) {
         const orderLineId = checkbox.getAttribute("data-id");
-        
+
 
         fetch('/Bar_Kitchen/ToggleStatus' , {
             method: 'POST',
@@ -86,7 +86,7 @@
             })
             .catch(error => {
                 console.error("Error:", error);
-                checkbox.checked = !checkbox.checked; 
+                checkbox.checked = !checkbox.checked;
             });
     };
 </script>

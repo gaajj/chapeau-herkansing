@@ -2,6 +2,7 @@
 using ChapeauHerkansing.Repositories.Readers;
 using ChapeauHerkansing.Repositories.Mappers;
 using Microsoft.Data.SqlClient;
+using ChapeauHerkansing.Repositories.Readers.ChapeauHerkansing.Repositories.Readers;
 
 namespace ChapeauHerkansing.Repositories
 {
@@ -9,13 +10,33 @@ namespace ChapeauHerkansing.Repositories
     {
         public MenuRepository(IConfiguration configuration) : base(configuration) { }
 
-        public List<Menu> GetAll()
+        public MenuItem GetMenuItemById(int menuItemId)
         {
-            List<Menu> menus = new List<Menu>();
-            return menus;
+            string query = @"
+                SELECT mi.id AS menuItemId,
+                mi.itemName,
+                mi.price,
+                mi.category,
+                mi.isAlcoholic,
+                mi.isDeleted,
+                s.id AS stockId,
+                s.amount
+                FROM
+                    menuItems mi
+                LEFT JOIN
+                    stock s ON mi.id = s.id
+                WHERE
+                    mi.id = @menuItemId;";
+
+            var parameters = new Dictionary<string, object>
+            {
+                { "@menuItemId", menuItemId }
+            };
+
+            return ExecuteSingle(query, MenuItemReader.Read, parameters);
         }
 
-        public Menu? GetFilteredMenu(string menuType)
+        public Menu? GetFilteredMenu(string menuType, string category = "")
         {
             string query = @"
                 SELECT 
@@ -37,6 +58,7 @@ namespace ChapeauHerkansing.Repositories
                     dbo.stock s ON s.id = mi.stockid
                 WHERE 
                     m.menuType = @MenuType 
+                    AND (@Category = '' OR mi.category = @Category)
                     AND mi.isDeleted = 0
                 ORDER BY 
                     mi.category, mi.itemName;
@@ -44,10 +66,26 @@ namespace ChapeauHerkansing.Repositories
 
             var parameters = new Dictionary<string, object>
             {
-                { "@MenuType", menuType }
+                { "@MenuType", menuType },
+                { "@Category", category }
             };
 
             return ExecuteQuery(query, ReadMenuWithItems, parameters).FirstOrDefault();
+        }
+
+        public List<string> GetAllCategories()
+        {
+            string query = @"
+                SELECT DISTINCT 
+                    mi.category
+                FROM 
+                    dbo.menuItems mi
+                WHERE 
+                    mi.isDeleted = 0
+                ORDER BY 
+                    mi.category;
+            ";
+            return ExecuteQuery(query, reader => reader.GetString(0));
         }
 
         private Menu ReadMenuWithItems(SqlDataReader reader)
@@ -60,7 +98,7 @@ namespace ChapeauHerkansing.Repositories
             {
                 if (!reader.IsDBNull(reader.GetOrdinal("menuItemID")))
                 {
-                    MenuItem menuItem = MenuItemMapper.FromReader(reader);
+                    MenuItem menuItem = MenuItemReader.Read(reader);
                     menu.MenuItems.Add(menuItem);
                 }
             } while (reader.Read() && reader.GetInt32(reader.GetOrdinal("menuID")) == menuId);
