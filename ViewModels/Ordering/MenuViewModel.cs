@@ -8,6 +8,6 @@ namespace ChapeauHerkansing.ViewModels.Ordering
         public Order Order { get; set; }
         public Menu Menu { get; set; }
         public MenuCategory? SelectedCategory { get; set; }
-        public string MenuType { get; set; } = "";
+        public MenuType? MenuType { get; set; }
     }
 }
