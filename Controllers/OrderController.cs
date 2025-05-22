@@ -1,9 +1,11 @@
 ﻿using ChapeauHerkansing.Models;
 using ChapeauHerkansing.Repositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ChapeauHerkansing.Controllers
 {
+    [Authorize(Roles = "Waiter")]
     public class OrderController : Controller
     {
         private readonly MenuRepository _menuRepository;

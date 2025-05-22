@@ -2,9 +2,11 @@
 using ChapeauHerkansing.Models;
 using ChapeauHerkansing.Repositories;
 using System.Linq;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ChapeauHerkansing.Controllers
 {
+    [Authorize(Roles = "Waiter")]
     public class TableOverviewController : Controller
     {
         private readonly TableRepository _tableRepo;
