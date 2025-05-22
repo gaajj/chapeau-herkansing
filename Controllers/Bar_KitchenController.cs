@@ -18,7 +18,7 @@ namespace ChapeauHerkansing.Controllers
 
         public IActionResult Index()
         {
-            List<Order> orders = _orderRepository.GetAll();
+            List<Order> orders = _orderRepository.GetAllNotReady();
 
             return View("~/Views/Bar_Kitchen/Index.cshtml", orders);
         }
