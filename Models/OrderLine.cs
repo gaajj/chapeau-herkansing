@@ -1,3 +1,5 @@
+using ChapeauHerkansing.Models.Enums;
+
 namespace ChapeauHerkansing.Models
 {
     public class OrderLine
@@ -6,11 +8,12 @@ namespace ChapeauHerkansing.Models
         public Order Order { get; set; }
         public MenuItem MenuItem { get; set; }
         public Staff Staff { get; set; }
-        public int? Amount { get; set; }
+        public int Amount { get; set; }
         public DateTime? OrderTime { get; set; }
         public string Note { get; set; }
+        public OrderStatus OrderStatus { get; set; }
 
-        public OrderLine(int orderLineID, Order order, MenuItem menuItem, Staff staff, int? amount, DateTime? orderTime, string note)
+        public OrderLine(int orderLineID, Order order, MenuItem menuItem, Staff staff, int amount, DateTime? orderTime, string note, OrderStatus orderStatus)
         {
             OrderLineID = orderLineID;
             Order = order;
@@ -19,6 +22,7 @@ namespace ChapeauHerkansing.Models
             Amount = amount;
             OrderTime = orderTime;
             Note = note;
+            this.OrderStatus = orderStatus;
         }
     }
 }

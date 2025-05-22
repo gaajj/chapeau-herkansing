@@ -57,7 +57,7 @@ namespace ChapeauHerkansing.Repositories
         protected List<T> ExecuteQuery<T>(string query, Func<SqlDataReader, T> mapFunction, Dictionary<string, object>? parameters = null)
         {
             var results = new List<T>();
-            using (var connection = GetConnection())
+            using (SqlConnection connection = GetConnection())
             {
                 using (var command = new SqlCommand(query, connection))
                 {
@@ -73,6 +73,27 @@ namespace ChapeauHerkansing.Repositories
                 }
             }
             return results;
+        }
+
+        protected List<T> ExecuteGroupedQuery<T>(string query, Func<SqlDataReader, Dictionary<int, T>, T> mapFunction, Dictionary<string, object>? parameters = null)
+        {
+            Dictionary<int, T> grouped = new Dictionary<int, T>();
+
+            using (SqlConnection connection = GetConnection())
+            using (SqlCommand command = new SqlCommand(query, connection))
+            {
+                AddParameters(command, parameters);
+                connection.Open();
+                using (SqlDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        mapFunction(reader, grouped);
+                    }
+                }
+            }
+
+            return grouped.Values.ToList();
         }
 
         private void AddParameters(SqlCommand command, Dictionary<string, object>? parameters)
