@@ -1,6 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using ChapeauHerkansing.Models;
+﻿using ChapeauHerkansing.Models;
 using ChapeauHerkansing.Repositories;
+using Microsoft.AspNetCore.Mvc;
 
 namespace ChapeauHerkansing.Controllers
 {
@@ -8,62 +8,96 @@ namespace ChapeauHerkansing.Controllers
     {
         private readonly OrderRepository _orderRepo;
         private readonly PaymentRepository _paymentRepo;
+        private readonly TableRepository _tableRepo;
 
         public PaymentController(IConfiguration configuration)
         {
             _orderRepo = new OrderRepository(configuration);
             _paymentRepo = new PaymentRepository(configuration);
+            _tableRepo = new TableRepository(configuration);
         }
 
-
-        public IActionResult Create(int orderId)
+        [HttpGet]
+        public IActionResult Create(int? orderId)
         {
-            var order = _orderRepo.GetAll().Last();
-            if (order == null)
-                return NotFound();
+            ViewBag.Orders = _orderRepo.GetAll();
+            var payment = new Payment();
 
-            Payment payment = new Payment
-            {
-                Order = order
-            };
+            if (orderId.HasValue)
+                payment.Order = GetOrderById(orderId.Value);
 
             return View(payment);
         }
 
         [HttpPost]
-
-        public IActionResult Create(Payment payment)
+        public IActionResult Create(Payment payment, decimal totalPaid, decimal? tip, int? splitBetween)
         {
-            Console.WriteLine("POST aangeroepen");
+            ViewBag.Orders = _orderRepo.GetAll();
 
             if (!ModelState.IsValid)
-            {
-                Console.WriteLine("ModelState invalid!");
-                foreach (var e in ModelState)
-                {
-                    Console.WriteLine($"{e.Key}: {string.Join(", ", e.Value.Errors.Select(err => err.ErrorMessage))}");
-                }
                 return View(payment);
-            }
 
-            Console.WriteLine("OrderID ontvangen: " + payment.Order?.OrderID);
+            payment.Order = GetOrderById(payment.Order?.OrderID);
+            if (payment.Order == null) return NotFound();
 
-            var fullOrder = _orderRepo.GetAll().FirstOrDefault(o => o.OrderID == payment.Order.OrderID);
-            if (fullOrder == null)
-            {
-                Console.WriteLine("Order niet gevonden!");
-                return NotFound();
-            }
+            decimal totalAmount = GetTotalPrice(payment.Order);
+            SetPaymentValues(payment, totalPaid, tip, totalAmount);
 
-            payment.Order = fullOrder;
+            if (!IsValidPayment(payment, totalAmount))
+                return View(payment);
 
-            Console.WriteLine("Insert starten...");
-            _paymentRepo.InsertPayment(payment);
-            Console.WriteLine("Insert gedaan");
+            HandleSplit(splitBetween, payment.AmountPaid);
+            SaveAndFinalize(payment);
 
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("Index", "Tableoverview");
         }
 
 
+
+        private Order? GetOrderById(int? orderId)
+        {
+            return _orderRepo.GetAll().FirstOrDefault(o => o.OrderID == orderId);
+        }
+
+        private static decimal GetTotalPrice(Order order)
+        {
+            return order.OrderLines.Sum(ol => (ol.MenuItem?.Price ?? 0m) * (ol.Amount ?? 0m));
+        }
+
+        private void SetPaymentValues(Payment payment, decimal? totalPaid, decimal? tip, decimal total)
+        {
+            if (totalPaid.HasValue && totalPaid.Value >= total)
+            {
+                payment.AmountPaid = totalPaid.Value;
+                payment.Tip = totalPaid.Value - total;
+            }
+            else if (tip.HasValue)
+            {
+                payment.Tip = tip.Value;
+                payment.AmountPaid = total + tip.Value;
+            }
+        }
+
+        private bool IsValidPayment(Payment payment, decimal total)
+        {
+            if (payment.AmountPaid < total)
+            {
+                ModelState.AddModelError("AmountPaid", "Het betaalde bedrag mag niet lager zijn dan het totaal.");
+                return false;
+            }
+            return true;
+        }
+
+        private void HandleSplit(int? splitBetween, decimal total)
+        {
+            if (splitBetween.HasValue && splitBetween.Value > 1)
+                ViewBag.SplitAmount = Math.Round(total / splitBetween.Value, 2);
+        }
+
+        private void SaveAndFinalize(Payment payment)
+        {
+            _paymentRepo.InsertPayment(payment);
+            _tableRepo.SetTableFree(payment.Order.Table.TableID);
+        }
     }
 }

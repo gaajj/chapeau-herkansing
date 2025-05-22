@@ -25,10 +25,10 @@ namespace ChapeauHerkansing.Repositories
                     using (SqlCommand command = new SqlCommand(query, connection))
                     {
                         command.Parameters.AddWithValue("@orderId", payment.Order.OrderID);
-                        command.Parameters.AddWithValue("@amountPaid", payment.AmountPaid ?? (object)DBNull.Value);
+                        command.Parameters.AddWithValue("@amountPaid", payment.AmountPaid);
                         command.Parameters.AddWithValue("@paymentMethod", payment.paymentMethodEnum.ToString());
-                        command.Parameters.AddWithValue("@tip", payment.Tip ?? (object)DBNull.Value);
-                        command.Parameters.AddWithValue("@feedback", payment.Feedback ?? (object)DBNull.Value);
+                        command.Parameters.AddWithValue("@tip", payment.Tip);
+                        command.Parameters.AddWithValue("@feedback", payment.Feedback);
 
                         connection.Open();
                         int result = command.ExecuteNonQuery();
