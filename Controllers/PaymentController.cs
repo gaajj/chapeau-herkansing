@@ -21,7 +21,7 @@ namespace ChapeauHerkansing.Controllers
         public IActionResult Create(int? orderId)
         {
             ViewBag.Orders = _orderRepo.GetAll();
-            var payment = new Payment();
+            Payment payment = new Payment();
 
             if (orderId.HasValue)
                 payment.Order = GetOrderById(orderId.Value);

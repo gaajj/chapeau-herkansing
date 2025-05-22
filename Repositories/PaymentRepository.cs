@@ -28,7 +28,7 @@ namespace ChapeauHerkansing.Repositories
                         command.Parameters.AddWithValue("@amountPaid", payment.AmountPaid);
                         command.Parameters.AddWithValue("@paymentMethod", payment.paymentMethodEnum.ToString());
                         command.Parameters.AddWithValue("@tip", payment.Tip);
-                        command.Parameters.AddWithValue("@feedback", payment.Feedback);
+                        command.Parameters.AddWithValue("@feedback", payment.Feedback ?? (object)DBNull.Value);
 
                         connection.Open();
                         int result = command.ExecuteNonQuery();
