@@ -57,7 +57,6 @@ namespace ChapeauHerkansing.Controllers
         }
 
 
-
         [HttpPost] 
         public async Task<IActionResult> Logout()
         {
@@ -72,7 +71,7 @@ namespace ChapeauHerkansing.Controllers
             return role switch
             {
                 "Waiter" => RedirectToAction("Index", "TableOverview"),
-                "Bar" or "Kitchen" => RedirectToAction("Index", "Bar_Kitchen"),
+                "Barman" or "Chef" => RedirectToAction("Index", "Bar_Kitchen"),
                 "Manager" => RedirectToAction("Index", "Management"),
                 _ => RedirectToAction("Index", "Login")
             };
