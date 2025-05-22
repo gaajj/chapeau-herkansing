@@ -6,6 +6,8 @@ namespace ChapeauHerkansing.Repositories
 {
     public class OrderRepository : BaseRepository
     {
+
+
         public OrderRepository(IConfiguration configuration) : base(configuration) { }
 
         public Order GetOrderById(int orderId)
@@ -64,6 +66,7 @@ namespace ChapeauHerkansing.Repositories
                 SELECT
                     o.id AS orderId,
                     o.isDeleted,
+                   o.timeCreated,
                     t.id AS tableId,
                     t.seats,
                     t.tableStatus,
@@ -87,7 +90,7 @@ namespace ChapeauHerkansing.Repositories
                     dbo.orders o
                 INNER JOIN
                     dbo.tables t ON o.tableId = t.id
-                LEFT JOIN
+                inner JOIN
                     dbo.orderLines ol ON o.id = ol.orderId
                 LEFT JOIN
                     dbo.menuItems mi ON ol.menuItemId = mi.id
@@ -96,10 +99,11 @@ namespace ChapeauHerkansing.Repositories
                 WHERE
                     o.isDeleted = 0
                 ORDER BY
-                    ol.orderTime;
+                    o.timeCreated;
             ";
 
-            return ExecuteQuery(query, ReadOrderWithLines, null);
+            List<Order> orders = ExecuteGroupedQuery<Order>(query, MapOrderWithLines, null);
+            return orders;
         }
 
         public Order GetOrderByTable(int tableId)
@@ -108,6 +112,7 @@ namespace ChapeauHerkansing.Repositories
                 SELECT
                     o.id AS orderId,
                     o.isDeleted,
+                    o.timeCreated,
                     t.id AS tableId,
                     t.seats,
                     t.tableStatus,
@@ -164,6 +169,22 @@ namespace ChapeauHerkansing.Repositories
                 { "@staffId", staff.Id },
                 { "@amount", amount }
             };
+        public void ToggleOrderLineStatus(int orderLineId)
+        {
+            string query = @"
+        UPDATE orderLines
+        SET orderStatus = 
+            CASE 
+                WHEN orderStatus = 'Ready' THEN 'BeingPrepared'
+                ELSE 'Ready'
+            END
+        WHERE id = @orderLineId;
+    ";
+
+            var parameters = new Dictionary<string, object>
+    {
+        { "@orderLineId", orderLineId }
+    };
 
             ExecuteNonQuery(query, parameters);
         }
@@ -217,6 +238,26 @@ namespace ChapeauHerkansing.Repositories
             ExecuteNonQuery(query, parameters);
         }
 
+        private Order MapOrderWithLines(SqlDataReader reader, Dictionary<int, Order> dict)
+        {
+            int orderId = reader.GetInt32(reader.GetOrdinal("orderId"));
+
+            if (!dict.TryGetValue(orderId, out Order order))
+            {
+                order = OrderReader.Read(reader);
+                order.OrderLines = new List<OrderLine>();
+                dict.Add(orderId, order);
+            }
+
+            if (!reader.IsDBNull(reader.GetOrdinal("orderLineId")))
+            {
+                OrderLine line = OrderLineReader.Read(reader, order);
+                order.OrderLines.Add(line);
+            }
+
+            return order;
+        }
+        
         private Order ReadOrderWithLines(SqlDataReader reader)
         {
             Order order = OrderReader.Read(reader);

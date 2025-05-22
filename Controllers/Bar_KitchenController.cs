@@ -6,9 +6,9 @@ namespace ChapeauHerkansing.Controllers
 {
     public class Bar_KitchenController : Controller
     {
-      private readonly OrderRepository _orderRepository;
+        private readonly OrderRepository _orderRepository;
 
-        public Bar_KitchenController (OrderRepository orderRepository)
+        public Bar_KitchenController(OrderRepository orderRepository)
         {
             _orderRepository = orderRepository;
         }
@@ -19,5 +19,20 @@ namespace ChapeauHerkansing.Controllers
 
             return View("~/Views/Bar_Kitchen/Index.cshtml", orders);
         }
+
+        public IActionResult GetOrders()
+        {
+            var orders = _orderRepository.GetAll(); 
+            return PartialView("_OrdersPartial", orders);
+        }
+        [HttpPost]
+        public IActionResult ToggleStatus([FromBody]int orderlineid)
+        {
+                _orderRepository.ToggleOrderLineStatus(orderlineid);
+            return Ok();
+        }
+          
+
+        }
     }
-}
+

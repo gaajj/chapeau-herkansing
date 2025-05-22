@@ -1,4 +1,5 @@
 ﻿using ChapeauHerkansing.Models;
+using ChapeauHerkansing.Models.Enums;
 using ChapeauHerkansing.Repositories.Mappers;
 using ChapeauHerkansing.Repositories.Readers.ChapeauHerkansing.Repositories.Readers;
 using Microsoft.Data.SqlClient;
@@ -16,7 +17,9 @@ namespace ChapeauHerkansing.Repositories.Readers
                 StaffReader.Read(reader),
                 reader.GetInt32(reader.GetOrdinal("amount")),
                 reader.GetDateTime(reader.GetOrdinal("orderTime")),
-                reader.IsDBNull(reader.GetOrdinal("note")) ? null : reader.GetString(reader.GetOrdinal("note"))
+                reader.IsDBNull(reader.GetOrdinal("note")) ? null : reader.GetString(reader.GetOrdinal("note")),
+                Enum.Parse<OrderStatus>(reader.GetString(reader.GetOrdinal("orderStatus")), true)
+
             );
         }
     }
