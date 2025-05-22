@@ -27,6 +27,13 @@ namespace ChapeauHerkansing.Controllers
             if (!string.IsNullOrEmpty(menuType))
             {
                 menu = _menuRepository.GetFilteredMenu(menuType, category);
+                if (menu == null || (menu.MenuItems.Count == 0 && !string.IsNullOrEmpty(category)))
+                {
+                    menu = new Menu(0, menuType)
+                    {
+                        MenuItems = new List<MenuItem>()
+                    };
+                }
             }
 
             MenuViewModel model = new MenuViewModel
