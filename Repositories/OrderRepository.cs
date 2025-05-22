@@ -153,7 +153,7 @@ namespace ChapeauHerkansing.Repositories
             return orders;
         }
 
-        public List<Order> GetAllReady()
+        public List<Order> GetAllReady() // parameters toevoegen zodat het 1 query wordt
         {
             string query = @"
                 SELECT

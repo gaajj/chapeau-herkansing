@@ -3,10 +3,11 @@ using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using ChapeauHerkansing.Models;
+using ChapeauHerkansing.Models.Enums;
 
 namespace ChapeauHerkansing.Repositories
 {
-    public class TableRepository
+    public class TableRepository // base repo
     {
         private readonly string _connectionString;
         public TableRepository(IConfiguration config)
@@ -14,7 +15,7 @@ namespace ChapeauHerkansing.Repositories
             _connectionString = config.GetConnectionString("ChapeauDatabase");
         }
 
-        public List<Table> GetAllTables()
+        public List<Table> GetAllTables() // gebruik tablereader
         {
             var tables = new List<Table>();
             const string sql = @"
@@ -34,7 +35,7 @@ namespace ChapeauHerkansing.Repositories
             return tables;
         }
 
-        public int GetReadyOrdersCount(int tableId)
+        public int GetReadyOrdersCount(int tableId) // deleted and status parameters maken
         {
             const string sql = @"
                 SELECT COUNT(*)
@@ -114,7 +115,7 @@ namespace ChapeauHerkansing.Repositories
             return list;
         }
 
-        public void SetTableFree(int tableId)
+        public void SetTableFree(int tableId) // in de controller vrij zetten
         {
             UpdateTableStatus(tableId, TableStatus.Free);
         }

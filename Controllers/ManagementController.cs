@@ -18,6 +18,7 @@ namespace ChapeauHerkansing.Controllers
 
         public IActionResult Index(MenuType menuType = MenuType.Lunch, MenuCategory? category = null)
         {
+            // var mag niet
             var menuItems = _menuService.GetFilteredMenuItems(menuType, category, includeDeleted: true);
 
             var viewModel = new MenuManagementViewModel
@@ -46,7 +47,7 @@ namespace ChapeauHerkansing.Controllers
         public IActionResult Create(MenuItemCreateViewModel model)
         {
             if (!ModelState.IsValid)
-            {
+            { // alle teksten in het engels
                 TempData["Error"] = "Formulier is ongeldig. Controleer alle velden.";
                 return View(model);
             }

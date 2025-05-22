@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 
 // Interface voor tafelrepository
-public interface ITableRepository
+public interface ITableRepository // kan verwijderd worden
 {
     List<Table> GetAllTables();
 }

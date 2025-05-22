@@ -3,7 +3,7 @@ using Microsoft.Data.SqlClient;
 
 namespace ChapeauHerkansing.Repositories
 {
-    public class StockRepository
+    public class StockRepository // getstockamount moet getstock zijn en returnt stock
     {
         private readonly string _connectionString;
 
@@ -24,7 +24,7 @@ namespace ChapeauHerkansing.Repositories
             }
         }
 
-        public void UpdateStock(int menuItemId, int newAmount)
+        public void UpdateStock(int menuItemId, int newAmount) // stock kan bij menuitem
         {
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {

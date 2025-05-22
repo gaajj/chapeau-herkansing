@@ -12,7 +12,7 @@ namespace ChapeauHerkansing.Repositories
             _connectionString = configuration.GetConnectionString("ChapeauDatabase");
         }
 
-        public void InsertPayment(Payment payment)
+        public void InsertPayment(Payment payment) //  baserepo gebruiken
         {
             try
             {

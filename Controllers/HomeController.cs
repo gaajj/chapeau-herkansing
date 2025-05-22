@@ -11,7 +11,7 @@ namespace ChapeauHerkansing.Controllers
     {
         private readonly ILogger<HomeController> _logger;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger) // kan weg? 
         {
             _logger = logger;
         }
@@ -21,18 +21,13 @@ namespace ChapeauHerkansing.Controllers
             return View(); // gewoon de homepagina zonder personeel
         }
 
-        public IActionResult Privacy()
-        {
-            return View();
-        }
-
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
 
-        [AllowAnonymous]
+        [AllowAnonymous] // uitvinden wat het doet
         public IActionResult AccessDenied()
         {
             return View();

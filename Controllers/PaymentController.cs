@@ -19,7 +19,7 @@ namespace ChapeauHerkansing.Controllers
         {
             _orderRepo = new OrderRepository(configuration);
             _paymentRepo = new PaymentRepository(configuration);
-            _tableRepo = new TableRepository(configuration);
+            _tableRepo = new TableRepository(configuration); // table meegeven in de query 
         }
 
         [HttpGet]
@@ -35,7 +35,7 @@ namespace ChapeauHerkansing.Controllers
         }
 
         [HttpPost]
-        public IActionResult Create(Payment payment, decimal totalPaid, decimal? tip, int? splitBetween)
+        public IActionResult Create(Payment payment, decimal totalPaid, decimal? tip, int? splitBetween) // betere functie namen
         {
             ViewBag.Orders = _orderRepo.GetAll();
 
@@ -64,7 +64,7 @@ namespace ChapeauHerkansing.Controllers
             return _orderRepo.GetAll().FirstOrDefault(o => o.OrderID == orderId);
         }
 
-        private static decimal GetTotalPrice(Order order)
+        private static decimal GetTotalPrice(Order order)  // calculated property van maken
         {
             return order.OrderLines.Sum(ol => (ol.MenuItem?.Price ?? 0m) * (decimal?)ol.Amount ?? 0m);
         }
@@ -83,7 +83,7 @@ namespace ChapeauHerkansing.Controllers
             }
         }
 
-        private bool IsValidPayment(Payment payment, decimal total)
+        private bool IsValidPayment(Payment payment, decimal total) // try catch toevoegen
         {
             if (payment.AmountPaid < total)
             {

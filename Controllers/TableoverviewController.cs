@@ -3,6 +3,7 @@ using ChapeauHerkansing.Models;
 using ChapeauHerkansing.Repositories;
 using System.Linq;
 using Microsoft.AspNetCore.Authorization;
+using ChapeauHerkansing.Models.Enums;
 
 namespace ChapeauHerkansing.Controllers
 {

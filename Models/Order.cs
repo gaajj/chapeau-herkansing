@@ -24,7 +24,7 @@ namespace ChapeauHerkansing.Models
             Timecreated = timeCreated;
 
 
-            OrderLines = new List<OrderLine>();
+            OrderLines = new List<OrderLine>(); // 1 van de 2 kan weg 
         }
 
         public Order() { }

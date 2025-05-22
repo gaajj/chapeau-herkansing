@@ -12,7 +12,7 @@ namespace ChapeauHerkansing.Repositories
         {
         }
 
-        public List<Staff> GetAllStaff(bool includeDeleted = false)
+        public List<Staff> GetAllStaff(bool includeDeleted = false) // isdeleted aanpassen
         {
             List<Staff> staffList = new List<Staff>();
             SqlConnection connection = CreateConnection();

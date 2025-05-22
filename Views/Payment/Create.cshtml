@@ -3,7 +3,7 @@
 
 @{
     ViewData["Title"] = "Afrekenen";
-    decimal totaalBedrag = Model?.Order?.OrderLines.Sum(ol => (decimal)ol.MenuItem.Price * ol.Amount) ?? 0;
+    decimal totaalBedrag = Model?.Order?.OrderLines.Sum(ol => (decimal)ol.MenuItem.Price * ol.Amount) ?? 0; // zet in de controller, door geven view model
     string totaalBedragStr = totaalBedrag.ToString("F2", CultureInfo.InvariantCulture);
 }
 

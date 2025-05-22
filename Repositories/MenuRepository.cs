@@ -7,7 +7,7 @@ using ChapeauHerkansing.Models.Enums;
 
 namespace ChapeauHerkansing.Repositories
 {
-    public class MenuRepository : BaseRepository
+    public class MenuRepository : BaseRepository // geen hardcoded values in de repository (isDeleted)
     {
         public MenuRepository(IConfiguration configuration) : base(configuration) { }
 

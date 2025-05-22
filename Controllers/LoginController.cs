@@ -1,10 +1,8 @@
 ﻿// Controllers/LoginController.cs
-using Microsoft.AspNetCore.Mvc;
 using ChapeauHerkansing.Models;
-using ChapeauHerkansing.Repositories;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
 
@@ -25,6 +23,7 @@ namespace ChapeauHerkansing.Controllers
         {
             if (User.Identity.IsAuthenticated)
             {
+                // var aanpassen 
                 var role = User.FindFirst(ClaimTypes.Role)?.Value;
                 return RedirectBasedOnRole(role);
             }
@@ -40,8 +39,7 @@ namespace ChapeauHerkansing.Controllers
                 ViewBag.Error = "Please fill in an username and password.";
                 return View();
             }
-
-            var user = _userRepository.GetByUsername(input.Username);
+            User user = _userRepository.GetByUsername(input.Username);
             if (user == null || !BCrypt.Net.BCrypt.Verify(input.Password, user.Password))
             {
                 ViewBag.Error = "Invalid Credentials!";
@@ -62,7 +60,7 @@ namespace ChapeauHerkansing.Controllers
         }
 
 
-        [HttpPost] 
+        [HttpPost]
         public async Task<IActionResult> Logout()
         {
             // laat ASP.NET Core de auth-cookie verwijderen

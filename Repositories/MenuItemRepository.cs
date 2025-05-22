@@ -5,7 +5,7 @@ using ChapeauHerkansing.Models.Enums;
 using ChapeauHerkansing.ViewModels.Management;
 using ChapeauHerkansing.Repositories.Mappers;
 
-namespace ChapeauHerkansing.Repositories
+namespace ChapeauHerkansing.Repositories // verplaats naar menu repository
 {
     public class MenuItemRepository
     {

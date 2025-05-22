@@ -2,7 +2,7 @@
 
 namespace ChapeauHerkansing.Repositories
 {
-    public class MenuItemMenuRepository
+    public class MenuItemMenuRepository // kan verwijderd worden, verplaats naar menurepo
     {
         private readonly string _connectionString;
 
@@ -29,6 +29,7 @@ namespace ChapeauHerkansing.Repositories
                 cmd.Parameters.AddWithValue("@menuItemId", menuItemId);
                 cmd.ExecuteNonQuery();
             }
+            // catch
             finally
             {
                 if (!externalConnection)

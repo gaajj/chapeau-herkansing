@@ -27,7 +27,7 @@ namespace ChapeauHerkansing.Controllers
         }
 
         [HttpPost]
-        public IActionResult Create(StaffCreateViewModel model)
+        public IActionResult Create(StaffCreateViewModel model) // wachtwoord moet gehashed worden
         {
             if (!ModelState.IsValid)
             {
@@ -40,7 +40,7 @@ namespace ChapeauHerkansing.Controllers
             return RedirectToAction("Index");
         }
 
-        public IActionResult Edit(int id)
+        public IActionResult Edit(int id) // betere benamingen
         {
             var staff = _staffService.GetStaffById(id);
             if (staff == null)

@@ -41,9 +41,9 @@
     {
         var color = table.Status switch
         {
-            ChapeauHerkansing.Models.TableStatus.Free => "background-color:#8AD2B0;",
-            ChapeauHerkansing.Models.TableStatus.Occupied => "background-color:#FFB347;",
-            ChapeauHerkansing.Models.TableStatus.Reserved => "background-color:#FF8080;",
+            TableStatus.Free => "background-color:#8AD2B0;",
+            TableStatus.Occupied => "background-color:#FFB347;",
+            TableStatus.Reserved => "background-color:#FF8080;",
             _ => "background-color:#C4C4C4;"
         };
         var ready = Model.ReadyOrderCounts.ContainsKey(table.TableID)

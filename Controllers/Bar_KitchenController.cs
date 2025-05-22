@@ -1,5 +1,4 @@
 ﻿using ChapeauHerkansing.Models;
-using ChapeauHerkansing.Models.Enums;
 using ChapeauHerkansing.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -19,29 +18,30 @@ namespace ChapeauHerkansing.Controllers
         public IActionResult Index()
         {
             List<Order> orders = _orderRepository.GetAllNotReady();
-
+            // views op een andere manier ophalen
+            // view model
             return View("~/Views/Bar_Kitchen/Index.cshtml", orders);
         }
 
         public IActionResult GetOngoingOrders()
         {
-            List<Order> orders = _orderRepository.GetAllNotReady(); 
+            List<Order> orders = _orderRepository.GetAllNotReady();
             return PartialView("_OrdersPartial", orders);
         }
         [HttpPost]
-        public IActionResult ToggleStatus([FromBody]int orderlineid)
+        public IActionResult ToggleStatus([FromBody] int orderlineid)
         {
-                _orderRepository.ToggleOrderLineStatus(orderlineid);
+            _orderRepository.ToggleOrderLineStatus(orderlineid);
             return Ok();
         }
 
         public IActionResult FinishedOrders()
         {
-            
+
 
             List<Order> orders = _orderRepository.GetAllReady();
 
-            return View("FinishedOrders", orders); 
+            return View("FinishedOrders", orders);
         }
         public IActionResult GetFinishedOrders()
         {
@@ -51,5 +51,5 @@ namespace ChapeauHerkansing.Controllers
 
 
     }
-    }
+}
 
