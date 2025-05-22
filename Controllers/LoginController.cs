@@ -23,6 +23,11 @@ namespace ChapeauHerkansing.Controllers
         [HttpGet]
         public IActionResult Index()
         {
+            if (User.Identity.IsAuthenticated)
+            {
+                var role = User.FindFirst(ClaimTypes.Role)?.Value;
+                return RedirectBasedOnRole(role);
+            }
             return View();
         }
 
