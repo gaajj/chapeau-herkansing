@@ -1,10 +1,12 @@
 ﻿using ChapeauHerkansing.Models;
 using ChapeauHerkansing.Models.Enums;
 using ChapeauHerkansing.Repositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ChapeauHerkansing.Controllers
 {
+    [Authorize(Roles = "Barman,Chef")]
     public class Bar_KitchenController : Controller
     {
         private readonly OrderRepository _orderRepository;

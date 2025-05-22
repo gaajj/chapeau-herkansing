@@ -1,11 +1,13 @@
 ﻿using ChapeauHerkansing.Models;
 using ChapeauHerkansing.Models.Enums;
 using ChapeauHerkansing.Repositories;
+using Microsoft.AspNetCore.Authorization;
 using ChapeauHerkansing.ViewModels.Ordering;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ChapeauHerkansing.Controllers
 {
+    [Authorize(Roles = "Waiter")]
     public class OrderController : Controller
     {
         private readonly MenuRepository _menuRepository;
@@ -27,9 +29,16 @@ namespace ChapeauHerkansing.Controllers
             if (!string.IsNullOrEmpty(menuType))
             {
                 menu = _menuRepository.GetFilteredMenu(menuType, category);
+                if (menu == null || (menu.MenuItems.Count == 0 && !string.IsNullOrEmpty(category)))
+                {
+                    menu = new Menu(0, menuType)
+                    {
+                        MenuItems = new List<MenuItem>()
+                    };
+                }
             }
 
-            var model = new MenuViewModel
+            MenuViewModel model = new MenuViewModel
             {
                 Order = order,
                 Menu = menu,
@@ -43,10 +52,10 @@ namespace ChapeauHerkansing.Controllers
         }
 
         [HttpPost]
-        public IActionResult AddMenuItemToOrder(int orderId, int menuItemId, int amount)
+        public IActionResult AddMenuItemToOrder(MenuItemAddViewModel model)
         {
-            Order order = _orderRepository.GetOrderById(orderId);
-            MenuItem menuItem = _menuRepository.GetMenuItemById(menuItemId);
+            Order order = _orderRepository.GetOrderById(model.OrderId);
+            MenuItem menuItem = _menuRepository.GetMenuItemById(model.MenuItemId);
             Staff staff = new Staff(2, "", "", "", "", Role.Waiter); // hard coded for now
             try
             {
@@ -54,7 +63,7 @@ namespace ChapeauHerkansing.Controllers
                 
                 foreach (OrderLine line in order.OrderLines)
                 {
-                    if (line.MenuItem.MenuItemID == menuItemId && string.IsNullOrWhiteSpace(line.Note))
+                    if (line.MenuItem.MenuItemID == model.MenuItemId && string.IsNullOrWhiteSpace(line.Note))
                     {
                         existingLine = line;
                         break;
@@ -63,11 +72,11 @@ namespace ChapeauHerkansing.Controllers
 
                 if (existingLine != null)
                 {
-                    _orderRepository.UpdateOrderLineAmount(existingLine.OrderLineID, existingLine.Amount + amount);
+                    _orderRepository.UpdateOrderLineAmount(existingLine.OrderLineID, existingLine.Amount + model.Amount);
                 }
                 else
                 {
-                    _orderRepository.AddMenuItemToOrder(order, menuItem, staff, amount);
+                    _orderRepository.AddMenuItemToOrder(order, menuItem, staff, model.Amount);
                 }
 
                 TempData["Message"] = "Menu item successfully added.";

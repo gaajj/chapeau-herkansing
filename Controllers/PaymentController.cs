@@ -1,9 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ChapeauHerkansing.Models;
 using ChapeauHerkansing.Repositories;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ChapeauHerkansing.Controllers
 {
+    [Authorize(Roles = "Waiter")]
     public class PaymentController : Controller
     {
         private readonly OrderRepository _orderRepo;

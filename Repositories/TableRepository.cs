@@ -67,7 +67,7 @@ namespace ChapeauHerkansing.Repositories
             cmd.ExecuteNonQuery();
         }
 
-        public bool HasUnfinishedOrders(int tableId)
+        public bool HasUnfinishedOrders(int tableId) 
         {
             const string sql = @"
         SELECT COUNT(*) 
