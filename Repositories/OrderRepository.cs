@@ -262,6 +262,8 @@ namespace ChapeauHerkansing.Repositories
                 { "@staffId", staff.Id },
                 { "@amount", amount }
             };
+
+            ExecuteNonQuery(query, parameters);
         }
         public void ToggleOrderLineStatus(int orderLineId)
         {
