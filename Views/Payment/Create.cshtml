@@ -1,48 +1,148 @@
-﻿@model ChapeauHerkansing.Models.Payment;
+﻿@model ChapeauHerkansing.Models.Payment
+@using System.Globalization
 
 @{
     ViewData["Title"] = "Afrekenen";
+    decimal totaalBedrag = Model?.Order?.OrderLines.Sum(ol => (decimal)ol.MenuItem.Price * ol.Amount) ?? 0;
+    string totaalBedragStr = totaalBedrag.ToString("F2", CultureInfo.InvariantCulture);
 }
 
-<h2>Order #@Model.Order.OrderID – Afrekenen</h2>
+<h2 class="text-center my-4">🧾 Afrekenen</h2>
 
-<form asp-action="Create" method="post">
-    <input type="hidden" name="Order.OrderID" value="@Model.Order.OrderID" />
-
-
-    <div>
-        <h4>Bestelde Items</h4>
-        <ul>
-            @foreach (var item in Model.Order.OrderLines)
+<!-- Orderselectie dropdown -->
+<form asp-action="Create" method="get" class="mb-4" style="max-width: 600px; margin: auto;">
+    <div class="form-group">
+        <label for="orderId">Kies een order</label>
+        <select class="form-control" name="orderId" onchange="this.form.submit()">
+            <option value="">-- Selecteer een order --</option>
+            @foreach (var order in ViewBag.Orders)
             {
-                <li>@item.MenuItem.Name – @item.Amount x €@item.MenuItem.Price</li>
+                bool selected = Model?.Order?.OrderID == order.OrderID;
+                string tafel = order.Table?.TableID.ToString() ?? "onbekend";
+                <option value="@order.OrderID" selected="@(selected ? "selected" : null)">
+                     (Tafel @tafel)
+                </option>
             }
-        </ul>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="AmountPaid">Totaalbedrag betaald</label>
-        <input asp-for="AmountPaid" class="form-control" type="number" step="0.01" />
-    </div>
-
-    <div class="form-group">
-        <label asp-for="Tip">Fooi</label>
-        <input asp-for="Tip" class="form-control" type="number" step="0.01" />
-    </div>
-
-    <div class="form-group">
-        <label asp-for="paymentMethodEnum">Betaalmethode</label>
-        <select asp-for="paymentMethodEnum" class="form-control"
-                asp-items="Html.GetEnumSelectList<PaymentMethod>()">
-            <option value="">-- Kies methode --</option>
         </select>
     </div>
-
-    <div class="form-group">
-        <label asp-for="Feedback">Feedback</label>
-        <textarea asp-for="Feedback" class="form-control"></textarea>
-    </div>
-
-    <button type="submit" class="btn btn-success">Afrekenen</button>
-    <a asp-controller="Home" asp-action="Index" class="btn btn-secondary">Annuleren</a>
 </form>
+
+@if (Model?.Order != null)
+{
+    <div class="card shadow p-4 mb-5" style="max-width: 700px; margin: auto;">
+        <h4 class="mb-3">Order #@Model.Order.OrderID – Afrekenen</h4>
+
+        <!-- Bestelde items -->
+        <ul class="list-group mb-3">
+            @foreach (var item in Model.Order.OrderLines)
+            {
+                <li class="list-group-item">
+                    @item.MenuItem.Name – @item.Amount x €@item.MenuItem.Price
+                </li>
+            }
+        </ul>
+
+        <div class="alert alert-info">
+            💰 <strong>Totaal te betalen:</strong> €@totaalBedragStr 
+        </div>
+
+        <form asp-action="Create" method="post">
+            <input type="hidden" name="Order.OrderID" value="@Model.Order.OrderID" />
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label asp-for="AmountPaid">Totaalbedrag betaald</label>
+                    <input asp-for="AmountPaid" class="form-control" type="number" step="0.01"
+                           min="@totaalBedragStr" value="@totaalBedragStr" id="amountPaid"
+                           oninput="checkAmountPaid()" />
+                    <div class="invalid-feedback d-block" id="amountError" style="display:none; color:red;">
+                        Het betaalde bedrag mag niet lager zijn dan het totaalbedrag.
+                    </div>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Tip">Fooi</label>
+                    <input asp-for="Tip" class="form-control" type="number" step="0.01" />
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="paymentMethodEnum">Betaalmethode</label>
+                <select asp-for="paymentMethodEnum" class="form-control"
+                        asp-items="Html.GetEnumSelectList<ChapeauHerkansing.Models.PaymentMethod>()">
+                    <option value="">-- Kies methode --</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Feedback">Feedback (optioneel)</label>
+                <textarea asp-for="Feedback" class="form-control" rows="2"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="splitBetween">Split betaling (aantal personen)</label>
+                <input type="number" class="form-control" id="splitBetween" name="splitBetween" min="1"
+                       onchange="generateSplitFields(this.value)" />
+            </div>
+
+            <div id="splitFields" class="mb-3"></div>
+
+
+            @if (ViewBag.SplitAmount != null)
+            {
+                <div class="alert alert-warning">
+                    Elke persoon betaalt: <strong>€@ViewBag.SplitAmount</strong>
+                </div>
+            }
+
+            <div class="text-end">
+                <button type="submit" class="btn btn-success me-2">💾 Afrekenen</button>
+                <a asp-controller="Home" asp-action="Index" class="btn btn-secondary">Annuleren</a>
+            </div>
+        </form>
+    </div>
+}
+
+<script>
+    function checkAmountPaid() {
+        const input = document.getElementById("amountPaid");
+        const min = parseFloat(input.min.replace(',', '.'));
+        const val = parseFloat(input.value.replace(',', '.'));
+        const error = document.getElementById("amountError");
+
+        if (val < min) {
+            input.setCustomValidity("Ongeldig");
+            error.style.display = "block";
+        } else {
+            input.setCustomValidity("");
+            error.style.display = "none";
+        }
+    }
+
+    function generateSplitFields(count) {
+        const container = document.getElementById("splitFields");
+        container.innerHTML = "";
+        const number = parseInt(count);
+        if (isNaN(number) || number < 2) return;
+
+        for (let i = 1; i <= number; i++) {
+            const group = document.createElement("div");
+            group.className = "form-group mb-2";
+
+            const label = document.createElement("label");
+            label.textContent = `Bedrag persoon ${i}`;
+
+            const input = document.createElement("input");
+            input.type = "number";
+            input.step = "0.01";
+            input.className = "form-control";
+            input.name = `personAmount${i}`;
+
+            group.appendChild(label);
+            group.appendChild(input);
+            container.appendChild(group);
+        }
+    }
+
+    window.onload = checkAmountPaid;
+</script>

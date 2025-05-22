@@ -114,6 +114,12 @@ namespace ChapeauHerkansing.Repositories
             return list;
         }
 
+        public void SetTableFree(int tableId)
+        {
+            UpdateTableStatus(tableId, TableStatus.Free);
+        }
+
+
 
     }
 }
