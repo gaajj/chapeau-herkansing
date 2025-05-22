@@ -1,6 +1,7 @@
 using ChapeauHerkansing.Models;
 using ChapeauHerkansing.Repositories;
 using ChapeauHerkansing.Services;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 using Microsoft.AspNetCore.Identity;
 using BCrypt.Net;
@@ -23,6 +24,13 @@ builder.Services.AddScoped<MenuService>();
 builder.Services.AddScoped<StaffService>();
 builder.Services.AddScoped<TableRepository>();
 
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+        .AddCookie(opts =>
+        {
+    opts.LoginPath = "/Login/Index";
+    opts.AccessDeniedPath = "/Home/AccessDenied";
+        });
+
 
 var app = builder.Build();
 
@@ -37,7 +45,7 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
-
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllerRoute(

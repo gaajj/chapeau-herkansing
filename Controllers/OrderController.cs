@@ -1,11 +1,13 @@
 ﻿using ChapeauHerkansing.Models;
 using ChapeauHerkansing.Models.Enums;
 using ChapeauHerkansing.Repositories;
+using Microsoft.AspNetCore.Authorization;
 using ChapeauHerkansing.ViewModels.Ordering;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ChapeauHerkansing.Controllers
 {
+    [Authorize(Roles = "Waiter")]
     public class OrderController : Controller
     {
         private readonly MenuRepository _menuRepository;
