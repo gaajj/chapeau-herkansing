@@ -18,17 +18,17 @@ namespace ChapeauHerkansing.Controllers
         }
 
         // hard coded table for now
-        public IActionResult Index(string menuType = "", int tableId = 2, MenuCategory? category = null)
+        public IActionResult Index(MenuType? menuType = null, int tableId = 2, MenuCategory? category = null)
         {
             Order order = _orderRepository.GetOrderByTable(tableId);
             Menu? menu = null;
 
-            if (!string.IsNullOrEmpty(menuType))
+            if (menuType.HasValue)
             {
                 menu = _menuRepository.GetFilteredMenu(menuType, category);
                 if (menu == null || (menu.MenuItems.Count == 0 && category != null))
                 {
-                    menu = new Menu(0, menuType)
+                    menu = new Menu(0, menuType.Value)
                     {
                         MenuItems = new List<MenuItem>()
                     };
@@ -40,7 +40,7 @@ namespace ChapeauHerkansing.Controllers
                 Order = order,
                 Menu = menu,
                 SelectedCategory = category,
-                MenuType = menuType     
+                MenuType = menuType
             };
 
             ViewData["Title"] = $"Order of table #{model.Order.Table.TableID}";

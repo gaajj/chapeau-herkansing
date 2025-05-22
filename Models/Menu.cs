@@ -10,10 +10,10 @@ namespace ChapeauHerkansing.Models
 
         public List<MenuItem> MenuItems { get; set; } = new List<MenuItem>();
 
-        public Menu(int menuID, string type)
+        public Menu(int menuID, MenuType type)
         {
             MenuID = menuID;
-            Type = type;
+            MenuType = type;
         }
     }
 }

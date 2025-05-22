@@ -37,7 +37,7 @@ namespace ChapeauHerkansing.Repositories
             return ExecuteSingle(query, MenuItemReader.Read, parameters);
         }
 
-        public Menu? GetFilteredMenu(string menuType, MenuCategory? category = null)
+        public Menu? GetFilteredMenu(MenuType? menuType, MenuCategory? category = null)
         {
             string query = @"
                 SELECT 
@@ -67,7 +67,7 @@ namespace ChapeauHerkansing.Repositories
 
             var parameters = new Dictionary<string, object>
             {
-                { "@MenuType", menuType },
+                { "@MenuType", menuType.ToString() },
                 { "@Category", category.ToString() }
             };
 
@@ -92,8 +92,12 @@ namespace ChapeauHerkansing.Repositories
         private Menu ReadMenuWithItems(SqlDataReader reader)
         {
             int menuId = reader.GetInt32(reader.GetOrdinal("menuID"));
-            string type = reader.GetString(reader.GetOrdinal("menuType"));
-            Menu menu = new Menu(menuId, type);
+            string typeString = reader.GetString(reader.GetOrdinal("menuType"));
+            if (!Enum.TryParse(typeString, ignoreCase: true, out MenuType menuType))
+            {
+                throw new Exception($"Invalid menu type: {typeString}");
+            }
+            Menu menu = new Menu(menuId, menuType);
 
             do
             {
