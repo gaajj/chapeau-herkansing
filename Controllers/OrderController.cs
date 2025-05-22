@@ -20,16 +20,15 @@ namespace ChapeauHerkansing.Controllers
         }
 
         // hard coded table for now
-        public IActionResult Index(string menuType = "", int tableId = 2, string category = "")
+        public IActionResult Index(string menuType = "", int tableId = 2, MenuCategory? category = null)
         {
             Order order = _orderRepository.GetOrderByTable(tableId);
             Menu? menu = null;
-            List<string> categories = _menuRepository.GetAllCategories();
 
             if (!string.IsNullOrEmpty(menuType))
             {
                 menu = _menuRepository.GetFilteredMenu(menuType, category);
-                if (menu == null || (menu.MenuItems.Count == 0 && !string.IsNullOrEmpty(category)))
+                if (menu == null || (menu.MenuItems.Count == 0 && category != null))
                 {
                     menu = new Menu(0, menuType)
                     {
@@ -42,7 +41,6 @@ namespace ChapeauHerkansing.Controllers
             {
                 Order = order,
                 Menu = menu,
-                Categories = categories,
                 SelectedCategory = category,
                 MenuType = menuType     
             };

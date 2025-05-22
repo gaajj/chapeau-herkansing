@@ -12,16 +12,23 @@
             </div>
 
             <!-- Item Name, Note, and Price -->
-            <div class="flex-grow-1 text-wrap me-3">
-                <div class="fw-bold d-flex justify-content-between align-items-center">
-                    <span>@line.MenuItem.Name</span>
-                    <span class="text-muted">€ @(line.MenuItem.Price* line.Amount)</span>
+            <div class="flex-grow-1 me-3">
+                <div class="fw-bold d-flex justify-content-between">
+                    <div class="d-flex align-items-center">
+                        <span>@line.MenuItem.Name</span>
+                        @if (line.MenuItem.IsAlcoholic)
+                        {
+                            <span class="badge bg-danger ms-2">Alcoholic</span>
+                        }
+                    </div>
+                    <span class="text-muted">€ @(line.MenuItem.Price * line.Amount)</span>
                 </div>
                 @if (!string.IsNullOrEmpty(line.Note))
                 {
-                    <small class="text-muted d-block">@line.Note</small>
+                    <small class="text-muted">@line.Note</small>
                 }
             </div>
+
 
             <!-- Action Buttons -->
             <div class="d-flex align-items-center">

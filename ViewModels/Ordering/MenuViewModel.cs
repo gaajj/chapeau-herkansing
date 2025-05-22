@@ -1,4 +1,5 @@
 ﻿using ChapeauHerkansing.Models;
+using ChapeauHerkansing.Models.Enums;
 
 namespace ChapeauHerkansing.ViewModels.Ordering
 {
@@ -6,8 +7,7 @@ namespace ChapeauHerkansing.ViewModels.Ordering
     {
         public Order Order { get; set; }
         public Menu Menu { get; set; }
-        public List<string> Categories { get; set; } = new();
-        public string SelectedCategory { get; set; } = "";
+        public MenuCategory? SelectedCategory { get; set; }
         public string MenuType { get; set; } = "";
     }
 }
