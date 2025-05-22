@@ -54,7 +54,7 @@ namespace ChapeauHerkansing.Repositories
                 { "@orderId", orderId }
             };
 
-            return ExecuteQuery(query, ReadOrderWithLines, parameters).FirstOrDefault();
+            return ExecuteSingle(query, ReadOrderWithLines, parameters);
         }
 
 
