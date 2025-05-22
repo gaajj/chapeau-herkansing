@@ -43,9 +43,9 @@
             <input type="hidden" name="menuType" value="@Model.MenuType" />
             <select name="category" class="form-select w-auto" onchange="this.form.submit()">
                 <option value="">All Categories</option>
-                @foreach (string item in Model.Categories)
+                @foreach (MenuCategory category in Enum.GetValues(typeof(MenuCategory)))
                 {
-                    <option value="@item" selected="@(Model.SelectedCategory == item ? "selected" : null)">@item</option>
+                    <option value="@category" selected="@(Model.SelectedCategory == category ? "selected" : null)">@category</option>
                 }
             </select>
         </form>

@@ -3,6 +3,7 @@ using ChapeauHerkansing.Repositories.Readers;
 using ChapeauHerkansing.Repositories.Mappers;
 using Microsoft.Data.SqlClient;
 using ChapeauHerkansing.Repositories.Readers.ChapeauHerkansing.Repositories.Readers;
+using ChapeauHerkansing.Models.Enums;
 
 namespace ChapeauHerkansing.Repositories
 {
@@ -36,7 +37,7 @@ namespace ChapeauHerkansing.Repositories
             return ExecuteSingle(query, MenuItemReader.Read, parameters);
         }
 
-        public Menu? GetFilteredMenu(string menuType, string category = "")
+        public Menu? GetFilteredMenu(string menuType, MenuCategory? category = null)
         {
             string query = @"
                 SELECT 
@@ -67,7 +68,7 @@ namespace ChapeauHerkansing.Repositories
             var parameters = new Dictionary<string, object>
             {
                 { "@MenuType", menuType },
-                { "@Category", category }
+                { "@Category", category.ToString() }
             };
 
             return ExecuteQuery(query, ReadMenuWithItems, parameters).FirstOrDefault();
