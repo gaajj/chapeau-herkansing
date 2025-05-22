@@ -1,6 +1,10 @@
 ﻿using ChapeauHerkansing.Models;
 using ChapeauHerkansing.Repositories;
+
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
+
+
 
 namespace ChapeauHerkansing.Controllers
 {
@@ -62,7 +66,7 @@ namespace ChapeauHerkansing.Controllers
 
         private static decimal GetTotalPrice(Order order)
         {
-            return order.OrderLines.Sum(ol => (ol.MenuItem?.Price ?? 0m) * (ol.Amount ?? 0m));
+            return order.OrderLines.Sum(ol => (ol.MenuItem?.Price ?? 0m) * (decimal?)ol.Amount ?? 0m);
         }
 
         private void SetPaymentValues(Payment payment, decimal? totalPaid, decimal? tip, decimal total)
