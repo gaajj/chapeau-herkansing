@@ -1,11 +1,15 @@
+using ChapeauHerkansing.Models.Enums;
+
 namespace ChapeauHerkansing.Models
 {
     public class Menu
     {
         public int MenuID { get; set; }
         public string Type { get; set; }
+        public MenuType MenuType { get; set; }
 
-        // Basic Constructor
+        public List<MenuItem> MenuItems { get; set; } = new List<MenuItem>();
+
         public Menu(int menuID, string type)
         {
             MenuID = menuID;
@@ -13,4 +17,3 @@ namespace ChapeauHerkansing.Models
         }
     }
 }
-

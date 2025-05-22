@@ -9,6 +9,9 @@ namespace ChapeauHerkansing.Models
         public string Password { get; set; }
         public string Role { get; set; }
 
+        public User() { }
+
+
         public User(int id, string firstName, string lastName, string username, string password, string role) {
           this.Id = id;
           this.FirstName = firstName;
