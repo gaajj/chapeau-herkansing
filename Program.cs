@@ -21,6 +21,7 @@ builder.Services.AddScoped<StockService>();
 builder.Services.AddScoped<MenuService>();
 builder.Services.AddScoped<StaffService>();
 builder.Services.AddScoped<TableRepository>();
+builder.Services.AddScoped<TableService>();
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
         .AddCookie(opts =>

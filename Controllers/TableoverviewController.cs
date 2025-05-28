@@ -4,30 +4,33 @@ using ChapeauHerkansing.Repositories;
 using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using ChapeauHerkansing.Models.Enums;
+using ChapeauHerkansing.Services;
+using ChapeauHerkansing.ViewModels.Tables;
+
 
 namespace ChapeauHerkansing.Controllers
 {
     [Authorize(Roles = "Waiter")]
     public class TableOverviewController : Controller
     {
-        private readonly TableRepository _tableRepo;
-        public TableOverviewController(TableRepository tableRepo)
+        private readonly TableService _tableService;
+
+        public TableOverviewController(TableService tableService)
         {
-            _tableRepo = tableRepo;
+            _tableService = tableService;
         }
         [HttpGet]
         public IActionResult Index()
         {
-            var tables = _tableRepo.GetAllTables();
+            var tables = _tableService.GetAllTables();
             var readyCounts = tables.ToDictionary(
                 t => t.TableID,
-                t => _tableRepo.GetReadyOrdersCount(t.TableID)
+                t => _tableService.GetReadyOrdersCount(t.TableID)
             );
             var statuses = tables.ToDictionary(
                 t => t.TableID,
-                t => _tableRepo.GetRunningOrderStatuses(t.TableID)
+                t => _tableService.GetRunningOrderStatuses(t.TableID)
             );
-
             var vm = new TableOverviewViewModel
             {
                 Tables = tables,
@@ -42,7 +45,7 @@ namespace ChapeauHerkansing.Controllers
         [HttpPost]
         public IActionResult ServeOrders(int tableId)
         {
-            _tableRepo.ServeOrdersForTable(tableId);
+            _tableService.ServeOrdersForTable(tableId);
             return RedirectToAction(nameof(Index));
         }
 
@@ -52,19 +55,16 @@ namespace ChapeauHerkansing.Controllers
             if (!Enum.TryParse<TableStatus>(newStatus, true, out var status))
             {
                 TempData["ErrorMessage"] = "Invalid status.";
-                return RedirectToAction("Index");
+                return RedirectToAction(nameof(Index));
             }
-            if (status == TableStatus.Free && _tableRepo.HasUnfinishedOrders(tableId))
+            if (status == TableStatus.Free && _tableService.HasUnfinishedOrders(tableId))
             {
                 TempData["ErrorMessage"] = "Cannot free table with unfinished orders.";
-                return RedirectToAction("Index");
+                return RedirectToAction(nameof(Index));
             }
-            _tableRepo.UpdateTableStatus(tableId, status);
-            return RedirectToAction("Index");
+            _tableService.UpdateTableStatus(tableId, status);
+            return RedirectToAction(nameof(Index));
         }
-
-
-
 
     }
 }

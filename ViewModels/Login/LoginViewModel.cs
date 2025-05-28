@@ -1,4 +1,4 @@
-﻿namespace ChapeauHerkansing.Models
+﻿namespace ChapeauHerkansing.ViewModels.Login
 {
     public class LoginViewModel
     {

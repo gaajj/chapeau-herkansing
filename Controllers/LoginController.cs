@@ -1,6 +1,6 @@
-﻿using ChapeauHerkansing.Models;
-using ChapeauHerkansing.Models.Enums;
+﻿using ChapeauHerkansing.Models.Enums;
 using ChapeauHerkansing.Services;
+using ChapeauHerkansing.ViewModels.Login;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
