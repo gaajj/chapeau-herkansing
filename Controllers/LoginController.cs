@@ -1,29 +1,31 @@
-﻿// Controllers/LoginController.cs
-using ChapeauHerkansing.Models;
+﻿using ChapeauHerkansing.Models;
+using ChapeauHerkansing.Models.Enums;
+using ChapeauHerkansing.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
 using System.Security.Claims;
-
+using System.Threading.Tasks;
 
 namespace ChapeauHerkansing.Controllers
 {
     public class LoginController : Controller
     {
-        private readonly IUsersRepository _userRepository;
+        private readonly StaffService _staffService;
 
-        public LoginController(IUsersRepository userRepository)
+        public LoginController(StaffService staffService)
         {
-            _userRepository = userRepository;
+            _staffService = staffService;
         }
 
         // Deze methode toont de loginpagina
         [HttpGet]
         public IActionResult Index()
         {
-            if (User.Identity.IsAuthenticated)
+            if (User.Identity?.IsAuthenticated == true)
             {
-                // var aanpassen 
+                // var aanpassen
                 var role = User.FindFirst(ClaimTypes.Role)?.Value;
                 return RedirectBasedOnRole(role);
             }
@@ -32,33 +34,34 @@ namespace ChapeauHerkansing.Controllers
 
         // Deze methode verwerkt de login en leidt door op basis van rol
         [HttpPost]
-        public async Task<IActionResult> Index(User input)
+        public async Task<IActionResult> Index(LoginViewModel input)
         {
             if (string.IsNullOrWhiteSpace(input.Username) || string.IsNullOrWhiteSpace(input.Password))
             {
-                ViewBag.Error = "Please fill in an username and password.";
+                ViewBag.Error = "Please fill in a username and password.";
                 return View();
             }
-            User user = _userRepository.GetByUsername(input.Username);
-            if (user == null || !BCrypt.Net.BCrypt.Verify(input.Password, user.Password))
+
+            var staff = _staffService.GetByUsername(input.Username);
+            if (staff == null || !BCrypt.Net.BCrypt.Verify(input.Password, staff.Password))
             {
                 ViewBag.Error = "Invalid Credentials!";
                 return View();
             }
 
             var claims = new List<Claim>
-    {
-        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-        new Claim(ClaimTypes.Name, user.Username),
-        new Claim(ClaimTypes.Role, user.Role)
-    };
+            {
+                new Claim(ClaimTypes.NameIdentifier, staff.Id.ToString()),
+                new Claim(ClaimTypes.Name, staff.Username),
+                new Claim(ClaimTypes.Role, staff.Role.ToString())
+            };
+
             var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
             var principal = new ClaimsPrincipal(identity);
 
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
-            return RedirectBasedOnRole(user.Role);
+            return RedirectBasedOnRole(staff.Role.ToString());
         }
-
 
         [HttpPost]
         public async Task<IActionResult> Logout()
@@ -69,15 +72,12 @@ namespace ChapeauHerkansing.Controllers
         }
 
         // Deze methode bepaalt de redirect op basis van gebruikersrol
-        private IActionResult RedirectBasedOnRole(string role)
+        private IActionResult RedirectBasedOnRole(string role) => role switch
         {
-            return role switch
-            {
-                "Waiter" => RedirectToAction("Index", "TableOverview"),
-                "Barman" or "Chef" => RedirectToAction("Index", "Bar_Kitchen"),
-                "Manager" => RedirectToAction("Index", "Management"),
-                _ => RedirectToAction("Index", "Login")
-            };
-        }
+            nameof(Role.Waiter) => RedirectToAction("Index", "TableOverview"),
+            nameof(Role.Barman) or nameof(Role.Chef) => RedirectToAction("Index", "Bar_Kitchen"),
+            nameof(Role.Manager) => RedirectToAction("Index", "Management"),
+            _ => RedirectToAction("Index", "Login")
+        };
     }
 }

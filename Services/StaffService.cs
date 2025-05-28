@@ -40,5 +40,10 @@ namespace ChapeauHerkansing.Services
         {
             return _staffRepo.ToggleStaffActive(id);
         }
+
+        public Staff? GetByUsername(string username)
+        {
+            return _staffRepo.GetStaffByUsername(username);
+        }
     }
 }

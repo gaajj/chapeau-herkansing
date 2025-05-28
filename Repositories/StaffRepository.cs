@@ -131,5 +131,21 @@ namespace ChapeauHerkansing.Repositories
                 throw new Exception("Medewerker niet gevonden of status kon niet gewijzigd worden.");
             }
         }
+
+        public Staff? GetStaffByUsername(string username)
+        {
+            using var conn = CreateConnection();
+            const string sql = @"SELECT ID, firstName, lastName, username, password, role, isDeleted
+                         FROM dbo.staff
+                         WHERE username = @username AND (isDeleted = 0 OR isDeleted IS NULL)";
+
+            using var cmd = new SqlCommand(sql, conn);
+            cmd.Parameters.AddWithValue("@username", username);
+
+            conn.Open();
+            using var rdr = cmd.ExecuteReader();
+            return rdr.Read() ? StaffMapper.FromReader(rdr) : null;
+        }
+
     }
 }
