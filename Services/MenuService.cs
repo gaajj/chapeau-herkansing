@@ -9,23 +9,13 @@ namespace ChapeauHerkansing.Services
     public class MenuService
     {
         private readonly MenuItemRepository _menuItemRepository;
-        private readonly StockService _stockService;
         private readonly MenuItemMenuRepository _menuItemMenuRepo;
 
-        public MenuService(MenuItemRepository menuItemRepo, StockService stockService, MenuItemMenuRepository menuItemMenuRepo)
+        public MenuService(MenuItemRepository menuItemRepo, MenuItemMenuRepository menuItemMenuRepo)
         {
             _menuItemRepository = menuItemRepo;
-            _stockService = stockService;
             _menuItemMenuRepo = menuItemMenuRepo;
         }
-
-
-        public MenuService(MenuItemRepository menuItemRepository, StockRepository stockRepo, StockService stockService)
-        {
-            _menuItemRepository = menuItemRepository;
-            _stockService = stockService;
-        }
-
 
         public List<MenuItem> GetAllMenuItems()
         {
@@ -37,13 +27,10 @@ namespace ChapeauHerkansing.Services
             return _menuItemRepository.GetMenuItemsByFilter(menuType, category, includeDeleted);
         }
 
-
         public void AddMenuItem(MenuItemCreateViewModel model)
         {
-            int stockId = _stockService.CreateInitialStock(model.StockAmount);
-            int menuItemId = _menuItemRepository.InsertMenuItem(model, stockId);
+            int menuItemId = _menuItemRepository.InsertMenuItem(model);
             _menuItemMenuRepo.LinkMenuItemToMenu((int)model.MenuType, menuItemId);
-
         }
 
         public MenuItem GetMenuItemById(int id)
@@ -53,7 +40,6 @@ namespace ChapeauHerkansing.Services
 
         public void UpdateMenuItem(int id, MenuItemCreateViewModel model)
         {
-            _stockService.UpdateStock(id, model.StockAmount);
             _menuItemRepository.UpdateMenuItem(id, model);
         }
 
@@ -61,8 +47,5 @@ namespace ChapeauHerkansing.Services
         {
             return _menuItemRepository.ToggleActive(id);
         }
-
-
-
     }
 }

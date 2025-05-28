@@ -77,7 +77,7 @@ namespace ChapeauHerkansing.Controllers
                 Price = item.Price,
                 Category = item.Category,
                 IsAlcoholic = item.IsAlcoholic,
-                StockAmount = item.StockAmount ?? 0,
+                StockAmount = item.StockAmount,
                 MenuType = item.MenuType
             };
 

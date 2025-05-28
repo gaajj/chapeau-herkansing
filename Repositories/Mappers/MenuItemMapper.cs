@@ -17,9 +17,8 @@ namespace ChapeauHerkansing.Repositories.Mappers
                 ParseCategory(reader.GetString(reader.GetOrdinal("category"))),
                 reader.GetBoolean(reader.GetOrdinal("isAlcoholic")),
                 reader.IsDBNull(reader.GetOrdinal("isDeleted")) ? null : reader.GetBoolean(reader.GetOrdinal("isDeleted")),
-                 reader.GetInt32(reader.GetOrdinal("stockId")),
-               reader.IsDBNull(reader.GetOrdinal("StockAmount")) ? null : reader.GetInt32(reader.GetOrdinal("StockAmount")),
-               ParseMenuType(reader.GetString(reader.GetOrdinal("menuType")))
+                reader.GetInt32(reader.GetOrdinal("stockAmount")), // niet nullable
+                (MenuType)reader.GetInt32(reader.GetOrdinal("menuType"))
             );
         }
 
