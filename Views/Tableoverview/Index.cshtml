@@ -124,8 +124,16 @@
             <div style="text-align:right;">
                 <button type="button" onclick="closeStatusModal()" style="margin-right:10px; padding:6px 12px; font-family:Tahoma;">Cancel</button>
                 <button type="submit" style="padding:6px 12px; background:#007bff; color:white; border:none; border-radius:4px; font-family:Tahoma;">Save</button>
+
             </div>
         </form>
+        <button type="button"
+                onclick="goToOrders()"
+                style="margin-top:10px; width:100%; padding:6px 0; background:#28a745; color:white; border:none; border-radius:4px; font-family:Tahoma; font-weight:bold;">
+            take an order for this table
+        </button>
+
+
     </div>
 </div>
 
@@ -140,5 +148,11 @@
         function closeStatusModal() {
             document.getElementById('statusModal').style.display = 'none';
         }
+            function goToOrders() {
+            var tableId = document.getElementById('modalTableId').value;
+            window.location.href = '/Order/Index?tableId=' + tableId;
+        }
+
+
     </script>
 }
