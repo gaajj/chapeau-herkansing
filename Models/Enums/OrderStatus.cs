@@ -2,8 +2,8 @@
 {
     public enum OrderStatus
     {
-
-        BeingPrepared,
-        Ready
+        Ordered,
+        Ready,
+        Served
     }
 }

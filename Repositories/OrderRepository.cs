@@ -16,7 +16,7 @@ namespace ChapeauHerkansing.Repositories
                 SELECT
                     o.id AS orderId,
                     o.isDeleted,
-                    o.timeCreated,
+                    o.orderTime AS orderOrderTime,
                     t.id AS tableId,
                     t.seats,
                     t.tableStatus,
@@ -28,7 +28,7 @@ namespace ChapeauHerkansing.Repositories
                     s.role,
                     ol.id AS orderLineId,
                     ol.amount,
-                    ol.orderTime,
+                    ol.orderTime AS orderLineOrderTime,
                     ol.note,
                     ol.orderStatus,
                     mi.id AS menuItemId,
@@ -205,7 +205,7 @@ namespace ChapeauHerkansing.Repositories
                 SELECT
                     o.id AS orderId,
                     o.isDeleted,
-                    o.timeCreated,
+                    o.orderTime AS orderOrderTime,
                     t.id AS tableId,
                     t.seats,
                     t.tableStatus,
@@ -217,7 +217,7 @@ namespace ChapeauHerkansing.Repositories
                     s.role,
                     ol.id AS orderLineId,
                     ol.amount,
-                    ol.orderTime,
+                    ol.orderTime AS orderLineOrderTime,
                     ol.note,
                     ol.orderStatus,
                     mi.id AS menuItemId,
@@ -252,8 +252,8 @@ namespace ChapeauHerkansing.Repositories
         public void AddMenuItemToOrder(Order order, MenuItem menuItem, Staff staff, int amount)
         {
             string query = @"
-                INSERT INTO orderLines (orderId, menuItemId, staffId, amount, orderTime)
-                VALUES (@orderId, @menuItemId, @staffId, @amount, GETDATE())";
+                INSERT INTO orderLines (orderId, menuItemId, staffId, amount, orderTime, orderStatus)
+                VALUES (@orderId, @menuItemId, @staffId, @amount, GETDATE(), 'ready')";
 
             var parameters = new Dictionary<string, object>
             {

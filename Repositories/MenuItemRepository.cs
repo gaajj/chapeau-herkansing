@@ -7,11 +7,11 @@ using ChapeauHerkansing.Repositories.Mappers;
 
 namespace ChapeauHerkansing.Repositories
 {
-    public class MenuItemRepository
+    public class MenuItemRepository : BaseRepository
     {
         private readonly string _connectionString;
 
-        public MenuItemRepository(IConfiguration configuration)
+        public MenuItemRepository(IConfiguration configuration) : base(configuration)
         {
             _connectionString = configuration.GetConnectionString("ChapeauDatabase");
         }
@@ -31,7 +31,7 @@ namespace ChapeauHerkansing.Repositories
                 FROM menuItems
                 WHERE isDeleted IS NULL OR isDeleted = 0";
 
-            return ExecuteQuery(query, null, null);
+            return ExecuteMenuItemQuery(query, null, null);
         }
 
         public List<MenuItem> GetMenuItemsByFilter(MenuType menuType, MenuCategory? category, bool includeDeleted = false)
@@ -55,10 +55,10 @@ namespace ChapeauHerkansing.Repositories
             if (!includeDeleted)
                 query += " AND (isDeleted IS NULL OR isDeleted = 0)";
 
-            return ExecuteQuery(query, menuType, category);
+            return ExecuteMenuItemQuery(query, menuType, category);
         }
 
-        private List<MenuItem> ExecuteQuery(string query, MenuType? menuType, MenuCategory? category)
+        private List<MenuItem> ExecuteMenuItemQuery(string query, MenuType? menuType, MenuCategory? category)
         {
             List<MenuItem> items = new List<MenuItem>();
 
@@ -206,7 +206,7 @@ namespace ChapeauHerkansing.Repositories
             }
         }
 
-        public List<MenuItem> GetMenuItemsByMenuType(MenuType menuType)
+        public Menu GetMenuItemsByMenuType(MenuType menuType)
         {
             string query = @"
                 SELECT 
@@ -222,7 +222,7 @@ namespace ChapeauHerkansing.Repositories
                 WHERE menuType = @menuType
                 AND (isDeleted IS NULL OR isDeleted = 0)";
 
-            List<MenuItem> items = new List<MenuItem>();
+            Menu menu = new Menu();
 
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
@@ -234,13 +234,13 @@ namespace ChapeauHerkansing.Repositories
 
                 while (reader.Read())
                 {
-                    items.Add(MenuItemMapper.FromReader(reader));
+                    menu.MenuItems.Add(MenuItemMapper.FromReader(reader));
                 }
 
                 reader.Close();
             }
 
-            return items;
+            return menu;
         }
     }
 }

@@ -19,20 +19,17 @@ namespace ChapeauHerkansing.Controllers
         }
 
         // hard coded table for now
-        public IActionResult Index(MenuType? menuType = null, int tableId = 2, MenuCategory? category = null)
+        public IActionResult Index(int tableId = 2, MenuType? menuType = null, MenuCategory? category = null)
         {
             Order order = _orderRepository.GetOrderByTable(tableId);
             Menu? menu = null;
 
             if (menuType.HasValue)
             {
-                menu = _menuRepository.GetFilteredMenu(menuType, category);
+                menu = _menuItemRepository.GetMenuItemsByMenuType(menuType.Value);
                 if (menu == null || (menu.MenuItems.Count == 0 && category != null))
                 {
-                    menu = new Menu(0, menuType.Value)
-                    {
-                        MenuItems = new List<MenuItem>()
-                    };
+                    menu = new Menu(); // forces no items message instead of going back to index
                 }
             }
 
@@ -52,8 +49,8 @@ namespace ChapeauHerkansing.Controllers
         public IActionResult AddMenuItemToOrder(MenuItemAddViewModel model)
         {
             Order order = _orderRepository.GetOrderById(model.OrderId);
-            MenuItem menuItem = _menuRepository.GetMenuItemById(model.MenuItemId);
-            Staff staff = new Staff(2, "", "", "", "", Role.Waiter); // hard coded for now
+            MenuItem menuItem = _menuItemRepository.GetMenuItemById(model.MenuItemId);
+            Staff staff = new Staff(10, "", "", "", "", Role.Waiter); // hard coded for now
             try
             {
                 OrderLine? existingLine = null;

@@ -16,11 +16,21 @@ namespace ChapeauHerkansing.Repositories.Readers
                 MenuItemReader.Read(reader),
                 StaffReader.Read(reader),
                 reader.GetInt32(reader.GetOrdinal("amount")),
-                reader.GetDateTime(reader.GetOrdinal("orderTime")),
+                reader.GetDateTime(reader.GetOrdinal("orderLineOrderTime")),
                 reader.IsDBNull(reader.GetOrdinal("note")) ? null : reader.GetString(reader.GetOrdinal("note")),
-                Enum.Parse<OrderStatus>(reader.GetString(reader.GetOrdinal("orderStatus")), true)
-
+                ParseOrderStatus(reader.GetString(reader.GetOrdinal("orderStatus")))
             );
+        }
+
+        private static OrderStatus ParseOrderStatus(string status)
+        {
+            return status.ToLower() switch
+            {
+                "ordered" => OrderStatus.Ordered,
+                "ready" => OrderStatus.Ready,
+                "served" => OrderStatus.Served,
+                _ => throw new InvalidCastException($"Unknown orderStatus: {status}")
+            };
         }
     }
 }
