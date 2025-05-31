@@ -69,7 +69,7 @@ namespace ChapeauHerkansing.Controllers
                 }
                 else
                 {
-                    _orderRepository.AddMenuItemToOrder(order, menuItem, staff, model.Amount);
+                    _orderRepository.AddMenuItemToOrder(order, menuItem, staff, model.Amount, OrderStatus.Ordered);
                 }
 
                 TempData["Message"] = "Menu item successfully added.";
