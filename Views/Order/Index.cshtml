@@ -1,6 +1,6 @@
 ﻿@model ChapeauHerkansing.ViewModels.Ordering.MenuViewModel  
 
-<h2 class="text-center text-capitalize">@ViewData["Title"]</h2>
+<h2 class="text-center text-capitalize">Order of table #@Model.Order.Table.TableID</h2>
 
 <div class="container mt-4" style="max-width: 800px;">  
     @if (TempData["Message"] != null)

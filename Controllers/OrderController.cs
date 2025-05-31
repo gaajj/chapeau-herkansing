@@ -41,7 +41,6 @@ namespace ChapeauHerkansing.Controllers
                 MenuType = menuType
             };
 
-            ViewData["Title"] = $"Order of table #{model.Order.Table.TableID}";
             return View(model);
         }
 
