@@ -20,19 +20,16 @@ namespace ChapeauHerkansing.Repositories
         {
             string query = @"
                 SELECT 
-                    m.id AS MenuItemID,
-                    m.itemName,
-                    m.price,
-                    m.category,
-                    m.isAlcoholic,
-                    m.isDeleted,
-                    m.stockAmount,
-                    mm.menuId,
-                    mt.menuType
-                FROM menuItems m
-                JOIN menu_menuItems mm ON m.id = mm.menuItemId
-                JOIN menu mt ON mm.menuId = mt.id
-                WHERE m.isDeleted IS NULL OR m.isDeleted = 0";
+                    id AS MenuItemID,
+                    itemName,
+                    price,
+                    category,
+                    isAlcoholic,
+                    isDeleted,
+                    stockAmount,
+                    menuType
+                FROM menuItems
+                WHERE isDeleted IS NULL OR isDeleted = 0";
 
             return ExecuteQuery(query, null, null);
         }
@@ -41,25 +38,22 @@ namespace ChapeauHerkansing.Repositories
         {
             string query = @"
                 SELECT 
-                    m.id AS MenuItemID,
-                    m.itemName,
-                    m.price,
-                    m.category,
-                    m.isAlcoholic,
-                    m.isDeleted,
-                    m.stockAmount,
-                    mm.menuId,
-                    mt.menuType
-                FROM menuItems m
-                JOIN menu_menuItems mm ON m.id = mm.menuItemId
-                JOIN menu mt ON mm.menuId = mt.id
-                WHERE mt.menuType = @menuType";
+                    id AS MenuItemID,
+                    itemName,
+                    price,
+                    category,
+                    isAlcoholic,
+                    isDeleted,
+                    stockAmount,
+                    menuType
+                FROM menuItems
+                WHERE menuType = @menuType";
 
             if (category != null)
-                query += " AND m.category = @category";
+                query += " AND category = @category";
 
             if (!includeDeleted)
-                query += " AND (m.isDeleted IS NULL OR m.isDeleted = 0)";
+                query += " AND (isDeleted IS NULL OR isDeleted = 0)";
 
             return ExecuteQuery(query, menuType, category);
         }
@@ -102,9 +96,9 @@ namespace ChapeauHerkansing.Repositories
                 try
                 {
                     string itemQuery = @"
-                        INSERT INTO menuItems (itemName, price, category, isAlcoholic, isDeleted, stockAmount)
+                        INSERT INTO menuItems (itemName, price, category, isAlcoholic, isDeleted, stockAmount, menuType)
                         OUTPUT INSERTED.id
-                        VALUES (@name, @price, @category, @isAlcoholic, 0, @stockAmount)";
+                        VALUES (@name, @price, @category, @isAlcoholic, 0, @stockAmount, @menuType)";
 
                     SqlCommand itemCmd = new SqlCommand(itemQuery, conn, transaction);
                     itemCmd.Parameters.AddWithValue("@name", model.Name);
@@ -112,6 +106,7 @@ namespace ChapeauHerkansing.Repositories
                     itemCmd.Parameters.AddWithValue("@category", model.Category.ToString().ToLower());
                     itemCmd.Parameters.AddWithValue("@isAlcoholic", model.IsAlcoholic);
                     itemCmd.Parameters.AddWithValue("@stockAmount", model.StockAmount);
+                    itemCmd.Parameters.AddWithValue("@menuType", (int)model.MenuType);
 
                     int menuItemId = (int)itemCmd.ExecuteScalar();
 
@@ -130,19 +125,16 @@ namespace ChapeauHerkansing.Repositories
         {
             string query = @"
                 SELECT 
-                    m.id AS MenuItemID,
-                    m.itemName,
-                    m.price,
-                    m.category,
-                    m.isAlcoholic,
-                    m.isDeleted,
-                    m.stockAmount,
-                    mm.menuId,
-                    mt.menuType
-                FROM menuItems m
-                JOIN menu_menuItems mm ON m.id = mm.menuItemId
-                JOIN menu mt ON mm.menuId = mt.id
-                WHERE m.id = @id";
+                    id AS MenuItemID,
+                    itemName,
+                    price,
+                    category,
+                    isAlcoholic,
+                    isDeleted,
+                    stockAmount,
+                    menuType
+                FROM menuItems
+                WHERE id = @id";
 
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
@@ -169,7 +161,8 @@ namespace ChapeauHerkansing.Repositories
                         price = @price,
                         category = @category,
                         isAlcoholic = @isAlcoholic,
-                        stockAmount = @stockAmount
+                        stockAmount = @stockAmount,
+                        menuType = @menuType
                     WHERE id = @id";
 
                 SqlCommand itemCmd = new SqlCommand(updateItem, conn);
@@ -178,6 +171,7 @@ namespace ChapeauHerkansing.Repositories
                 itemCmd.Parameters.AddWithValue("@category", model.Category.ToString().ToLower());
                 itemCmd.Parameters.AddWithValue("@isAlcoholic", model.IsAlcoholic);
                 itemCmd.Parameters.AddWithValue("@stockAmount", model.StockAmount);
+                itemCmd.Parameters.AddWithValue("@menuType", (int)model.MenuType);
                 itemCmd.Parameters.AddWithValue("@id", id);
                 itemCmd.ExecuteNonQuery();
             }
@@ -210,6 +204,43 @@ namespace ChapeauHerkansing.Repositories
 
                 throw new Exception("Item niet gevonden of geen status gewijzigd.");
             }
+        }
+
+        public List<MenuItem> GetMenuItemsByMenuType(MenuType menuType)
+        {
+            string query = @"
+                SELECT 
+                    id AS MenuItemID,
+                    itemName,
+                    price,
+                    category,
+                    isAlcoholic,
+                    isDeleted,
+                    stockAmount,
+                    menuType
+                FROM menuItems
+                WHERE menuType = @menuType
+                AND (isDeleted IS NULL OR isDeleted = 0)";
+
+            List<MenuItem> items = new List<MenuItem>();
+
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                SqlCommand cmd = new SqlCommand(query, conn);
+                cmd.Parameters.AddWithValue("@menuType", (int)menuType);
+
+                conn.Open();
+                SqlDataReader reader = cmd.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    items.Add(MenuItemMapper.FromReader(reader));
+                }
+
+                reader.Close();
+            }
+
+            return items;
         }
     }
 }

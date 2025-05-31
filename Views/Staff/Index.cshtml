@@ -3,6 +3,8 @@
 @{
     ViewData["Title"] = "Manage Employees";
 }
+<partial name="_ManagementTabs" />
+
 @if (TempData["Message"] != null)
 {
     <div class="alert alert-success alert-dismissible fade show" role="alert">

@@ -5,22 +5,23 @@ namespace ChapeauHerkansing.ViewModels.Management
 {
     public class MenuItemCreateViewModel
     {
-        [Required]
+        [Required(ErrorMessage = "Naam is verplicht.")]
         public string Name { get; set; }
 
-        [Required]
-        [Range(0.1, 1000)]
+        [Required(ErrorMessage = "Prijs is verplicht.")]
+        [Range(0.01, 1000, ErrorMessage = "Prijs moet tussen 0.01 en 1000 liggen.")]
         public decimal Price { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Categorie is verplicht.")]
         public MenuCategory Category { get; set; }
 
         public bool IsAlcoholic { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Voorraad is verplicht.")]
+        [Range(0, 1000, ErrorMessage = "Voorraad moet 0 of meer zijn.")]
         public int StockAmount { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "MenuType is verplicht.")]
         public MenuType MenuType { get; set; }
     }
 }

@@ -55,11 +55,12 @@ namespace ChapeauHerkansing.Controllers
                 TempData["Message"] = "Gerecht succesvol toegevoegd.";
                 return RedirectToAction("Index");
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                TempData["Error"] = "Er is iets misgegaan bij het toevoegen van het gerecht.";
+                TempData["Error"] = $"Fout bij toevoegen: {ex.Message}";
                 return View(model);
             }
+
         }
 
 
@@ -123,6 +124,21 @@ namespace ChapeauHerkansing.Controllers
             return RedirectToAction("Index");
         }
 
+        public IActionResult Financial(DateTime? startDate, DateTime? endDate, string period = "month")
+        {
+            var viewModel = new FinancialOverviewViewModel
+            {
+                SelectedPeriod = period,
+                StartDate = startDate ?? DateTime.Now.AddMonths(-1),
+                EndDate = endDate ?? DateTime.Now,
+                // Deze worden later gevuld met data uit je Order- en PaymentRepository
+                TotalSalesByType = new Dictionary<string, int>(),
+                TotalIncomeByType = new Dictionary<string, decimal>(),
+                TotalTipAmount = 0
+            };
+
+            return View(viewModel);
+        }
 
 
 

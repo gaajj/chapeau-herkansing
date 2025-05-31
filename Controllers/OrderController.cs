@@ -1,17 +1,19 @@
 ﻿using ChapeauHerkansing.Models;
+using ChapeauHerkansing.Models.Enums;
 using ChapeauHerkansing.Repositories;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
 
 namespace ChapeauHerkansing.Controllers
 {
     public class OrderController : Controller
     {
-        private readonly MenuRepository _menuRepository;
+        private readonly MenuItemRepository _menuItemRepository;
         private readonly OrderRepository _orderRepository;
 
-        public OrderController(MenuRepository menuRepository, OrderRepository orderRepository)
+        public OrderController(MenuItemRepository menuItemRepository, OrderRepository orderRepository)
         {
-            _menuRepository = menuRepository;
+            _menuItemRepository = menuItemRepository;
             _orderRepository = orderRepository;
         }
 
@@ -19,10 +21,12 @@ namespace ChapeauHerkansing.Controllers
         {
             if (!string.IsNullOrEmpty(menuType))
             {
-                Menu? menu = _menuRepository.GetFilteredMenu(menuType);
-                ViewData["MenuType"] = menuType;
-                ViewData["FilteredMenu"] = menu;
-                return View(_orderRepository.GetOrderByTable(tableId));
+                if (Enum.TryParse<MenuType>(menuType, true, out MenuType parsedType))
+                {
+                    List<MenuItem> items = _menuItemRepository.GetMenuItemsByMenuType(parsedType);
+                    ViewData["MenuType"] = parsedType;
+                    ViewData["FilteredMenuItems"] = items;
+                }
             }
 
             Order? order = _orderRepository.GetOrderByTable(tableId);

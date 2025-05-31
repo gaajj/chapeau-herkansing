@@ -9,12 +9,10 @@ namespace ChapeauHerkansing.Services
     public class MenuService
     {
         private readonly MenuItemRepository _menuItemRepository;
-        private readonly MenuItemMenuRepository _menuItemMenuRepo;
 
-        public MenuService(MenuItemRepository menuItemRepo, MenuItemMenuRepository menuItemMenuRepo)
+        public MenuService(MenuItemRepository menuItemRepo)
         {
             _menuItemRepository = menuItemRepo;
-            _menuItemMenuRepo = menuItemMenuRepo;
         }
 
         public List<MenuItem> GetAllMenuItems()
@@ -29,8 +27,9 @@ namespace ChapeauHerkansing.Services
 
         public void AddMenuItem(MenuItemCreateViewModel model)
         {
-            int menuItemId = _menuItemRepository.InsertMenuItem(model);
-            _menuItemMenuRepo.LinkMenuItemToMenu((int)model.MenuType, menuItemId);
+            // Eerder werd de koppeling via MenuItemMenuRepository afgehandeld.
+            // Nu voegen we het menuItem direct toe, met het juiste menuType (als integer) in de menuItems-tabel.
+            _menuItemRepository.InsertMenuItem(model);
         }
 
         public MenuItem GetMenuItemById(int id)

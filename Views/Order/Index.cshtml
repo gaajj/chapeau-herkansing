@@ -1,7 +1,8 @@
 ﻿@model ChapeauHerkansing.Models.Order
+
 @{
     ViewData["Title"] = "Order and Menu";
-    var filteredMenu = ViewData["FilteredMenu"] as ChapeauHerkansing.Models.Menu;
+    List<ChapeauHerkansing.Models.MenuItem> filteredMenuItems = ViewData["FilteredMenuItems"] as List<ChapeauHerkansing.Models.MenuItem>;
 }
 
 <h2 class="text-center">Order and Menu</h2>
@@ -15,7 +16,7 @@
                 <button type="submit" name="menuType" value="lunch" class="btn btn-primary">Lunch</button>
                 <button type="submit" name="menuType" value="dinner" class="btn btn-primary">Dinner</button>
                 <button type="submit" name="menuType" value="drinks" class="btn btn-primary">Drinks</button>
-                @if (filteredMenu != null)
+                @if (filteredMenuItems != null)
                 {
                     <button type="submit" class="btn btn-secondary" name="menuType" value="">Back to Order</button>
                 }
@@ -25,9 +26,9 @@
 
     <!-- Content Section -->
     <div id="contentSection">
-        @if (filteredMenu != null)
+        @if (filteredMenuItems != null)
         {
-            <partial name="_MenuView" model="filteredMenu" />
+            <partial name="_MenuView" model="filteredMenuItems" />
         }
         else
         {
