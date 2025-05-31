@@ -1,4 +1,5 @@
-﻿using ChapeauHerkansing.Models.Enums;
+﻿using ChapeauHerkansing.Models;
+using ChapeauHerkansing.Models.Enums;
 using ChapeauHerkansing.Services;
 using ChapeauHerkansing.ViewModels.Login;
 using Microsoft.AspNetCore.Authentication;
@@ -21,13 +22,16 @@ namespace ChapeauHerkansing.Controllers
 
         // Deze methode toont de loginpagina
         [HttpGet]
-        public IActionResult Index()
+        public IActionResult Index() // controleer je hier eerst: “Is de gebruiker al ingelogd? Zo ja, dan gaan we niet opnieuw de login-pagina tonen, maar redirecten we op basis van zijn/haar rol.
         {
             if (User.Identity?.IsAuthenticated == true)
             {
-                // var aanpassen
-                var role = User.FindFirst(ClaimTypes.Role)?.Value;
-                return RedirectBasedOnRole(role);
+                Claim? roleClaim = User.FindFirst(ClaimTypes.Role); // haalt de rol van de gebruiker op uit de claims
+                if (roleClaim != null && Enum.TryParse<Role>(roleClaim.Value, out Role roleEnum)) // probeert de rol te parsen naar de enum Role
+                {
+                    return RedirectBasedOnRole(roleEnum.ToString()); // leidt door op basis van de rol van de gebruiker
+                }
+                return RedirectBasedOnRole(string.Empty);
             }
             return View();
         }
@@ -42,22 +46,22 @@ namespace ChapeauHerkansing.Controllers
                 return View();
             }
 
-            var staff = _staffService.GetByUsername(input.Username);
+            Staff? staff = _staffService.GetByUsername(input.Username);
             if (staff == null || !BCrypt.Net.BCrypt.Verify(input.Password, staff.Password))
             {
                 ViewBag.Error = "Invalid Credentials!";
                 return View();
             }
 
-            var claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.NameIdentifier, staff.Id.ToString()),
-                new Claim(ClaimTypes.Name, staff.Username),
-                new Claim(ClaimTypes.Role, staff.Role.ToString())
-            };
+            IList<Claim> claims = new List<Claim>
+    {
+        new Claim(ClaimTypes.NameIdentifier, staff.Id.ToString()),
+        new Claim(ClaimTypes.Name, staff.Username),
+        new Claim(ClaimTypes.Role, staff.Role.ToString())
+    };
 
-            var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-            var principal = new ClaimsPrincipal(identity);
+            ClaimsIdentity identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+            ClaimsPrincipal principal = new ClaimsPrincipal(identity);
 
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
             return RedirectBasedOnRole(staff.Role.ToString());

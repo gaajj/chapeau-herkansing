@@ -22,24 +22,29 @@ namespace ChapeauHerkansing.Controllers
         [HttpGet]
         public IActionResult Index()
         {
-            var tables = _tableService.GetAllTables();
-            var readyCounts = tables.ToDictionary(
+            List<Table> tables = _tableService.GetAllTables();
+
+            Dictionary<int, int> readyCounts = tables.ToDictionary(
                 t => t.TableID,
                 t => _tableService.GetReadyOrdersCount(t.TableID)
             );
-            var statuses = tables.ToDictionary(
+
+            Dictionary<int, List<string>> statuses = tables.ToDictionary(
                 t => t.TableID,
                 t => _tableService.GetRunningOrderStatuses(t.TableID)
             );
-            var vm = new TableOverviewViewModel
+
+            TableOverviewViewModel vm = new TableOverviewViewModel
             {
                 Tables = tables,
                 ReadyOrderCounts = readyCounts,
                 RunningOrderStatuses = statuses,
                 ErrorMessage = TempData["ErrorMessage"] as string
             };
+
             return View(vm);
         }
+
 
 
         [HttpPost]

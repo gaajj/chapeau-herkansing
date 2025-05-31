@@ -19,7 +19,8 @@ namespace ChapeauHerkansing.Services
             => _tableRepo.GetAllTables();
 
         public int GetReadyOrdersCount(int tableId)
-            => _tableRepo.GetReadyOrdersCount(tableId);
+    => _tableRepo.GetReadyOrdersCount(tableId, "ready", false);
+
 
         public List<string> GetRunningOrderStatuses(int tableId)
             => _tableRepo.GetRunningOrderStatuses(tableId);
