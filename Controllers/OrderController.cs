@@ -38,7 +38,6 @@ namespace ChapeauHerkansing.Controllers
                     {
                         menu.MenuItems = menu.MenuItems
                             .Where(item => item.Category == category.Value)
-                            .OrderBy(item => item.Name)
                             .ToList();
                     }
                 }
