@@ -27,9 +27,20 @@ namespace ChapeauHerkansing.Controllers
             if (menuType.HasValue)
             {
                 menu = _menuItemRepository.GetMenuItemsByMenuType(menuType.Value);
+
                 if (menu == null || (menu.MenuItems.Count == 0 && category != null))
                 {
                     menu = new Menu(); // forces no items message instead of going back to index
+                }
+                else
+                {
+                    if (category != null)
+                    {
+                        menu.MenuItems = menu.MenuItems
+                            .Where(item => item.Category == category.Value)
+                            .OrderBy(item => item.Name)
+                            .ToList();
+                    }
                 }
             }
 
