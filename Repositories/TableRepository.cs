@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using ChapeauHerkansing.Models;
+using ChapeauHerkansing.Models.Enums;
 
 namespace ChapeauHerkansing.Repositories
 {

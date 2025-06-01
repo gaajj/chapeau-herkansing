@@ -1,8 +1,6 @@
-using System.Collections.Generic;
 using ChapeauHerkansing.Models;
 using Microsoft.Data.SqlClient;
-using ChapeauHerkansing.Repositories.Mappers;
-using Microsoft.Extensions.Configuration;
+using ChapeauHerkansing.Repositories.Readers;
 
 namespace ChapeauHerkansing.Repositories
 {
@@ -12,13 +10,12 @@ namespace ChapeauHerkansing.Repositories
         {
         }
 
-        public List<Staff> GetAllStaff(bool includeDeleted = false)
+        public StaffCollection GetAllStaff(bool includeDeleted = false)
         {
             List<Staff> staffList = new List<Staff>();
             SqlConnection connection = CreateConnection();
 
             string query = "SELECT ID, firstName, lastName, username, password, role, isDeleted FROM dbo.staff";
-
             if (!includeDeleted)
             {
                 query += " WHERE isDeleted = 0";
@@ -30,14 +27,15 @@ namespace ChapeauHerkansing.Repositories
 
             while (reader.Read())
             {
-                staffList.Add(StaffMapper.FromReader(reader));
+                staffList.Add(StaffReader.Read(reader));
             }
 
             reader.Close();
             connection.Close();
 
-            return staffList;
+            return new StaffCollection(staffList);
         }
+
 
         public Staff GetStaffById(int id)
         {
@@ -52,7 +50,7 @@ namespace ChapeauHerkansing.Repositories
 
                 if (reader.Read())
                 {
-                    return StaffMapper.FromReader(reader);
+                    return StaffReader.Read(reader);
                 }
 
                 return null;

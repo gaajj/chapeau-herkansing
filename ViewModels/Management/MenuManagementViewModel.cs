@@ -6,7 +6,7 @@ namespace ChapeauHerkansing.ViewModels.Management
 {
     public class MenuManagementViewModel
     {
-        public List<MenuItem> MenuItems { get; set; } = new();
+        public Menu Menu { get; set; } = new();
         public MenuType SelectedMenuType { get; set; }
         public MenuCategory? SelectedCategory { get; set; }
 

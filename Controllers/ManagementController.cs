@@ -2,6 +2,7 @@
 using ChapeauHerkansing.Services;
 using ChapeauHerkansing.Models.Enums;
 using ChapeauHerkansing.ViewModels.Management;
+using ChapeauHerkansing.Models;
 
 namespace ChapeauHerkansing.Controllers
 {
@@ -16,16 +17,16 @@ namespace ChapeauHerkansing.Controllers
 
         public IActionResult Index(MenuType menuType = MenuType.Lunch, MenuCategory? category = null)
         {
-            var menuItems = _menuService.GetFilteredMenuItems(menuType, category, includeDeleted: true);
-
-            var viewModel = new MenuManagementViewModel
+            Menu menu = _menuService.GetFilteredMenu(menuType, category, includeDeleted: true);
+            MenuManagementViewModel viewModel = new MenuManagementViewModel
             {
-                MenuItems = menuItems,
+                Menu = menu,
                 SelectedMenuType = menuType,
                 SelectedCategory = category,
                 MenuTypes = Enum.GetValues(typeof(MenuType)).Cast<MenuType>().ToList(),
                 Categories = Enum.GetValues(typeof(MenuCategory)).Cast<MenuCategory>().ToList()
             };
+
 
             return View(viewModel);
         }

@@ -60,9 +60,9 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model.MenuItems)
+        @foreach (MenuItem item in Model.Menu.MenuItems)
         {
-            var rowClass = item.IsDeleted == true ? "table-secondary text-muted" : "";
+            string rowClass = item.IsDeleted == true ? "table-secondary text-muted" : "";
 
             <tr class="@rowClass">
                 <td>@item.Name</td>

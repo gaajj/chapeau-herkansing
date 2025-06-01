@@ -15,15 +15,18 @@ namespace ChapeauHerkansing.Services
             _menuItemRepository = menuItemRepo;
         }
 
-        public List<MenuItem> GetAllMenuItems()
+        public Menu GetAllMenu()
         {
             return _menuItemRepository.GetAllMenuItems();
         }
 
-        public List<MenuItem> GetFilteredMenuItems(MenuType menuType, MenuCategory? category, bool includeDeleted = false)
+
+        public Menu GetFilteredMenu(MenuType menuType, MenuCategory? category, bool includeDeleted = false)
         {
             return _menuItemRepository.GetMenuItemsByFilter(menuType, category, includeDeleted);
         }
+
+
 
         public void AddMenuItem(MenuItemCreateViewModel model)
         {

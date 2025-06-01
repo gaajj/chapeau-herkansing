@@ -36,12 +36,5 @@ namespace ChapeauHerkansing.Models
             MenuType = menuType;
         }
 
-        public MenuItem(int menuItemID, string name)
-        {
-            MenuItemID = menuItemID;
-            Name = name;
-        }
-
-        public MenuItem() { } // Voor EF of defaultconstructies indien nodig
     }
 }

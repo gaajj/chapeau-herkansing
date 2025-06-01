@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using ChapeauHerkansing.Models;
 using ChapeauHerkansing.Repositories;
 using System.Linq;
+using ChapeauHerkansing.Models.Enums;
+using ChapeauHerkansing.ViewModels;
+
 
 namespace ChapeauHerkansing.Controllers
 {

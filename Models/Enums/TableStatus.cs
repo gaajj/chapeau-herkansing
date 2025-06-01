@@ -1,4 +1,4 @@
-﻿namespace ChapeauHerkansing.Models
+﻿namespace ChapeauHerkansing.Models.Enums
 {
     public enum TableStatus
     {

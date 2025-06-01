@@ -1,3 +1,5 @@
+using ChapeauHerkansing.Models.Enums;
+
 namespace ChapeauHerkansing.Models
 {
     public class Payment

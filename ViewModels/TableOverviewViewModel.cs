@@ -1,6 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using ChapeauHerkansing.Models;
+using System.Collections.Generic;
 
-namespace ChapeauHerkansing.Models
+namespace ChapeauHerkansing.ViewModels
 {
     public class TableOverviewViewModel
     {

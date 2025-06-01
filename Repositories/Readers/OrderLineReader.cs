@@ -1,7 +1,5 @@
 ﻿using ChapeauHerkansing.Models;
 using ChapeauHerkansing.Models.Enums;
-using ChapeauHerkansing.Repositories.Mappers;
-using ChapeauHerkansing.Repositories.Readers.ChapeauHerkansing.Repositories.Readers;
 using Microsoft.Data.SqlClient;
 
 namespace ChapeauHerkansing.Repositories.Readers

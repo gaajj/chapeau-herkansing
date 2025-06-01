@@ -3,7 +3,7 @@ using Microsoft.Data.SqlClient;
 using ChapeauHerkansing.Models;
 using ChapeauHerkansing.Models.Enums;
 using ChapeauHerkansing.ViewModels.Management;
-using ChapeauHerkansing.Repositories.Mappers;
+using ChapeauHerkansing.Repositories.Readers;
 
 namespace ChapeauHerkansing.Repositories
 {
@@ -16,38 +16,39 @@ namespace ChapeauHerkansing.Repositories
             _connectionString = configuration.GetConnectionString("ChapeauDatabase");
         }
 
-        public List<MenuItem> GetAllMenuItems()
+        public Menu GetAllMenuItems()
         {
             string query = @"
-                SELECT 
-                    id AS MenuItemID,
-                    itemName,
-                    price,
-                    category,
-                    isAlcoholic,
-                    isDeleted,
-                    stockAmount,
-                    menuType
-                FROM menuItems
-                WHERE isDeleted IS NULL OR isDeleted = 0";
+        SELECT 
+            id AS MenuItemID,
+            itemName,
+            price,
+            category,
+            isAlcoholic,
+            isDeleted,
+            stockAmount,
+            menuType
+        FROM menuItems
+        WHERE isDeleted IS NULL OR isDeleted = 0";
 
-            return ExecuteMenuItemQuery(query, null, null);
+            return ExecuteMenuQuery(query, null, null);
         }
 
-        public List<MenuItem> GetMenuItemsByFilter(MenuType menuType, MenuCategory? category, bool includeDeleted = false)
+
+        public Menu GetMenuItemsByFilter(MenuType menuType, MenuCategory? category, bool includeDeleted = false)
         {
             string query = @"
-                SELECT 
-                    id AS MenuItemID,
-                    itemName,
-                    price,
-                    category,
-                    isAlcoholic,
-                    isDeleted,
-                    stockAmount,
-                    menuType
-                FROM menuItems
-                WHERE menuType = @menuType";
+        SELECT 
+            id AS MenuItemID,
+            itemName,
+            price,
+            category,
+            isAlcoholic,
+            isDeleted,
+            stockAmount,
+            menuType
+        FROM menuItems
+        WHERE menuType = @menuType";
 
             if (category != null)
                 query += " AND category = @category";
@@ -55,10 +56,11 @@ namespace ChapeauHerkansing.Repositories
             if (!includeDeleted)
                 query += " AND (isDeleted IS NULL OR isDeleted = 0)";
 
-            return ExecuteMenuItemQuery(query, menuType, category);
+            return ExecuteMenuQuery(query, menuType, category);
         }
 
-        private List<MenuItem> ExecuteMenuItemQuery(string query, MenuType? menuType, MenuCategory? category)
+
+        private Menu ExecuteMenuQuery(string query, MenuType? menuType, MenuCategory? category)
         {
             List<MenuItem> items = new List<MenuItem>();
 
@@ -77,14 +79,16 @@ namespace ChapeauHerkansing.Repositories
 
                 while (reader.Read())
                 {
-                    items.Add(MenuItemMapper.FromReader(reader));
+                    items.Add(MenuItemReader.Read(reader));
                 }
 
                 reader.Close();
             }
 
-            return items;
+            return new Menu(items); // objectgeoriënteerd resultaat
         }
+
+
 
         public int InsertMenuItem(MenuItemCreateViewModel model)
         {
@@ -144,7 +148,7 @@ namespace ChapeauHerkansing.Repositories
                 conn.Open();
                 SqlDataReader reader = cmd.ExecuteReader();
                 if (reader.Read())
-                    return MenuItemMapper.FromReader(reader);
+                    return MenuItemReader.Read(reader);
                 return null;
             }
         }
@@ -234,7 +238,7 @@ namespace ChapeauHerkansing.Repositories
 
                 while (reader.Read())
                 {
-                    menu.MenuItems.Add(MenuItemMapper.FromReader(reader));
+                    menu.MenuItems.Add(MenuItemReader.Read(reader));
                 }
 
                 reader.Close();
@@ -251,7 +255,7 @@ namespace ChapeauHerkansing.Repositories
                 WHERE id = @id AND (isDeleted IS NULL OR isDeleted = 0);
             ";
 
-            var parameters = new Dictionary<string, object>
+            Dictionary<string, object> parameters = new Dictionary<string, object>
             {
                 { "@change", amountChange },
                 { "@id", menuItemId }

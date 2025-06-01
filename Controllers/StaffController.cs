@@ -17,9 +17,11 @@ namespace ChapeauHerkansing.Controllers
 
         public IActionResult Index()
         {
-            List<Staff> staffList = _staffService.GetAllStaff(true);
-            return View(staffList);
+            StaffCollection model = _staffService.GetAllStaff(true);
+            return View(model);
+
         }
+
 
         public IActionResult Create()
         {
