@@ -46,5 +46,10 @@ namespace ChapeauHerkansing.Services
         {
             return _menuItemRepository.ToggleActive(id);
         }
+
+        public Menu GetMenuItemsByMenuType(MenuType menuType)
+        {
+            return _menuItemRepository.GetMenuItemsByMenuType(menuType);
+        }
     }
 }

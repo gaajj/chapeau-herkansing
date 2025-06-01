@@ -19,6 +19,7 @@ builder.Services.AddScoped<MenuItemRepository>();
 
 builder.Services.AddScoped<MenuService>();
 builder.Services.AddScoped<StaffService>();
+builder.Services.AddScoped<OrderService>();
 builder.Services.AddScoped<TableRepository>();
 
 
