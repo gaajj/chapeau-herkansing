@@ -242,5 +242,22 @@ namespace ChapeauHerkansing.Repositories
 
             return menu;
         }
+
+        public void UpdateStock(int menuItemId, int amountChange)
+        {
+            string query = @"
+                UPDATE menuItems
+                SET stockAmount = stockAmount + @change
+                WHERE id = @id AND (isDeleted IS NULL OR isDeleted = 0);
+            ";
+
+            var parameters = new Dictionary<string, object>
+            {
+                { "@change", amountChange },
+                { "@id", menuItemId }
+            };
+
+            ExecuteNonQuery(query, parameters);
+        }
     }
 }

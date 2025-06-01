@@ -263,7 +263,7 @@ namespace ChapeauHerkansing.Repositories
                 { "@menuItemId", menuItem.MenuItemID },
                 { "@staffId", staff.Id },
                 { "@amount", amount },
-                { "@status", status }
+                { "@status", status.ToString() }
             };
 
             ExecuteNonQuery(query, parameters);

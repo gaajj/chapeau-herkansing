@@ -63,6 +63,11 @@ namespace ChapeauHerkansing.Controllers
             Staff staff = new Staff(10, "", "", "", "", Role.Waiter); // hard coded for now
             try
             {
+                if (menuItem.StockAmount < model.Amount)
+                {
+                    TempData["Error"] = "Not enough stock available to add this item.";
+                    return RedirectToAction("Index", new { tableId = order.Table.TableID });
+                }
                 OrderLine? existingLine = null;
                 
                 foreach (OrderLine line in order.OrderLines)
@@ -77,12 +82,14 @@ namespace ChapeauHerkansing.Controllers
                 if (existingLine != null)
                 {
                     _orderRepository.UpdateOrderLineAmount(existingLine.OrderLineID, existingLine.Amount + model.Amount);
+                    
                 }
                 else
                 {
                     _orderRepository.AddMenuItemToOrder(order, menuItem, staff, model.Amount, OrderStatus.Ordered);
                 }
 
+                _menuItemRepository.UpdateStock(model.MenuItemId, -model.Amount);
                 TempData["Message"] = "Menu item successfully added.";
             }
             catch
@@ -101,10 +108,12 @@ namespace ChapeauHerkansing.Controllers
                 if (model.Amount > 1)
                 {
                     _orderRepository.UpdateOrderLineAmount(model.OrderLineId, model.Amount - 1);
+                    _menuItemRepository.UpdateStock(model.MenuItemId, 1);
                 }
                 else
                 {
                     _orderRepository.RemoveOrderLine(model.OrderLineId);
+                    _menuItemRepository.UpdateStock(model.MenuItemId, model.Amount);
                 }
 
                 TempData["Message"] = "Item removed from order.";

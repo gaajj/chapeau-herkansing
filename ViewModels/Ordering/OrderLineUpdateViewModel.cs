@@ -5,5 +5,6 @@
         public int OrderLineId { get; set; }
         public int Amount { get; set; }
         public int TableId { get; set; }
+        public int MenuItemId { get; set; }
     }
 }
