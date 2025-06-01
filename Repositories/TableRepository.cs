@@ -113,13 +113,5 @@ namespace ChapeauHerkansing.Repositories
                 list.Add(reader.GetString(0));
             return list;
         }
-
-        public void SetTableFree(int tableId)
-        {
-            UpdateTableStatus(tableId, TableStatus.Free);
-        }
-
-
-
     }
 }

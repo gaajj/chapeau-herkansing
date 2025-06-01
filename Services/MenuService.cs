@@ -43,7 +43,6 @@ namespace ChapeauHerkansing.Services
             int stockId = _stockService.CreateInitialStock(model.StockAmount);
             int menuItemId = _menuItemRepository.InsertMenuItem(model, stockId);
             _menuItemMenuRepo.LinkMenuItemToMenu((int)model.MenuType, menuItemId);
-
         }
 
         public MenuItem GetMenuItemById(int id)

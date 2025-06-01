@@ -31,8 +31,8 @@ namespace ChapeauHerkansing.Repositories
                         command.Parameters.AddWithValue("@feedback", payment.Feedback ?? (object)DBNull.Value);
 
                         connection.Open();
-                        int result = command.ExecuteNonQuery();
-                        Console.WriteLine($"Insert uitgevoerd, rows affected: {result}");
+                        command.ExecuteNonQuery();
+
                     }
                 }
             }
@@ -41,7 +41,5 @@ namespace ChapeauHerkansing.Repositories
                 Console.WriteLine("FOUT bij insert: " + ex.Message);
             }
         }
-
-
     }
 }

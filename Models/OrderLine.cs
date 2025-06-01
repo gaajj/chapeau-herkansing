@@ -10,7 +10,22 @@ namespace ChapeauHerkansing.Models
         public DateTime? OrderTime { get; set; }
         public string Note { get; set; }
 
-        public OrderLine(int orderLineID, Order order, MenuItem menuItem, Staff staff, int? amount, DateTime? orderTime, string note)
+
+        public decimal VAT
+        {
+            get
+            {
+                if (MenuItem?.Price == null || Amount == null)
+                    return 0;
+
+                decimal percentage = MenuItem.IsAlcoholic ? 0.21m : 0.09m;
+                return MenuItem.Price * percentage * Amount.Value;
+            }
+        }
+
+
+
+        public OrderLine(int orderLineID, Order order, MenuItem menuItem, Staff staff, int amount, DateTime? orderTime, string note)
         {
             OrderLineID = orderLineID;
             Order = order;
