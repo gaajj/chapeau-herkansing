@@ -72,7 +72,7 @@ namespace ChapeauHerkansing.Controllers
                 
                 foreach (OrderLine line in order.OrderLines)
                 {
-                    if (line.MenuItem.MenuItemID == model.MenuItemId && string.IsNullOrWhiteSpace(line.Note))
+                    if (line.MenuItem.MenuItemID == model.MenuItemId && model.Note == line.Note)
                     {
                         existingLine = line;
                         break;
