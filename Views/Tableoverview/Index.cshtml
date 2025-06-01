@@ -98,49 +98,100 @@
     }
 </div>
 
-<div id="statusModal" style="
-        display:none;
-        position:fixed;
-        top:0; left:0; right:0; bottom:0;
-        background:rgba(0,0,0,0.5);
-        align-items:center;
-        justify-content:center;
-    ">
-    <div style="
-            background:white;
-            padding:20px;
-            border-radius:8px;
-            width:280px;
-            font-family:Tahoma;
-        ">
-        <h3 style="margin-top:0;">Change Table Status</h3>
+<style>
+    .modal-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,.55);
+        align-items: center;
+        justify-content: center;
+        z-index: 1050;
+    }
+
+    .modal-card {
+        background: #fff;
+        padding: 24px;
+        border-radius: 10px;
+        width: 320px;
+        font-family: Tahoma;
+        box-shadow: 0 8px 24px rgba(0,0,0,.15);
+    }
+
+    .modal-actions {
+        display: flex;
+        gap: 8px;
+        justify-content: center
+    }
+
+    .btn {
+        padding: 8px 16px;
+        border: none;
+        border-radius: 6px;
+        font-family: Tahoma;
+        font-size: 14px;
+        cursor: pointer;
+        transition: opacity .15s;
+    }
+
+        .btn:hover {
+            opacity: .85
+        }
+
+    .btn-primary {
+        background: #007bff;
+        color: #fff
+    }
+
+    .btn-outline {
+        background: #fff;
+        color: #333;
+        border: 2px solid #333
+    }
+
+    .btn-success {
+        background: #28a745;
+        color: #fff
+    }
+
+    .btn-block {
+        width: 100%;
+        margin-top: 18px
+    }
+</style>
+
+<div id="statusModal" class="modal-overlay">
+    <div class="modal-card">
+        <h3 id="modalHeader" style="margin-top:0;margin-bottom:18px;">
+            Change Table Status – Table <span id="modalTableNumber"></span>
+        </h3>
         <form asp-controller="TableOverview" asp-action="SetTableStatus" method="post">
             <input type="hidden" id="modalTableId" name="tableId" />
-            <div style="margin-bottom:15px;">
-                <label><input type="radio" name="newStatus" value="Free" /> Free</label><br />
-                <label><input type="radio" name="newStatus" value="Occupied" /> Occupied</label><br />
-                <label><input type="radio" name="newStatus" value="Reserved" /> Reserved</label>
-            </div>
-            <div style="text-align:right;">
-                <button type="button" onclick="closeStatusModal()" style="margin-right:10px; padding:6px 12px; font-family:Tahoma;">Cancel</button>
-                <button type="submit" style="padding:6px 12px; background:#007bff; color:white; border:none; border-radius:4px; font-family:Tahoma;">Save</button>
 
+            <div class="mb-3" style="margin-bottom:18px;">
+                <label><input type="radio" name="newStatus" value="Free"> Free</label><br>
+                <label><input type="radio" name="newStatus" value="Occupied"> Occupied</label><br>
+                <label><input type="radio" name="newStatus" value="Reserved"> Reserved</label>
+            </div>
+
+            <div class="modal-actions">
+                <button type="button" class="btn btn-outline" onclick="closeStatusModal()">Cancel</button>
+                <button type="submit" class="btn btn-primary">Save</button>
             </div>
         </form>
-        <button type="button"
-                onclick="goToOrders()"
-                style="margin-top:10px; width:100%; padding:6px 0; background:#28a745; color:white; border:none; border-radius:4px; font-family:Tahoma; font-weight:bold;">
-            take an order for this table
+
+        <button type="button" class="btn btn-success btn-block" onclick="goToOrders()">
+            Take an order for this table
         </button>
-
-
     </div>
 </div>
+
 
 @section Scripts {
     <script>
         function openStatusModal(id, current) {
             document.getElementById('modalTableId').value = id;
+             document.getElementById('modalTableNumber').textContent = id;
             var radios = document.getElementsByName('newStatus');
             radios.forEach(r => r.checked = r.value === current);
             document.getElementById('statusModal').style.display = 'flex';
