@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using ChapeauHerkansing.Models;
 
 namespace ChapeauHerkansing.ViewModels.Tables

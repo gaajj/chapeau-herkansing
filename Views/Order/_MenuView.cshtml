@@ -18,6 +18,14 @@
                             {
                                 <span class="badge bg-danger ms-2">Alcoholic</span>
                             }
+                            @if (item.StockAmount == 0)
+                            {
+                                <span class="badge bg-secondary ms-2">Out of Stock</span>
+                            }
+                            else if (item.StockAmount <= 10)
+                            {
+                                <span class="badge bg-warning text-dark ms-2">Stock Left: @item.StockAmount</span>
+                            }
                         </div>
 
                         <!-- Price and Add Button -->
@@ -27,7 +35,9 @@
                                 <input type="hidden" name="orderId" value="@Model.Order.OrderID" />
                                 <input type="hidden" name="menuItemId" value="@item.MenuItemID" />
                                 <input type="number" name="amount" value="1" min="1" class="form-control d-inline w-auto me-2" />
-                                <button type="submit" class="btn btn-success btn-sm">Add</button>
+                                <button type="submit" 
+                                    class="btn btn-sm 
+                                        @(item.StockAmount == 0 ? "btn-secondary disabled" : "btn-primary")">Add</button>
                             </form>
                         </div>
                     </li>

@@ -4,14 +4,8 @@
     ViewData["Title"] = "Manage Menu";
 }
 
-<ul class="nav nav-tabs mb-3">
-    <li class="nav-item">
-        <a class="nav-link active" asp-controller="Management" asp-action="Index">Menu</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link" asp-controller="Staff" asp-action="Index">Employees</a>
-    </li>
-</ul>
+<partial name="_ManagementTabs" />
+
 
 
 <h2>Manage Menu</h2>
@@ -66,16 +60,29 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model.MenuItems)
+        @foreach (MenuItem item in Model.Menu.MenuItems)
         {
-            var rowClass = item.IsDeleted == true ? "table-secondary text-muted" : "";
+            string rowClass = item.IsDeleted == true ? "table-secondary text-muted" : "";
 
             <tr class="@rowClass">
                 <td>@item.Name</td>
                 <td>€ @item.Price</td>
                 <td>@item.Category</td>
                 <td>@(item.IsAlcoholic ? "Yes" : "No")</td>
-                <td>@item.StockAmount</td>
+                <td>
+                    @if (item.StockAmount <= 0)
+                    {
+                        <span class="text-danger fw-bold">Out of stock</span>
+                    }
+                    else if (item.StockAmount <= 10)
+                    {
+                        <span class="text-warning fw-semibold">Almost out (@item.StockAmount)</span>
+                    }
+                    else
+                    {
+                        <span>@item.StockAmount</span>
+                    }
+                </td>
                 <td>
                     <a asp-action="Edit" asp-route-id="@item.MenuItemID" class="btn btn-sm btn-primary">Edit</a>
                     @if (item.IsDeleted == true)

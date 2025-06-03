@@ -3,6 +3,7 @@ using ChapeauHerkansing.Services;
 using ChapeauHerkansing.Models.Enums;
 using ChapeauHerkansing.ViewModels.Management;
 using Microsoft.AspNetCore.Authorization;
+using ChapeauHerkansing.Models;
 
 namespace ChapeauHerkansing.Controllers
 {
@@ -18,17 +19,16 @@ namespace ChapeauHerkansing.Controllers
 
         public IActionResult Index(MenuType menuType = MenuType.Lunch, MenuCategory? category = null)
         {
-            // var mag niet
-            var menuItems = _menuService.GetFilteredMenuItems(menuType, category, includeDeleted: true);
-
-            var viewModel = new MenuManagementViewModel
+            Menu menu = _menuService.GetFilteredMenu(menuType, category, includeDeleted: true);
+            MenuManagementViewModel viewModel = new MenuManagementViewModel
             {
-                MenuItems = menuItems,
+                Menu = menu,
                 SelectedMenuType = menuType,
                 SelectedCategory = category,
                 MenuTypes = Enum.GetValues(typeof(MenuType)).Cast<MenuType>().ToList(),
                 Categories = Enum.GetValues(typeof(MenuCategory)).Cast<MenuCategory>().ToList()
             };
+
 
             return View(viewModel);
         }
@@ -58,11 +58,12 @@ namespace ChapeauHerkansing.Controllers
                 TempData["Message"] = "Gerecht succesvol toegevoegd.";
                 return RedirectToAction("Index");
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                TempData["Error"] = "Er is iets misgegaan bij het toevoegen van het gerecht.";
+                TempData["Error"] = $"Fout bij toevoegen: {ex.Message}";
                 return View(model);
             }
+
         }
 
 
@@ -80,7 +81,7 @@ namespace ChapeauHerkansing.Controllers
                 Price = item.Price,
                 Category = item.Category,
                 IsAlcoholic = item.IsAlcoholic,
-                StockAmount = item.StockAmount ?? 0,
+                StockAmount = item.StockAmount,
                 MenuType = item.MenuType
             };
 
@@ -126,6 +127,21 @@ namespace ChapeauHerkansing.Controllers
             return RedirectToAction("Index");
         }
 
+        public IActionResult Financial(DateTime? startDate, DateTime? endDate, string period = "month")
+        {
+            var viewModel = new FinancialOverviewViewModel
+            {
+                SelectedPeriod = period,
+                StartDate = startDate ?? DateTime.Now.AddMonths(-1),
+                EndDate = endDate ?? DateTime.Now,
+                // Deze worden later gevuld met data uit je Order- en PaymentRepository
+                TotalSalesByType = new Dictionary<string, int>(),
+                TotalIncomeByType = new Dictionary<string, decimal>(),
+                TotalTipAmount = 0
+            };
+
+            return View(viewModel);
+        }
 
 
 

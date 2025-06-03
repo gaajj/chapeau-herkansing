@@ -1,39 +1,45 @@
 ﻿using ChapeauHerkansing.Models;
 using ChapeauHerkansing.Models.Enums;
 using ChapeauHerkansing.Repositories;
+using ChapeauHerkansing.Services;
 using Microsoft.AspNetCore.Authorization;
 using ChapeauHerkansing.ViewModels.Ordering;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
 
 namespace ChapeauHerkansing.Controllers
 {
     [Authorize(Roles = "Waiter")]
     public class OrderController : Controller
     {
-        private readonly MenuRepository _menuRepository;
-        private readonly OrderRepository _orderRepository;
+        private readonly MenuService _menuService;
+        private readonly OrderService _orderService;
 
-        public OrderController(MenuRepository menuRepository, OrderRepository orderRepository)
+        public OrderController(MenuService menuService, OrderService orderService)
         {
-            _menuRepository = menuRepository;
-            _orderRepository = orderRepository;
+            _menuService = menuService;
+            _orderService = orderService;
         }
 
         // hard coded table for now
-        public IActionResult Index(MenuType? menuType = null, int tableId = 2, MenuCategory? category = null)
+        public IActionResult Index(int tableId = 2, MenuType? menuType = null, MenuCategory? category = null)
         {
-            Order order = _orderRepository.GetOrderByTable(tableId);
+            Order order = _orderService.GetOrderByTable(tableId);
             Menu? menu = null;
 
             if (menuType.HasValue)
             {
-                menu = _menuRepository.GetFilteredMenu(menuType, category);
+                menu = _menuService.GetMenuItemsByMenuType(menuType.Value);
+
                 if (menu == null || (menu.MenuItems.Count == 0 && category != null))
                 {
-                    menu = new Menu(0, menuType.Value)
-                    {
-                        MenuItems = new List<MenuItem>()
-                    };
+                    menu = new Menu(); // forces no items message instead of going back to index
+                }
+                else if (category != null)
+                {
+                    menu.MenuItems = menu.MenuItems
+                        .Where(item => item.Category == category.Value)
+                        .ToList();
                 }
             }
 
@@ -45,38 +51,25 @@ namespace ChapeauHerkansing.Controllers
                 MenuType = menuType
             };
 
-            ViewData["Title"] = $"Order of table #{model.Order.Table.TableID}";
             return View(model);
         }
 
         [HttpPost]
         public IActionResult AddMenuItemToOrder(MenuItemAddViewModel model)
         {
-            Order order = _orderRepository.GetOrderById(model.OrderId);
-            MenuItem menuItem = _menuRepository.GetMenuItemById(model.MenuItemId);
-            Staff staff = new Staff(2, "", "", "", "", Role.Waiter); // hard coded for now
+            Order order = _orderService.GetOrderById(model.OrderId);
+            MenuItem menuItem = _menuService.GetMenuItemById(model.MenuItemId);
+            Staff staff = new Staff(10, "", "", "", "", Role.Waiter); // hard coded for now
+
             try
             {
-                OrderLine? existingLine = null;
-                
-                foreach (OrderLine line in order.OrderLines)
+                if (menuItem.StockAmount < model.Amount)
                 {
-                    if (line.MenuItem.MenuItemID == model.MenuItemId && string.IsNullOrWhiteSpace(line.Note))
-                    {
-                        existingLine = line;
-                        break;
-                    }
+                    TempData["Error"] = "Not enough stock available to add this item.";
+                    return RedirectToAction("Index", new { tableId = order.Table.TableID });
                 }
 
-                if (existingLine != null)
-                {
-                    _orderRepository.UpdateOrderLineAmount(existingLine.OrderLineID, existingLine.Amount + model.Amount);
-                }
-                else
-                {
-                    _orderRepository.AddMenuItemToOrder(order, menuItem, staff, model.Amount);
-                }
-
+                _orderService.AddMenuItemToOrder(order, menuItem, staff, model);
                 TempData["Message"] = "Menu item successfully added.";
             }
             catch
@@ -92,15 +85,7 @@ namespace ChapeauHerkansing.Controllers
         {
             try
             {
-                if (model.Amount > 1)
-                {
-                    _orderRepository.UpdateOrderLineAmount(model.OrderLineId, model.Amount - 1);
-                }
-                else
-                {
-                    _orderRepository.RemoveOrderLine(model.OrderLineId);
-                }
-
+                _orderService.RemoveOrderLine(model.OrderLineId, model.MenuItemId, model.Amount);
                 TempData["Message"] = "Item removed from order.";
             }
             catch
@@ -116,7 +101,7 @@ namespace ChapeauHerkansing.Controllers
         {
             try
             {
-                _orderRepository.UpdateOrderLineNote(model.OrderLineId, model.Note);
+                _orderService.UpdateOrderLineNote(model.OrderLineId, model.Note);
                 TempData["Message"] = "Note updated.";
             }
             catch

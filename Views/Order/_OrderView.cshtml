@@ -50,6 +50,7 @@
                     <input type="hidden" name="OrderLineId" value="@line.OrderLineID" />
                     <input type="hidden" name="Amount" value="@line.Amount" />
                     <input type="hidden" name="TableId" value="@Model.Table.TableID" />
+                    <input type="hidden" name="MenuItemId" value="@line.MenuItem.MenuItemID" />
                     <button type="submit" class="btn btn-danger btn-sm">–</button>
                 </form>
                 <!-- Add 1 -->
@@ -57,6 +58,7 @@
                     <input type="hidden" name="orderId" value="@Model.OrderID" />
                     <input type="hidden" name="menuItemId" value="@line.MenuItem.MenuItemID" />
                     <input type="hidden" name="amount" value="1" />
+                    <input type="hidden" name="note" value="@line.Note" />
                     <button type="submit" class="btn btn-success btn-sm">+</button>
                 </form>
             </div>

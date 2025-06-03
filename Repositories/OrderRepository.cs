@@ -1,4 +1,5 @@
 ﻿using ChapeauHerkansing.Models;
+using ChapeauHerkansing.Models.Enums;
 using ChapeauHerkansing.Repositories.Readers;
 using Microsoft.Data.SqlClient;
 
@@ -16,7 +17,7 @@ namespace ChapeauHerkansing.Repositories
                 SELECT
                     o.id AS orderId,
                     o.isDeleted,
-                    o.timeCreated,
+                    o.orderTime AS orderOrderTime,
                     t.id AS tableId,
                     t.seats,
                     t.tableStatus,
@@ -28,7 +29,7 @@ namespace ChapeauHerkansing.Repositories
                     s.role,
                     ol.id AS orderLineId,
                     ol.amount,
-                    ol.orderTime,
+                    ol.orderTime AS orderLineOrderTime,
                     ol.note,
                     ol.orderStatus,
                     mi.id AS menuItemId,
@@ -205,7 +206,7 @@ namespace ChapeauHerkansing.Repositories
                 SELECT
                     o.id AS orderId,
                     o.isDeleted,
-                    o.timeCreated,
+                    o.orderTime AS orderOrderTime,
                     t.id AS tableId,
                     t.seats,
                     t.tableStatus,
@@ -217,7 +218,7 @@ namespace ChapeauHerkansing.Repositories
                     s.role,
                     ol.id AS orderLineId,
                     ol.amount,
-                    ol.orderTime,
+                    ol.orderTime AS orderLineOrderTime,
                     ol.note,
                     ol.orderStatus,
                     mi.id AS menuItemId,
@@ -249,20 +250,25 @@ namespace ChapeauHerkansing.Repositories
             return ExecuteQuery(query, ReadOrderWithLines, parameters).FirstOrDefault();
         }
 
-        public void AddMenuItemToOrder(Order order, MenuItem menuItem, Staff staff, int amount)
+        public void AddMenuItemToOrder(Order order, MenuItem menuItem, Staff staff, int amount, OrderStatus status)
         {
             string query = @"
-                INSERT INTO orderLines (orderId, menuItemId, staffId, amount, orderTime)
-                VALUES (@orderId, @menuItemId, @staffId, @amount, GETDATE())";
+                INSERT INTO orderLines (orderId, menuItemId, staffId, amount, orderTime, orderStatus)
+                VALUES (@orderId, @menuItemId, @staffId, @amount, GETDATE(), @status)
+            ";
 
             var parameters = new Dictionary<string, object>
             {
                 { "@orderId", order.OrderID },
                 { "@menuItemId", menuItem.MenuItemID },
                 { "@staffId", staff.Id },
-                { "@amount", amount }
-            }; ExecuteNonQuery(query, parameters);
+                { "@amount", amount },
+                { "@status", status.ToString() }
+            };
+
+            ExecuteNonQuery(query, parameters);
         }
+
         public void ToggleOrderLineStatus(int orderLineId)
         {
             string query = @"

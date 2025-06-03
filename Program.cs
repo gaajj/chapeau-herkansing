@@ -15,11 +15,10 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<StaffRepository>();
 builder.Services.AddScoped<OrderRepository>();
 builder.Services.AddScoped<MenuItemRepository>();
-builder.Services.AddScoped<StockRepository>();
-builder.Services.AddScoped<MenuRepository>();
-builder.Services.AddScoped<StockService>();
+
 builder.Services.AddScoped<MenuService>();
 builder.Services.AddScoped<StaffService>();
+builder.Services.AddScoped<OrderService>();
 builder.Services.AddScoped<TableRepository>();
 builder.Services.AddScoped<TableService>();
 

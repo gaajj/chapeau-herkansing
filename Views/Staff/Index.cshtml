@@ -1,8 +1,10 @@
-﻿@model List<ChapeauHerkansing.Models.Staff>
+﻿@model ChapeauHerkansing.Models.StaffCollection
 
 @{
     ViewData["Title"] = "Manage Employees";
 }
+<partial name="_ManagementTabs" />
+
 @if (TempData["Message"] != null)
 {
     <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -36,7 +38,7 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (var employee in Model)
+        @foreach (var employee in Model.StaffMembers)
         {
             var rowClass = employee.IsDeleted == true ? "table-secondary text-muted" : "";
 

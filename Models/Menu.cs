@@ -1,19 +1,17 @@
-using ChapeauHerkansing.Models.Enums;
-
-namespace ChapeauHerkansing.Models
+﻿namespace ChapeauHerkansing.Models
 {
     public class Menu
     {
-        public int MenuID { get; set; }
-        public string Type { get; set; }
-        public MenuType MenuType { get; set; }
-
         public List<MenuItem> MenuItems { get; set; } = new List<MenuItem>();
 
-        public Menu(int menuID, MenuType type)
+        public Menu()
         {
-            MenuID = menuID;
-            MenuType = type;
+            MenuItems = new List<MenuItem>();
+        }
+
+        public Menu(List<MenuItem> menuItems)
+        {
+            MenuItems = menuItems;
         }
     }
 }

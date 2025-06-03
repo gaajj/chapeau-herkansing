@@ -8,15 +8,13 @@ namespace ChapeauHerkansing.Models
         public string Name { get; set; }
         public decimal Price { get; set; }
         public MenuCategory Category { get; set; }
-
         public bool IsAlcoholic { get; set; }
         public bool? IsDeleted { get; set; }
-        public int StockID { get; set; }       // FK naar stock (bijv. voor voorraad)
-        public int? StockAmount { get; set; }
+        public int StockAmount { get; set; } // Rechtstreeks op MenuItem
 
-        public MenuType MenuType { get; set; } // FK naar menu (bij JOIN opgehaald)
+        public MenuType MenuType { get; set; } // Via JOIN opgehaald
 
-
+        // Constructors
         public MenuItem(int menuItemID, string name, decimal price, MenuCategory category, bool isAlcoholic)
         {
             MenuItemID = menuItemID;
@@ -25,23 +23,17 @@ namespace ChapeauHerkansing.Models
             Category = category;
             IsAlcoholic = isAlcoholic;
         }
-        public MenuItem(int menuItemID, string name, decimal price, MenuCategory category, bool isAlcoholic, bool? IsDeleted, int StockID, int? StockAmount, MenuType menuType)
+
+        public MenuItem(int menuItemID, string name, decimal price, MenuCategory category, bool isAlcoholic, bool? isDeleted, int stockAmount, MenuType menuType)
         {
             MenuItemID = menuItemID;
             Name = name;
             Price = price;
             Category = category;
             IsAlcoholic = isAlcoholic;
-            this.IsDeleted = IsDeleted;
-            this.StockID = StockID;
-            this.StockAmount = StockAmount;
+            IsDeleted = isDeleted;
+            StockAmount = stockAmount;
             MenuType = menuType;
-
-        }
-        public MenuItem(int menuItemID, string name)
-        {
-            MenuItemID = menuItemID;
-            Name = name;
         }
 
     }

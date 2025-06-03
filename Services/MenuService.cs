@@ -9,41 +9,30 @@ namespace ChapeauHerkansing.Services
     public class MenuService
     {
         private readonly MenuItemRepository _menuItemRepository;
-        private readonly StockService _stockService;
-        private readonly MenuItemMenuRepository _menuItemMenuRepo;
 
-        public MenuService(MenuItemRepository menuItemRepo, StockService stockService, MenuItemMenuRepository menuItemMenuRepo)
+        public MenuService(MenuItemRepository menuItemRepo)
         {
             _menuItemRepository = menuItemRepo;
-            _stockService = stockService;
-            _menuItemMenuRepo = menuItemMenuRepo;
         }
 
-
-        public MenuService(MenuItemRepository menuItemRepository, StockRepository stockRepo, StockService stockService)
-        {
-            _menuItemRepository = menuItemRepository;
-            _stockService = stockService;
-        }
-
-
-        public List<MenuItem> GetAllMenuItems()
+        public Menu GetAllMenu()
         {
             return _menuItemRepository.GetAllMenuItems();
         }
 
-        public List<MenuItem> GetFilteredMenuItems(MenuType menuType, MenuCategory? category, bool includeDeleted = false)
+
+        public Menu GetFilteredMenu(MenuType menuType, MenuCategory? category, bool includeDeleted = false)
         {
             return _menuItemRepository.GetMenuItemsByFilter(menuType, category, includeDeleted);
         }
 
 
+
         public void AddMenuItem(MenuItemCreateViewModel model)
         {
-            int stockId = _stockService.CreateInitialStock(model.StockAmount);
-            int menuItemId = _menuItemRepository.InsertMenuItem(model, stockId);
-            _menuItemMenuRepo.LinkMenuItemToMenu((int)model.MenuType, menuItemId);
-
+            // Eerder werd de koppeling via MenuItemMenuRepository afgehandeld.
+            // Nu voegen we het menuItem direct toe, met het juiste menuType (als integer) in de menuItems-tabel.
+            _menuItemRepository.InsertMenuItem(model);
         }
 
         public MenuItem GetMenuItemById(int id)
@@ -53,7 +42,6 @@ namespace ChapeauHerkansing.Services
 
         public void UpdateMenuItem(int id, MenuItemCreateViewModel model)
         {
-            _stockService.UpdateStock(id, model.StockAmount);
             _menuItemRepository.UpdateMenuItem(id, model);
         }
 
@@ -62,7 +50,9 @@ namespace ChapeauHerkansing.Services
             return _menuItemRepository.ToggleActive(id);
         }
 
-
-
+        public Menu GetMenuItemsByMenuType(MenuType menuType)
+        {
+            return _menuItemRepository.GetMenuItemsByMenuType(menuType);
+        }
     }
 }

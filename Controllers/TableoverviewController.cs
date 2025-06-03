@@ -1,11 +1,14 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using ChapeauHerkansing.Models;
 using ChapeauHerkansing.Repositories;
 using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using ChapeauHerkansing.Models.Enums;
 using ChapeauHerkansing.Services;
 using ChapeauHerkansing.ViewModels.Tables;
+using ChapeauHerkansing.Models.Enums;
+using ChapeauHerkansing.ViewModels;
+using ChapeauHerkansing.Models;
+
 
 
 namespace ChapeauHerkansing.Controllers

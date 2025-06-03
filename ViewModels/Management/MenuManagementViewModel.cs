@@ -6,12 +6,11 @@ namespace ChapeauHerkansing.ViewModels.Management
 {
     public class MenuManagementViewModel
     {
-        public List<MenuItem> MenuItems { get; set; }
-
+        public Menu Menu { get; set; } = new();
         public MenuType SelectedMenuType { get; set; }
         public MenuCategory? SelectedCategory { get; set; }
 
-        public List<MenuType> MenuTypes { get; set; }
-        public List<MenuCategory> Categories { get; set; }
+        public List<MenuType> MenuTypes { get; set; } = new();
+        public List<MenuCategory> Categories { get; set; } = new();
     }
 }
