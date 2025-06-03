@@ -28,6 +28,5 @@ namespace ChapeauHerkansing.Models
         }
 
         public Order() { }
-
     }
 }

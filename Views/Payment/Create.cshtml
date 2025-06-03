@@ -1,60 +1,63 @@
-﻿@model ChapeauHerkansing.Models.Payment
-@using System.Globalization
+﻿@model ChapeauHerkansing.ViewModels.PaymentViewModel
 
-@{
-    ViewData["Title"] = "Afrekenen";
-    decimal totaalBedrag = Model?.Order?.OrderLines.Sum(ol => (decimal)ol.MenuItem.Price * ol.Amount) ?? 0; // zet in de controller, door geven view model
-    string totaalBedragStr = totaalBedrag.ToString("F2", CultureInfo.InvariantCulture);
-}
+<h2 class="text-center my-4">📟 Afrekenen</h2>
 
-<h2 class="text-center my-4">🧾 Afrekenen</h2>
-
-<!-- Orderselectie dropdown -->
+<!-- Orderselectie -->
 <form asp-action="Create" method="get" class="mb-4" style="max-width: 600px; margin: auto;">
     <div class="form-group">
         <label for="orderId">Kies een order</label>
         <select class="form-control" name="orderId" onchange="this.form.submit()">
             <option value="">-- Selecteer een order --</option>
-            @foreach (var order in ViewBag.Orders)
+            @foreach (var order in Model.Orders)
             {
-                bool selected = Model?.Order?.OrderID == order.OrderID;
-                string tafel = order.Table?.TableID.ToString() ?? "onbekend";
-                <option value="@order.OrderID" selected="@(selected ? "selected" : null)">
-                     (Tafel @tafel)
+                <option value="@order.OrderID" selected="@(Model.Order?.OrderID == order.OrderID ? "selected" : null)">
+                    (Order @order.OrderID - Tafel @(order.Table?.TableID ?? 0))
                 </option>
             }
         </select>
     </div>
 </form>
 
-@if (Model?.Order != null)
+@if (Model.Orders == null || !Model.Orders.Any())
+{
+    <div class="alert alert-warning text-center">
+        📭 Er zijn momenteel geen openstaande bestellingen.
+    </div>
+}
+else if (Model.Order == null)
+{
+    <div class="alert alert-info text-center">
+        ℹ️ Selecteer een geldige order om verder te gaan.
+    </div>
+}
+else
 {
     <div class="card shadow p-4 mb-5" style="max-width: 700px; margin: auto;">
         <h4 class="mb-3">Order #@Model.Order.OrderID – Afrekenen</h4>
 
-        <!-- Bestelde items -->
         <ul class="list-group mb-3">
             @foreach (var item in Model.Order.OrderLines)
             {
                 <li class="list-group-item">
-                    @item.MenuItem.Name – @item.Amount x €@item.MenuItem.Price
+                    @item.MenuItem.Name – @item.Amount x €@item.MenuItem.Price.ToString("F2")
+                    → btw: €@item.VAT.ToString("F2")
                 </li>
             }
         </ul>
 
-        <div class="alert alert-info">
-            💰 <strong>Totaal te betalen:</strong> €@totaalBedragStr 
+        <div class="alert alert-secondary">
+            <div><strong>Totaal btw:</strong> €@Model.VatAmount.ToString("F2")</div>
+            <div><strong>Totaal te betalen:</strong> €@Model.TotalAmount.ToString("F2")</div>
         </div>
 
-        <form asp-action="Create" method="post">
-            <input type="hidden" name="Order.OrderID" value="@Model.Order.OrderID" />
+        <!-- Afrekenformulier -->
+        <form asp-action="Create" method="post" id="paymentForm">
+            <input type="hidden" asp-for="OrderId" />
 
             <div class="row">
                 <div class="col-md-6 mb-3">
                     <label asp-for="AmountPaid">Totaalbedrag betaald</label>
-                    <input asp-for="AmountPaid" class="form-control" type="number" step="0.01"
-                           min="@totaalBedragStr" value="@totaalBedragStr" id="amountPaid"
-                           oninput="checkAmountPaid()" />
+                    <input asp-for="AmountPaid" class="form-control" id="amountPaid" type="number" step="0.01" oninput="checkAmountPaid()" />
                     <div class="invalid-feedback d-block" id="amountError" style="display:none; color:red;">
                         Het betaalde bedrag mag niet lager zijn dan het totaalbedrag.
                     </div>
@@ -62,14 +65,22 @@
 
                 <div class="col-md-6 mb-3">
                     <label asp-for="Tip">Fooi</label>
-                    <input asp-for="Tip" class="form-control" type="number" step="0.01" />
+                    <input asp-for="Tip" class="form-control" type="number" step="0.01" id="tipField" />
+                    <div class="form-check mt-2">
+                        <input class="form-check-input" type="radio" name="ChangeOption" id="tipOption" value="tip" checked />
+                        <label class="form-check-label" for="tipOption">Als fooi geven</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="ChangeOption" id="backOption" value="back" />
+                        <label class="form-check-label" for="backOption">Teruggeven aan klant</label>
+                    </div>
                 </div>
             </div>
 
             <div class="mb-3">
-                <label asp-for="paymentMethodEnum">Betaalmethode</label>
-                <select asp-for="paymentMethodEnum" class="form-control"
-                        asp-items="Html.GetEnumSelectList<ChapeauHerkansing.Models.Enums.PaymentMethod>()">
+                <label asp-for="PaymentMethodEnum">Betaalmethode</label>
+                <select asp-for="PaymentMethodEnum" class="form-control"
+                        asp-items="Html.GetEnumSelectList<ChapeauHerkansing.Models.PaymentMethod>()">
                     <option value="">-- Kies methode --</option>
                 </select>
             </div>
@@ -80,69 +91,135 @@
             </div>
 
             <div class="form-group">
-                <label for="splitBetween">Split betaling (aantal personen)</label>
-                <input type="number" class="form-control" id="splitBetween" name="splitBetween" min="1"
-                       onchange="generateSplitFields(this.value)" />
+                <label asp-for="SplitBetween">Split betaling (aantal personen)</label>
+                <input asp-for="SplitBetween" class="form-control" type="number" min="1" onchange="generateSplitFields(this.value)" />
             </div>
 
             <div id="splitFields" class="mb-3"></div>
 
-
-            @if (ViewBag.SplitAmount != null)
+            @if (Model.SplitAmount != null)
             {
                 <div class="alert alert-warning">
-                    Elke persoon betaalt: <strong>€@ViewBag.SplitAmount</strong>
+                    Elke persoon betaalt: <strong>€@Model.SplitAmount</strong>
                 </div>
             }
 
             <div class="text-end">
-                <button type="submit" class="btn btn-success me-2">💾 Afrekenen</button>
+                <button type="submit" class="btn btn-success me-2">📅 Afrekenen</button>
                 <a asp-controller="Home" asp-action="Index" class="btn btn-secondary">Annuleren</a>
             </div>
         </form>
     </div>
 }
 
-<script>
-    function checkAmountPaid() {
-        const input = document.getElementById("amountPaid");
-        const min = parseFloat(input.min.replace(',', '.'));
-        const val = parseFloat(input.value.replace(',', '.'));
-        const error = document.getElementById("amountError");
+@section Scripts {
+    <script>
+        function checkAmountPaid() {
+            const input = document.getElementById("amountPaid");
+            const min = parseFloat("@Model.TotalAmount".replace(",", "."));
+            const val = parseFloat(input.value.replace(',', '.'));
+            const error = document.getElementById("amountError");
 
-        if (val < min) {
-            input.setCustomValidity("Ongeldig");
-            error.style.display = "block";
-        } else {
-            input.setCustomValidity("");
-            error.style.display = "none";
+            if (val < min) {
+                input.setCustomValidity("Ongeldig");
+                error.style.display = "block";
+            } else {
+                input.setCustomValidity("");
+                error.style.display = "none";
+            }
         }
-    }
 
-    function generateSplitFields(count) {
-        const container = document.getElementById("splitFields");
-        container.innerHTML = "";
-        const number = parseInt(count);
-        if (isNaN(number) || number < 2) return;
-
-        for (let i = 1; i <= number; i++) {
-            const group = document.createElement("div");
-            group.className = "form-group mb-2";
-
-            const label = document.createElement("label");
-            label.textContent = `Bedrag persoon ${i}`;
-
-            const input = document.createElement("input");
-            input.type = "number";
-            input.step = "0.01";
-            input.className = "form-control";
-            input.name = `personAmount${i}`;
-
-            group.appendChild(label);
-            group.appendChild(input);
-            container.appendChild(group);
+        function calculateChange() {
+            const total = parseFloat("@Model.TotalAmount".replace(",", "."));
+            const paid = parseFloat(document.getElementById("amountPaid").value.replace(",", "."));
+            return Math.max(0, paid - total);
         }
-    }
 
-    window.onload = checkAmountPaid;
-</script>
+        function handleChangeOption() {
+            const change = calculateChange();
+            const tipField = document.getElementById("tipField");
+            const giveTip = document.getElementById("tipOption").checked;
+
+            if (giveTip) {
+                tipField.value = change.toFixed(2);
+            } else {
+                tipField.value = "0.00";
+            }
+        }
+
+        function updateTotalFromSplits() {
+            const inputs = document.querySelectorAll("#splitFields input");
+            let sum = 0;
+            inputs.forEach(input => {
+                const val = parseFloat(input.value.replace(",", "."));
+                if (!isNaN(val)) sum += val;
+            });
+
+            const totalInput = document.getElementById("amountPaid");
+            if (totalInput) {
+                totalInput.value = sum.toFixed(2);
+                checkAmountPaid();
+                handleChangeOption();
+            }
+        }
+
+        function generateSplitFields(count) {
+            const container = document.getElementById("splitFields");
+            container.innerHTML = "";
+            const number = parseInt(count);
+            if (isNaN(number) || number < 2) return;
+
+            for (let i = 1; i <= number; i++) {
+                const group = document.createElement("div");
+                group.className = "form-group mb-2";
+
+                const label = document.createElement("label");
+                label.textContent = `Bedrag persoon ${i}`;
+
+                const input = document.createElement("input");
+                input.type = "number";
+                input.step = "0.01";
+                input.className = "form-control";
+                input.name = `personAmount${i}`;
+                input.addEventListener("input", updateTotalFromSplits);
+
+                group.appendChild(label);
+                group.appendChild(input);
+                container.appendChild(group);
+            }
+        }
+
+        window.onload = function () {
+            checkAmountPaid();
+            handleChangeOption();
+
+            const form = document.getElementById("paymentForm");
+            if (form) {
+                form.addEventListener("submit", function (e) {
+                    const total = parseFloat(document.getElementById("amountPaid").value.replace(",", "."));
+                    const splitInputs = document.querySelectorAll("#splitFields input");
+                    let splitSum = 0;
+
+                    splitInputs.forEach(input => {
+                        const val = parseFloat(input.value.replace(",", "."));
+                        if (!isNaN(val)) {
+                            splitSum += val;
+                        }
+                    });
+
+                    const roundedSum = Math.round(splitSum * 100) / 100;
+                    const roundedTotal = Math.round(total * 100) / 100;
+
+                    if (splitInputs.length > 0 && roundedSum !== roundedTotal) {
+                        e.preventDefault();
+                        alert(`⚠️ De ingevulde bedragen (€${roundedSum.toFixed(2)}) komen niet overeen met het totaalbedrag (€${roundedTotal.toFixed(2)}).`);
+                    }
+                });
+            }
+
+            document.getElementById("amountPaid").addEventListener("input", handleChangeOption);
+            document.getElementById("tipOption").addEventListener("change", handleChangeOption);
+            document.getElementById("backOption").addEventListener("change", handleChangeOption);
+        }
+    </script>
+}

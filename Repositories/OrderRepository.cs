@@ -377,5 +377,18 @@ namespace ChapeauHerkansing.Repositories
 
             return order;
         }
+
+
+        public void SoftDeleteOrder(int orderId)
+        {
+            string query = "UPDATE orders SET isDeleted = 1 WHERE id = @orderId;";
+            Dictionary<string, object> parameters = new Dictionary<string, object>
+            {
+                { "@orderId", orderId }
+            };
+
+            ExecuteNonQuery(query, parameters);
+        }
+
     }
 }
