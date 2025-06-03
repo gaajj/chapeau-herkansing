@@ -22,13 +22,10 @@ namespace ChapeauHerkansing.Models
                     return 0;
 
                 decimal percentage = MenuItem.IsAlcoholic ? 0.21m : 0.09m;
-                return MenuItem.Price * percentage * Amount.Value;
+                return MenuItem.Price * percentage * Amount;
             }
         }
 
-
-
-        public OrderLine(int orderLineID, Order order, MenuItem menuItem, Staff staff, int amount, DateTime? orderTime, string note)
         public OrderLine(int orderLineID, Order order, MenuItem menuItem, Staff staff, int amount, DateTime? orderTime, string note, OrderStatus orderStatus)
         {
             OrderLineID = orderLineID;

@@ -80,7 +80,7 @@ else
             <div class="mb-3">
                 <label asp-for="PaymentMethodEnum">Betaalmethode</label>
                 <select asp-for="PaymentMethodEnum" class="form-control"
-                        asp-items="Html.GetEnumSelectList<ChapeauHerkansing.Models.PaymentMethod>()">
+                        asp-items="Html.GetEnumSelectList<ChapeauHerkansing.Models.Enums.PaymentMethod>()">
                     <option value="">-- Kies methode --</option>
                 </select>
             </div>

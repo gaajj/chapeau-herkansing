@@ -1,4 +1,5 @@
 ﻿using ChapeauHerkansing.Models;
+using ChapeauHerkansing.Models.Enums;
 using System.Globalization;
 
 namespace ChapeauHerkansing.ViewModels
@@ -24,7 +25,7 @@ namespace ChapeauHerkansing.ViewModels
         public decimal TotalAmount => Order?.OrderLines?.Sum(ol =>
         {
             decimal price = ol.MenuItem?.Price ?? 0m;
-            int amount = ol.Amount ?? 0;
+            int amount = ol.Amount;
             return (price * amount) + ol.VAT;
         }) ?? 0m;
 

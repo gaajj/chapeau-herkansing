@@ -1,4 +1,5 @@
 ﻿using ChapeauHerkansing.Models;
+using ChapeauHerkansing.Models.Enums;
 using ChapeauHerkansing.Repositories;
 using System;
 using System.Linq;
@@ -18,7 +19,7 @@ namespace ChapeauHerkansing.Services
 
         public decimal CalculateTotal(Order order)
         {
-            return order.OrderLines.Sum(ol => (ol.MenuItem?.Price ?? 0m) * (ol.Amount ?? 0m));
+            return order.OrderLines.Sum(ol => (ol.MenuItem?.Price ?? 0m) * (ol.Amount));
         }
 
         public bool ValidatePayment(Payment payment, decimal totalAmount)

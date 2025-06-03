@@ -70,7 +70,7 @@ namespace ChapeauHerkansing.Repositories
                 SELECT
                     o.id AS orderId,
                     o.isDeleted,
-                   o.timeCreated,
+                    o.orderTime AS orderOrderTime,
                     t.id AS tableId,
                     t.seats,
                     t.tableStatus,
@@ -82,19 +82,21 @@ namespace ChapeauHerkansing.Repositories
                     s.role,
                     ol.id AS orderLineId,
                     ol.amount,
-                    ol.orderTime,
+                    ol.orderTime AS orderLineOrderTime,
                     ol.note,
                     ol.orderStatus,
                     mi.id AS menuItemId,
                     mi.itemName,
                     mi.price,
                     mi.category,
-                    mi.isAlcoholic
+                    mi.isAlcoholic,
+                    mi.menuType,
+                    mi.stockAmount
                 FROM
                     dbo.orders o
                 INNER JOIN
                     dbo.tables t ON o.tableId = t.id
-                inner JOIN
+                LEFT JOIN
                     dbo.orderLines ol ON o.id = ol.orderId
                 LEFT JOIN
                     dbo.menuItems mi ON ol.menuItemId = mi.id
@@ -103,7 +105,7 @@ namespace ChapeauHerkansing.Repositories
                 WHERE
                     o.isDeleted = 0
                 ORDER BY
-                    o.timeCreated;
+                    ol.orderTime;
             ";
 
             List<Order> orders = ExecuteGroupedQuery<Order>(query, MapOrderWithLines, null);
