@@ -36,7 +36,9 @@ namespace ChapeauHerkansing.Repositories
                     mi.itemName,
                     mi.price,
                     mi.category,
-                    mi.isAlcoholic
+                    mi.isAlcoholic,
+                    mi.menuType,
+                    mi.stockAmount
                 FROM
                     dbo.orders o
                 INNER JOIN
@@ -225,7 +227,9 @@ namespace ChapeauHerkansing.Repositories
                     mi.itemName,
                     mi.price,
                     mi.category,
-                    mi.isAlcoholic
+                    mi.isAlcoholic,
+                    mi.menuType,
+                    mi.stockAmount
                 FROM
                     dbo.orders o
                 INNER JOIN
