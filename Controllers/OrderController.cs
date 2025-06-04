@@ -2,10 +2,11 @@
 using ChapeauHerkansing.Models.Enums;
 using ChapeauHerkansing.Repositories;
 using ChapeauHerkansing.Services;
-using Microsoft.AspNetCore.Authorization;
 using ChapeauHerkansing.ViewModels.Ordering;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
+using System.Security.Claims;
 
 namespace ChapeauHerkansing.Controllers
 {
@@ -15,12 +16,14 @@ namespace ChapeauHerkansing.Controllers
         private readonly MenuService _menuService;
         private readonly OrderService _orderService;
         private readonly TableService _tableService;
+        private readonly StaffService _staffService;
 
-        public OrderController(MenuService menuService, OrderService orderService, TableService tableService)
+        public OrderController(MenuService menuService, OrderService orderService, TableService tableService, StaffService staffService)
         {
             _menuService = menuService;
             _orderService = orderService;
             _tableService = tableService;
+            _staffService = staffService;
         }
 
         public IActionResult Index(int tableId = 2, MenuType? menuType = null, MenuCategory? category = null)
@@ -73,7 +76,9 @@ namespace ChapeauHerkansing.Controllers
         {
             Order order = _orderService.GetOrderById(model.OrderId);
             MenuItem menuItem = _menuService.GetMenuItemById(model.MenuItemId);
-            Staff staff = new Staff(10, "", "", "", "", Role.Waiter); // hard coded for now
+
+            int staffId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            Staff staff = _staffService.GetStaffById(staffId);
 
             try
             {
