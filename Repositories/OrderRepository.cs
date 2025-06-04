@@ -344,6 +344,21 @@ namespace ChapeauHerkansing.Repositories
             ExecuteNonQuery(query, parameters);
         }
 
+        public void CreateOrderForTable(int tableId)
+        {
+            string query = @"
+                INSERT INTO orders (tableId, orderTime)
+                VALUES (@tableId, GETDATE());
+            ";
+
+            var parameters = new Dictionary<string, object>
+            {
+                { "@tableId", tableId }
+            };
+
+            ExecuteSingle(query, OrderReader.Read, parameters);
+        }
+
         private Order MapOrderWithLines(SqlDataReader reader, Dictionary<int, Order> dict)
         {
             int orderId = reader.GetInt32(reader.GetOrdinal("orderId"));

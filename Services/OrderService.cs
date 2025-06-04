@@ -78,5 +78,10 @@ namespace ChapeauHerkansing.Services
         {
             _orderRepository.UpdateOrderLineAmount(orderLineId, amount);
         }
+
+        public void CreateOrderForTable(int tableId)
+        {
+            _orderRepository.CreateOrderForTable(tableId);
+        }
     }
 }

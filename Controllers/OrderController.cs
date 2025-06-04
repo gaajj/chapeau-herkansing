@@ -14,17 +14,31 @@ namespace ChapeauHerkansing.Controllers
     {
         private readonly MenuService _menuService;
         private readonly OrderService _orderService;
+        private readonly TableService _tableService;
 
-        public OrderController(MenuService menuService, OrderService orderService)
+        public OrderController(MenuService menuService, OrderService orderService, TableService tableService)
         {
             _menuService = menuService;
             _orderService = orderService;
+            _tableService = tableService;
         }
 
-        // hard coded table for now
         public IActionResult Index(int tableId = 2, MenuType? menuType = null, MenuCategory? category = null)
         {
             Order order = _orderService.GetOrderByTable(tableId);
+
+            if (order == null)
+            {
+                Table? table = _tableService.GetTableById(tableId);
+                if (table != null && table.Status == TableStatus.Free)
+                {
+                    _orderService.CreateOrderForTable(tableId);
+                    _tableService.UpdateTableStatus(tableId, TableStatus.Occupied);
+
+                    order = _orderService.GetOrderByTable(tableId);
+                }
+            }
+
             Menu? menu = null;
 
             if (menuType.HasValue)
