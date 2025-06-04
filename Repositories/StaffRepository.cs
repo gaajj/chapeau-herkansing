@@ -1,10 +1,11 @@
 using ChapeauHerkansing.Models;
 using Microsoft.Data.SqlClient;
 using ChapeauHerkansing.Repositories.Readers;
+using ChapeauHerkansing.Repositories.Interfaces;
 
 namespace ChapeauHerkansing.Repositories
 {
-    public class StaffRepository : BaseRepository
+    public class StaffRepository : BaseRepository, IStaffRepository
     {
         public StaffRepository(IConfiguration configuration) : base(configuration)
         {
