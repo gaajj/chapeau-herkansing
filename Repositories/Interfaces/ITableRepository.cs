@@ -6,6 +6,7 @@ namespace ChapeauHerkansing.Repositories.Interfaces
 {
     public interface ITableRepository
     {
+        Table? GetTableById(int tableId);
         List<Table> GetAllTables();
         int GetReadyOrdersCount(int tableId, string orderStatus, bool includeDeleted);
         void ServeOrdersForTable(int tableId);

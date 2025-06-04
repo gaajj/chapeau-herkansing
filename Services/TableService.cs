@@ -17,6 +17,9 @@ namespace ChapeauHerkansing.Services
             _tableRepo = tableRepo;
         }
 
+        public Table? GetTableById(int tableId)
+            => _tableRepo.GetTableById(tableId);
+
         public List<Table> GetAllTables()
             => _tableRepo.GetAllTables();
 

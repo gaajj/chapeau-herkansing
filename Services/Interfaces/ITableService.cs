@@ -6,6 +6,7 @@ namespace ChapeauHerkansing.Services.Interfaces
 {
     public interface ITableService
     {
+        Table? GetTableById(int tableId);
         List<Table> GetAllTables();
         int GetReadyOrdersCount(int tableId);
         List<string> GetRunningOrderStatuses(int tableId);

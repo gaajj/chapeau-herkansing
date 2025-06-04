@@ -2,15 +2,17 @@
 using ChapeauHerkansing.Models;
 using ChapeauHerkansing.Models.Enums;
 using ChapeauHerkansing.Repositories;
+using ChapeauHerkansing.Repositories.Interfaces;
+using ChapeauHerkansing.Services.Interfaces;
 using ChapeauHerkansing.ViewModels.Management;
 
 namespace ChapeauHerkansing.Services
 {
-    public class MenuService
+    public class MenuService : IMenuService
     {
-        private readonly MenuItemRepository _menuItemRepository;
+        private readonly IMenuItemRepository _menuItemRepository;
 
-        public MenuService(MenuItemRepository menuItemRepo)
+        public MenuService(IMenuItemRepository menuItemRepo)
         {
             _menuItemRepository = menuItemRepo;
         }
