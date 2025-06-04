@@ -4,10 +4,11 @@ using System;
 using System.Collections.Generic;
 using ChapeauHerkansing.Models;
 using ChapeauHerkansing.Models.Enums;
+using ChapeauHerkansing.Repositories.Interfaces;
 
 namespace ChapeauHerkansing.Repositories
 {
-    public class TableRepository : BaseRepository
+    public class TableRepository : BaseRepository, ITableRepository
     {
         public TableRepository(IConfiguration config) : base(config)
         {

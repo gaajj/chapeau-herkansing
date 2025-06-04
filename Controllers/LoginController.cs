@@ -8,14 +8,16 @@ using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using ChapeauHerkansing.Services.Interfaces;
+
 
 namespace ChapeauHerkansing.Controllers
 {
     public class LoginController : Controller
     {
-        private readonly StaffService _staffService;
+        private readonly IStaffService _staffService;
 
-        public LoginController(StaffService staffService)
+        public LoginController(IStaffService staffService)
         {
             _staffService = staffService;
         }

@@ -2,14 +2,17 @@
 using ChapeauHerkansing.Models;
 using ChapeauHerkansing.Repositories;
 using ChapeauHerkansing.ViewModels.Management;
+using ChapeauHerkansing.Services.Interfaces;
+using ChapeauHerkansing.Repositories.Interfaces;
+
 
 namespace ChapeauHerkansing.Services
 {
-    public class StaffService
+    public class StaffService : IStaffService
     {
-        private readonly StaffRepository _staffRepo;
+        private readonly IStaffRepository _staffRepo;
 
-        public StaffService(StaffRepository staffRepo)
+        public StaffService(IStaffRepository staffRepo)
         {
             _staffRepo = staffRepo;
         }

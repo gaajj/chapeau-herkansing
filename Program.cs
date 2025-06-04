@@ -2,7 +2,8 @@ using ChapeauHerkansing.Models;
 using ChapeauHerkansing.Repositories;
 using ChapeauHerkansing.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
-
+using ChapeauHerkansing.Services.Interfaces;
+using ChapeauHerkansing.Repositories.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using BCrypt.Net;
 var builder = WebApplication.CreateBuilder(args);
@@ -15,12 +16,17 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<StaffRepository>();
 builder.Services.AddScoped<OrderRepository>();
 builder.Services.AddScoped<MenuItemRepository>();
-
+builder.Services.AddScoped<IStaffRepository, StaffRepository>();
+builder.Services.AddScoped<ITableRepository, TableRepository>();
 builder.Services.AddScoped<MenuService>();
 builder.Services.AddScoped<StaffService>();
 builder.Services.AddScoped<OrderService>();
 builder.Services.AddScoped<TableRepository>();
 builder.Services.AddScoped<TableService>();
+builder.Services.AddScoped<IStaffService, StaffService>();
+builder.Services.AddScoped<ITableService, TableService>();
+
+
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
         .AddCookie(opts =>
