@@ -131,5 +131,11 @@ namespace ChapeauHerkansing.Controllers
 
             return RedirectToAction("Index", new { model.TableId});
         }
+
+        [HttpPost]
+        public IActionResult PayOrder(int orderId)
+        {
+            return RedirectToAction("Create", "Payment", new { orderId = orderId });
+        }
     }
 }
