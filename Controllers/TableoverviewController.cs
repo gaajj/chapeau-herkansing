@@ -8,6 +8,8 @@ using ChapeauHerkansing.ViewModels.Tables;
 using ChapeauHerkansing.Models.Enums;
 using ChapeauHerkansing.ViewModels;
 using ChapeauHerkansing.Models;
+using ChapeauHerkansing.Services.Interfaces;
+
 
 
 
@@ -16,9 +18,9 @@ namespace ChapeauHerkansing.Controllers
     [Authorize(Roles = "Waiter")]
     public class TableOverviewController : Controller
     {
-        private readonly TableService _tableService;
+        private readonly ITableService _tableService;
 
-        public TableOverviewController(TableService tableService)
+        public TableOverviewController(ITableService tableService)
         {
             _tableService = tableService;
         }
