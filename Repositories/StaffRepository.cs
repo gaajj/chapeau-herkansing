@@ -15,7 +15,7 @@ namespace ChapeauHerkansing.Repositories
             List<Staff> staffList = new List<Staff>();
             SqlConnection connection = CreateConnection();
 
-            string query = "SELECT ID, firstName, lastName, username, password, role, isDeleted FROM dbo.staff";
+            string query = "SELECT ID AS staffId, firstName, lastName, username, password, role, isDeleted FROM dbo.staff";
             if (!includeDeleted)
             {
                 query += " WHERE isDeleted = 0";
@@ -41,7 +41,7 @@ namespace ChapeauHerkansing.Repositories
         {
             using (SqlConnection conn = CreateConnection())
             {
-                string query = "SELECT ID, firstName, lastName, username, password, role, isDeleted FROM dbo.staff WHERE ID = @id";
+                string query = "SELECT ID AS staffId, firstName, lastName, username, password, role, isDeleted FROM dbo.staff WHERE ID = @id";
                 SqlCommand cmd = new SqlCommand(query, conn);
                 cmd.Parameters.AddWithValue("@id", id);
 
@@ -133,7 +133,7 @@ namespace ChapeauHerkansing.Repositories
         public Staff? GetStaffByUsername(string username)
         {
             using var conn = CreateConnection();
-            const string sql = @"SELECT ID, firstName, lastName, username, password, role, isDeleted
+            const string sql = @"SELECT ID AS staffId, firstName, lastName, username, password, role, isDeleted
                          FROM dbo.staff
                          WHERE username = @username AND (isDeleted = 0 OR isDeleted IS NULL)";
 
