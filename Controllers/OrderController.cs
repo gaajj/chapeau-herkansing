@@ -2,6 +2,7 @@
 using ChapeauHerkansing.Models.Enums;
 using ChapeauHerkansing.Repositories;
 using ChapeauHerkansing.Services;
+using ChapeauHerkansing.Services.Interfaces;
 using ChapeauHerkansing.ViewModels.Ordering;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -13,12 +14,12 @@ namespace ChapeauHerkansing.Controllers
     [Authorize(Roles = "Waiter")]
     public class OrderController : Controller
     {
-        private readonly MenuService _menuService;
-        private readonly OrderService _orderService;
-        private readonly TableService _tableService;
-        private readonly StaffService _staffService;
+        private readonly IMenuService _menuService;
+        private readonly IOrderService _orderService;
+        private readonly ITableService _tableService;
+        private readonly IStaffService _staffService;
 
-        public OrderController(MenuService menuService, OrderService orderService, TableService tableService, StaffService staffService)
+        public OrderController(IMenuService menuService, IOrderService orderService, ITableService tableService, IStaffService staffService)
         {
             _menuService = menuService;
             _orderService = orderService;

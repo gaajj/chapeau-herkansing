@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Authorization;
+using ChapeauHerkansing.Repositories.Interfaces;
 
 
 
@@ -14,7 +15,7 @@ namespace ChapeauHerkansing.Controllers
     [Authorize(Roles = "Waiter")]
     public class PaymentController : Controller
     {
-        private readonly OrderRepository _orderRepo;
+        private readonly IOrderRepository _orderRepo;
         private readonly PaymentService _paymentService;
 
         public PaymentController(IConfiguration config)

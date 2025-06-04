@@ -1,11 +1,12 @@
 ﻿using ChapeauHerkansing.Models;
 using ChapeauHerkansing.Models.Enums;
+using ChapeauHerkansing.Repositories.Interfaces;
 using ChapeauHerkansing.Repositories.Readers;
 using Microsoft.Data.SqlClient;
 
 namespace ChapeauHerkansing.Repositories
 {
-    public class OrderRepository : BaseRepository
+    public class OrderRepository : BaseRepository, IOrderRepository
     {
 
 

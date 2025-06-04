@@ -1,16 +1,18 @@
 ﻿using ChapeauHerkansing.Models;
 using ChapeauHerkansing.Models.Enums;
 using ChapeauHerkansing.Repositories;
+using ChapeauHerkansing.Repositories.Interfaces;
+using ChapeauHerkansing.Services.Interfaces;
 using ChapeauHerkansing.ViewModels.Ordering;
 
 namespace ChapeauHerkansing.Services
 {
-    public class OrderService
+    public class OrderService : IOrderService
     {
-        private readonly OrderRepository _orderRepository;
-        private readonly MenuItemRepository _menuItemRepository;
+        private readonly IOrderRepository _orderRepository;
+        private readonly IMenuItemRepository _menuItemRepository;
 
-        public OrderService(OrderRepository orderRepository, MenuItemRepository menuItemRepository)
+        public OrderService(IOrderRepository orderRepository, IMenuItemRepository menuItemRepository)
         {
             _orderRepository = orderRepository;
             _menuItemRepository = menuItemRepository;

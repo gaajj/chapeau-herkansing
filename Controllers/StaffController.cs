@@ -3,14 +3,15 @@ using System.Collections.Generic;
 using ChapeauHerkansing.Models;
 using ChapeauHerkansing.Services;
 using ChapeauHerkansing.ViewModels.Management;
+using ChapeauHerkansing.Services.Interfaces;
 
 namespace ChapeauHerkansing.Controllers
 {
     public class StaffController : Controller
     {
-        private readonly StaffService _staffService;
+        private readonly IStaffService _staffService;
 
-        public StaffController(StaffService staffService)
+        public StaffController(IStaffService staffService)
         {
             _staffService = staffService;
         }

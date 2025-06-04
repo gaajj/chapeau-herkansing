@@ -1,9 +1,10 @@
 ﻿using ChapeauHerkansing.Models;
+using ChapeauHerkansing.Repositories.Interfaces;
 using Microsoft.Data.SqlClient;
 
 namespace ChapeauHerkansing.Repositories
 {
-    public class PaymentRepository
+    public class PaymentRepository : IPaymentRepository
     {
         private readonly string _connectionString;
 
