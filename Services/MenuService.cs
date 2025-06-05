@@ -30,8 +30,6 @@ namespace ChapeauHerkansing.Services
 
         public void AddMenuItem(MenuItemCreateViewModel model)
         {
-            // Eerder werd de koppeling via MenuItemMenuRepository afgehandeld.
-            // Nu voegen we het menuItem direct toe, met het juiste menuType (als integer) in de menuItems-tabel.
             _menuItemRepository.InsertMenuItem(model);
         }
 

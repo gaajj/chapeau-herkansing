@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
 using ChapeauHerkansing.Models;
 using ChapeauHerkansing.Services;
 using ChapeauHerkansing.ViewModels.Management;
@@ -17,40 +16,44 @@ namespace ChapeauHerkansing.Controllers
 
         public IActionResult Index()
         {
-            StaffCollection model = _staffService.GetAllStaff(true);
-            return View(model);
-
+            // Haalt alle medewerkers op (ook gedeactiveerden als true)
+            StaffCollection staffCollection = _staffService.GetAllStaff(true);
+            return View(staffCollection);
         }
 
-
+        [HttpGet]
         public IActionResult Create()
         {
             return View();
         }
 
         [HttpPost]
-        public IActionResult Create(StaffCreateViewModel model) // wachtwoord moet gehashed worden
+        public IActionResult Create(StaffCreateViewModel model)
         {
             if (!ModelState.IsValid)
             {
-                TempData["Error"] = "Vul alle velden correct in.";
+                TempData["Error"] = "Please fill in all fields correctly.";
                 return View(model);
             }
 
+            // Hashing gebeurt binnen de service
             _staffService.AddStaff(model);
-            TempData["Message"] = "Medewerker succesvol toegevoegd.";
+            TempData["Message"] = "Staff member successfully added.";
             return RedirectToAction("Index");
         }
 
-        public IActionResult Edit(int id) // betere benamingen
+        [HttpGet]
+        public IActionResult Edit(int staffId)
         {
-            var staff = _staffService.GetStaffById(id);
+            // Haalt de medewerker op die aangepast moet worden
+            Staff staff = _staffService.GetStaffById(staffId);
             if (staff == null)
             {
                 return NotFound();
             }
 
-            var model = new StaffEditViewModel
+            // Zet bestaande data in een edit viewmodel
+            StaffEditViewModel model = new StaffEditViewModel
             {
                 Id = staff.Id,
                 FirstName = staff.FirstName,
@@ -65,30 +68,30 @@ namespace ChapeauHerkansing.Controllers
         }
 
         [HttpPost]
-        public IActionResult Edit(int id, StaffEditViewModel model)
+        public IActionResult Edit(int staffId, StaffEditViewModel model)
         {
             if (!ModelState.IsValid)
             {
-                TempData["Error"] = "Vul alle velden correct in.";
+                TempData["Error"] = "Please fill in all fields correctly.";
                 return View(model);
             }
 
-            var existing = _staffService.GetStaffById(id);
+            Staff existingStaff = _staffService.GetStaffById(staffId);
 
-            var updatedModel = new StaffEditViewModel
+            // Als er geen nieuw wachtwoord is ingevoerd, houd het oude wachtwoord
+            StaffEditViewModel updatedModel = new StaffEditViewModel
             {
-                Id = id,
+                Id = staffId,
                 FirstName = model.FirstName,
                 LastName = model.LastName,
                 Username = model.Username,
-                // Alleen aanpassen als nieuw wachtwoord is ingevoerd
-                Password = string.IsNullOrWhiteSpace(model.Password) ? existing.Password : model.Password,
+                Password = string.IsNullOrWhiteSpace(model.Password) ? existingStaff.Password : model.Password,
                 Role = model.Role,
                 IsDeleted = model.IsDeleted
             };
 
-            _staffService.UpdateStaff(id, updatedModel);
-            TempData["Message"] = "Medewerker succesvol bijgewerkt.";
+            _staffService.UpdateStaff(staffId, updatedModel);
+            TempData["Message"] = "Staff member successfully updated.";
             return RedirectToAction("Index");
         }
 
@@ -96,12 +99,15 @@ namespace ChapeauHerkansing.Controllers
         {
             try
             {
+                // Activeer of deactiveer medewerker
                 bool isNowInactive = _staffService.ToggleStaffActive(id);
-                TempData["Message"] = isNowInactive ? "Medewerker gedeactiveerd." : "Medewerker opnieuw geactiveerd.";
+                TempData["Message"] = isNowInactive
+                    ? "Staff member deactivated."
+                    : "Staff member reactivated.";
             }
             catch
             {
-                TempData["Error"] = "Status aanpassen mislukt.";
+                TempData["Error"] = "Failed to update staff status.";
             }
 
             return RedirectToAction("Index");
