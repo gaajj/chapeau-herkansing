@@ -34,7 +34,7 @@ namespace ChapeauHerkansing.Controllers
             if (order == null)
             {
                 Table? table = _tableService.GetTableById(tableId);
-                if (table != null && table.Status == TableStatus.Free)
+                if (table != null && (table.Status == TableStatus.Free || table.Status == TableStatus.Reserved))
                 {
                     _orderService.CreateOrderForTable(tableId);
                     _tableService.UpdateTableStatus(tableId, TableStatus.Occupied);
