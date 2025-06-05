@@ -119,7 +119,7 @@ namespace ChapeauHerkansing.Repositories
                 SELECT
                     o.id AS orderId,
                     o.isDeleted,
-                   o.timeCreated,
+                   o.orderTIme,
                     t.id AS tableId,
                     t.seats,
                     t.tableStatus,
@@ -150,9 +150,9 @@ namespace ChapeauHerkansing.Repositories
                 LEFT JOIN
                     dbo.staff s ON ol.staffId = s.id
                 WHERE
-                    o.isDeleted = 0 and ol.orderStatus='BeingPrepared'
+                    o.isDeleted = 0 and ol.orderStatus='Ordered'
                 ORDER BY
-                    o.timeCreated;
+                    o.orderTime;
             ";
 
             List<Order> orders = ExecuteGroupedQuery<Order>(query, MapOrderWithLines, null);
@@ -165,7 +165,7 @@ namespace ChapeauHerkansing.Repositories
                 SELECT
                     o.id AS orderId,
                     o.isDeleted,
-                   o.timeCreated,
+                   o.orderTime,
                     t.id AS tableId,
                     t.seats,
                     t.tableStatus,
@@ -198,7 +198,7 @@ namespace ChapeauHerkansing.Repositories
                 WHERE
                     o.isDeleted = 0 and ol.orderStatus='Ready'
                 ORDER BY
-                    o.timeCreated;
+                    o.orderTime;
             ";
 
             List<Order> orders = ExecuteGroupedQuery<Order>(query, MapOrderWithLines, null);
@@ -282,7 +282,7 @@ namespace ChapeauHerkansing.Repositories
         UPDATE orderLines
         SET orderStatus = 
             CASE 
-                WHEN orderStatus = 'Ready' THEN 'BeingPrepared'
+                WHEN orderStatus = 'Ready' THEN 'Ordered'
                 ELSE 'Ready'
             END
         WHERE id = @orderLineId;
