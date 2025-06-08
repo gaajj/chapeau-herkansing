@@ -17,8 +17,8 @@ namespace ChapeauHerkansing.Controllers
         public IActionResult Index()
         {
             // Haalt alle medewerkers op (ook gedeactiveerden als true)
-            StaffCollection staffCollection = _staffService.GetAllStaff(true);
-            return View(staffCollection);
+            List<Staff> staffList = _staffService.GetAllStaff(true);
+            return View(staffList);
         }
 
         [HttpGet]

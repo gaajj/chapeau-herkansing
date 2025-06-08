@@ -124,58 +124,51 @@ namespace ChapeauHerkansing.Controllers
 
         public IActionResult Financial(DateTime? startDate, DateTime? endDate, string period = "month")
         {
-            DateTime start;
-            DateTime end;
+            if (period == "custom")
+            {
+                if (!startDate.HasValue || !endDate.HasValue)
+                {
+                    TempData["Error"] = "Please select both a start and end date for the custom period.";
+                    return RedirectToAction("Financial");
+                }
 
-            if (period == "month")
-            {
-                start = DateTime.Now.AddMonths(-1);
-                end = DateTime.Now;
+                if (startDate > endDate)
+                {
+                    TempData["Error"] = "Start date cannot be after end date.";
+                    return RedirectToAction("Financial");
+                }
             }
-            else if (period == "quarter")
-            {
-                start = DateTime.Now.AddMonths(-3);
-                end = DateTime.Now;
-            }
-            else if (period == "year")
-            {
-                start = DateTime.Now.AddYears(-1);
-                end = DateTime.Now;
-            }
-            else if (period == "custom" && startDate.HasValue && endDate.HasValue)
-            {
-                start = startDate.Value;
-                end = endDate.Value;
-            }
-            else
-            {
-                // terugval naar de laatste maand als er geen geldige periode is gekozen
-                start = DateTime.Now.AddMonths(-1);
-                end = DateTime.Now;
-            }
+
+            (DateTime start, DateTime end) = GetStartEndDateByPeriod(period, startDate, endDate);
 
             List<FinancialData> data = _financialService.GetFinancialOverview(start, end);
-            decimal tips = _financialService.GetTotalTips(start, end);
 
             FinancialOverviewViewModel model = new FinancialOverviewViewModel
             {
                 SelectedPeriod = period,
                 StartDate = start,
                 EndDate = end,
-                TotalSalesByType = new Dictionary<string, int>(),
-                TotalIncomeByType = new Dictionary<string, decimal>(),
-                TotalTipAmount = tips
+                ReportItems = data
             };
 
-            foreach (FinancialData item in data)
-            {
-                model.TotalSalesByType[item.MenuType] = item.TotalSales;
-                model.TotalIncomeByType[item.MenuType] = item.TotalIncome;
-            }
+            System.Diagnostics.Debug.WriteLine($"Aantal records in financial data: {data.Count}");
 
             return View(model);
         }
 
+        private (DateTime Start, DateTime End) GetStartEndDateByPeriod(string period, DateTime? startDate, DateTime? endDate)
+        {
+            DateTime now = DateTime.Now;
+
+            return period switch
+            {
+                "month" => (now.AddMonths(-1), now),
+                "quarter" => (now.AddMonths(-3), now),
+                "year" => (now.AddYears(-1), now),
+                "custom" when startDate.HasValue && endDate.HasValue => (startDate.Value, endDate.Value),
+                _ => (now.AddMonths(-1), now)
+            };
+        }
 
     }
 }

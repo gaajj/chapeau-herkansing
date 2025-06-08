@@ -9,7 +9,7 @@ namespace ChapeauHerkansing.Repositories
         public StaffRepository(IConfiguration configuration) : base(configuration) { }
 
         // Haalt alle medewerkers op, optioneel inclusief gedeactiveerden
-        public StaffCollection GetAllStaff(bool includeDeleted = false)
+        public List<Staff> GetAllStaff(bool includeDeleted = false)
         {
             List<Staff> staffList = new();
             using SqlConnection connection = CreateConnection();
@@ -25,8 +25,9 @@ namespace ChapeauHerkansing.Repositories
             while (reader.Read())
                 staffList.Add(StaffReader.Read(reader));
 
-            return new StaffCollection(staffList);
+            return staffList;
         }
+
 
         // Haalt één medewerker op op basis van ID
         public Staff GetStaffById(int id)

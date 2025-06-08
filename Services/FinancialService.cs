@@ -16,12 +16,7 @@ namespace ChapeauHerkansing.Services
 
         public List<FinancialData> GetFinancialOverview(DateTime start, DateTime end)
         {
-            return _repository.GetFinancialData(start, end);
-        }
-
-        public decimal GetTotalTips(DateTime start, DateTime end)
-        {
-            return _repository.GetTotalTipAmount(start, end);
+            return _repository.GetFinancialData(start, end, null);
         }
     }
 }

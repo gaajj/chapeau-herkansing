@@ -215,17 +215,18 @@ namespace ChapeauHerkansing.Repositories
         public void UpdateStock(int menuItemId, int amountChange)
         {
             string query = @"
-            UPDATE menuItems
-            SET stockAmount = stockAmount + @change
-            WHERE id = @id AND (isDeleted IS NULL OR isDeleted = 0)";
+                UPDATE menuItems
+                SET stockAmount = stockAmount + @change
+                WHERE id = @id AND (isDeleted IS NULL OR isDeleted = 0)";
 
-            Dictionary<string, object> parameters = new()
-            {
-                { "@change", amountChange },
-                { "@id", menuItemId }
-            };
+            using SqlConnection connection = CreateConnection();
+            using SqlCommand command = new SqlCommand(query, connection);
+            command.Parameters.AddWithValue("@change", amountChange);
+            command.Parameters.AddWithValue("@id", menuItemId);
 
-            ExecuteNonQuery(query, parameters);
+            connection.Open();
+            command.ExecuteNonQuery();
         }
+
     }
 }

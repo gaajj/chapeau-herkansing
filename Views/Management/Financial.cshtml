@@ -1,5 +1,5 @@
 ﻿@model ChapeauHerkansing.ViewModels.Management.FinancialOverviewViewModel
-@using ChapeauHerkansing.Models.Enums
+@using ChapeauHerkansing.Models
 
 @{
     ViewData["Title"] = "Financial Overview";
@@ -8,6 +8,14 @@
 <partial name="_ManagementTabs" />
 
 <h2 class="mb-4">Financial Overview</h2>
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @TempData["Error"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
 
 <form method="get" class="row g-3 mb-4">
     <div class="col-md-3">
@@ -18,16 +26,18 @@
             <option value="year" selected="@(Model.SelectedPeriod == "year")">Last Year</option>
             <option value="custom" selected="@(Model.SelectedPeriod == "custom")">Custom</option>
         </select>
-
     </div>
+
     <div class="col-md-3">
         <label class="form-label">Start Date:</label>
         <input type="date" name="startDate" class="form-control" value="@Model.StartDate.ToString("yyyy-MM-dd")" />
     </div>
+
     <div class="col-md-3">
         <label class="form-label">End Date:</label>
         <input type="date" name="endDate" class="form-control" value="@Model.EndDate.ToString("yyyy-MM-dd")" />
     </div>
+
     <div class="col-md-3 d-flex align-items-end">
         <button type="submit" class="btn btn-primary w-100">Show</button>
     </div>
@@ -35,47 +45,38 @@
 
 <hr />
 
-@if (Model.TotalSalesByType != null && Model.TotalSalesByType.Any())
+@if (Model.ReportItems != null && Model.ReportItems.Any())
 {
-    <h4>Sales Per Menu Type</h4>
+    <h4>Sales, Revenue & Tips Per Menu Type</h4>
     <ul class="list-group mb-3">
-        @foreach (KeyValuePair<string, int> pair in Model.TotalSalesByType)
+        @foreach (FinancialData item in Model.ReportItems)
         {
-            MenuType type = Enum.TryParse(pair.Key, out MenuType parsedType) ? parsedType : MenuType.Lunch;
-            string label = parsedType.ToString();
-
-            <li class="list-group-item d-flex justify-content-between">
-                <span>@label</span>
-                <span>@pair.Value orders</span>
+            <li class="list-group-item">
+                <strong>@item.MenuType</strong><br />
+                Sales: @item.TotalSales orders<br />
+                Revenue: € @item.Revenue.ToString("0.00")<br />
+                Tips: € @item.Tips.ToString("0.00")<br />
+                Total Income: € @item.TotalIncome.ToString("0.00")
             </li>
         }
     </ul>
+
+    <div class="row">
+        <div class="col-md-6">
+            <h4>Total Income from All Sales</h4>
+            <p class="fs-5 fw-semibold">
+                € @Model.ReportItems.Sum(r => r.TotalIncome).ToString("0.00")
+            </p>
+        </div>
+        <div class="col-md-6">
+            <h4>Total Tip Amount</h4>
+            <p class="fs-5 fw-semibold">
+                € @Model.ReportItems.Sum(r => r.Tips).ToString("0.00")
+            </p>
+        </div>
+    </div>
 }
 else
 {
-    <p>No sales data available for this period.</p>
+    <p>No financial data available for this period.</p>
 }
-
-@if (Model.TotalIncomeByType != null && Model.TotalIncomeByType.Any())
-{
-    <h4>Income Per Menu Type</h4>
-    <ul class="list-group mb-3">
-        @foreach (KeyValuePair<string, decimal> pair in Model.TotalIncomeByType)
-        {
-            MenuType type = Enum.TryParse(pair.Key, out MenuType parsedType) ? parsedType : MenuType.Lunch;
-            string label = parsedType.ToString();
-
-            <li class="list-group-item d-flex justify-content-between">
-                <span>@label</span>
-                <span>€ @pair.Value.ToString("0.00")</span>
-            </li>
-        }
-    </ul>
-}
-else
-{
-    <p>No income data available for this period.</p>
-}
-
-<h4>Total Tip Amount</h4>
-<p class="fs-5 fw-semibold">€ @Model.TotalTipAmount.ToString("0.00")</p>

@@ -14,10 +14,11 @@ namespace ChapeauHerkansing.Services
             _staffRepo = staffRepo;
         }
 
-        public StaffCollection GetAllStaff(bool includeDeleted = false)
+        public List<Staff> GetAllStaff(bool includeDeleted)
         {
             return _staffRepo.GetAllStaff(includeDeleted);
         }
+
 
 
         public Staff GetStaffById(int id)

@@ -10,81 +10,58 @@ namespace ChapeauHerkansing.Repositories
     {
         public FinancialRepository(IConfiguration configuration) : base(configuration) { }
 
-        public List<FinancialData> GetFinancialData(DateTime startDate, DateTime endDate)
+        public List<FinancialData> GetFinancialData(DateTime fromDate, DateTime toDate, MenuType? filter)
         {
-            List<FinancialData> result = new List<FinancialData>();
+            List<FinancialData> list = new List<FinancialData>();
+
+            using SqlConnection conn = CreateConnection();
 
             string query = @"
-                SELECT mi.menuType, COUNT(ol.id) AS TotalSales, SUM(mi.price * ol.amount) AS TotalIncome
-                FROM orderLines ol
-                INNER JOIN menuItems mi ON ol.menuItemId = mi.id
-                INNER JOIN orders o ON ol.orderId = o.id
-                WHERE o.orderTime BETWEEN @startDate AND @endDate AND o.isDeleted = 0
-                GROUP BY mi.menuType";
+                SELECT 
+                    mi.menuType, 
+                    COUNT(*) AS TotalSales, 
+                    SUM(mi.price) AS Revenue,
+                    SUM(p.tip) AS Tips,
+                    SUM(mi.price + p.tip) AS TotalIncome
+                FROM orders o
+                JOIN orderLines ol ON o.id = ol.orderId
+                JOIN menuItems mi ON ol.menuItemId = mi.id
+                JOIN payments p ON o.id = p.orderId
+                WHERE o.orderTime BETWEEN @from AND @to AND o.isDeleted = 0 AND p.isDeleted = 0";
 
-            using (SqlConnection connection = CreateConnection())
+            if (filter != null)
             {
-                SqlCommand command = new SqlCommand(query, connection);
-                command.Parameters.AddWithValue("@startDate", startDate);
-                command.Parameters.AddWithValue("@endDate", endDate);
-
-                connection.Open();
-                SqlDataReader reader = command.ExecuteReader();
-
-                while (reader.Read())
-                {
-                    int menuTypeInt = Convert.ToInt32(reader["menuType"]);
-                    string menuTypeName = Enum.IsDefined(typeof(MenuType), menuTypeInt)
-                        ? ((MenuType)menuTypeInt).ToString()
-                        : "Unknown";
-
-                    int totalSales = Convert.ToInt32(reader["TotalSales"]);
-                    decimal totalIncome = Convert.ToDecimal(reader["TotalIncome"]);
-
-                    FinancialData data = new FinancialData
-                    {
-                        MenuType = menuTypeName,
-                        TotalSales = totalSales,
-                        TotalIncome = totalIncome
-                    };
-
-                    result.Add(data);
-                }
-
-                reader.Close();
+                query += " AND mi.menuType = @menuType";
             }
 
-            return result;
-        }
+            query += " GROUP BY mi.menuType";
 
-        public decimal GetTotalTipAmount(DateTime startDate, DateTime endDate)
-        {
-            decimal totalTips = 0;
-
-            string query = @"
-                SELECT SUM(p.tip)
-                FROM payments p
-                INNER JOIN orders o ON p.orderId = o.id
-                WHERE o.orderTime BETWEEN @startDate AND @endDate AND o.isDeleted = 0";
-
-            using (SqlConnection connection = CreateConnection())
+            using SqlCommand cmd = new SqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@from", fromDate);
+            cmd.Parameters.AddWithValue("@to", toDate);
+            if (filter != null)
             {
-                SqlCommand command = new SqlCommand(query, connection);
-                command.Parameters.AddWithValue("@startDate", startDate);
-                command.Parameters.AddWithValue("@endDate", endDate);
-
-                connection.Open();
-                SqlDataReader reader = command.ExecuteReader();
-
-                if (reader.Read() && !reader.IsDBNull(0))
-                {
-                    totalTips = reader.GetDecimal(0);
-                }
-
-                reader.Close();
+                cmd.Parameters.AddWithValue("@menuType", (int)filter);
             }
 
-            return totalTips;
+            conn.Open();
+            using SqlDataReader reader = cmd.ExecuteReader();
+
+            while (reader.Read())
+            {
+                FinancialData data = new FinancialData
+                {
+                    MenuType = Enum.GetName(typeof(MenuType), reader.GetInt32(0)),
+                    TotalSales = reader.GetInt32(1),
+                    Revenue = reader.GetDecimal(2),
+                    Tips = reader.GetDecimal(3),
+                    TotalIncome = reader.GetDecimal(4)
+                };
+
+                list.Add(data);
+            }
+
+            return list;
         }
     }
 }
