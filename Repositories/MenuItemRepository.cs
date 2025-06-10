@@ -4,10 +4,11 @@ using ChapeauHerkansing.Models;
 using ChapeauHerkansing.Models.Enums;
 using ChapeauHerkansing.ViewModels.Management;
 using ChapeauHerkansing.Repositories.Readers;
+using ChapeauHerkansing.Repositories.Interfaces;
 
 namespace ChapeauHerkansing.Repositories // verplaats naar menu repository
 {
-    public class MenuItemRepository : BaseRepository
+    public class MenuItemRepository : BaseRepository, IMenuItemRepository
     {
         private readonly string _connectionString;
 

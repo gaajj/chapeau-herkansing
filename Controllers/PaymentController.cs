@@ -1,30 +1,33 @@
-﻿using ChapeauHerkansing.Interfaces;
-using ChapeauHerkansing.Models;
+﻿using ChapeauHerkansing.Models;
 using ChapeauHerkansing.Repositories;
 using ChapeauHerkansing.Services;
 using ChapeauHerkansing.ViewModels;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.AspNetCore.Authorization;
+using ChapeauHerkansing.Repositories.Interfaces;
+
+
 
 namespace ChapeauHerkansing.Controllers
 {
     [Authorize(Roles = "Waiter")]
     public class PaymentController : Controller
     {
-        private readonly OrderRepository _orderRepo; 
-        private readonly IPaymentService _paymentService; // repos moeten in de services
+        private readonly IOrderRepository _orderRepo;
+        private readonly PaymentService _paymentService;
 
-        public PaymentController(IPaymentService paymentService, IConfiguration config)
+        public PaymentController(IConfiguration config)
         {
-            _orderRepo = new OrderRepository(config); 
-            _paymentService = paymentService;         
+            _orderRepo = new OrderRepository(config);
+            PaymentRepository paymentRepo = new PaymentRepository(config);
+            TableRepository tableRepo = new TableRepository(config);
+            _paymentService = new PaymentService(paymentRepo, tableRepo);
         }
 
-
         [HttpGet]
-        public IActionResult Create(int orderId) // methodenaam wijzigen
+        public IActionResult Create(int orderId)
         {
             List<Order> orders = _orderRepo.GetAll().Where(o => !o.IsDeleted).ToList();
             Order order = orders.FirstOrDefault(o => o.OrderID == orderId);
@@ -62,8 +65,10 @@ namespace ChapeauHerkansing.Controllers
                 ModelState.AddModelError("AmountPaid", "Het betaalde bedrag is te laag.");
                 return View(viewModel);
             }
-                    
-            _paymentService.FinalizePayment(payment, order);
+
+            _paymentService.FinalizePayment(payment);
+            _orderRepo.SoftDeleteOrder(order.OrderID);
+
             return RedirectToAction("Index", "Tableoverview");
         }
     }

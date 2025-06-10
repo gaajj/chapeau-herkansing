@@ -1,36 +1,32 @@
-using BCrypt.Net;
-using ChapeauHerkansing.Interfaces;
 using ChapeauHerkansing.Models;
 using ChapeauHerkansing.Repositories;
 using ChapeauHerkansing.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using ChapeauHerkansing.Services.Interfaces;
+using ChapeauHerkansing.Repositories.Interfaces;
 using Microsoft.AspNetCore.Identity;
+using BCrypt.Net;
 var builder = WebApplication.CreateBuilder(args);
-
-
 
 builder.Configuration.AddEnvironmentVariables();
 
 builder.Services.AddControllersWithViews();
-builder.Services.AddScoped<StaffRepository>();
-builder.Services.AddScoped<OrderRepository>();
-builder.Services.AddScoped<MenuItemRepository>();
 
-builder.Services.AddScoped<MenuService>();
-builder.Services.AddScoped<StaffService>();
-builder.Services.AddScoped<OrderService>();
-builder.Services.AddScoped<TableRepository>();
-builder.Services.AddScoped<TableService>();
-builder.Services.AddScoped<IPaymentService, PaymentService>();
-builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
+builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+builder.Services.AddScoped<IMenuItemRepository, MenuItemRepository>();
+builder.Services.AddScoped<IStaffRepository, StaffRepository>();
+builder.Services.AddScoped<ITableRepository, TableRepository>();
 
-
+builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<IMenuService, MenuService>();
+builder.Services.AddScoped<IStaffService, StaffService>();
+builder.Services.AddScoped<ITableService, TableService>();
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
         .AddCookie(opts =>
         {
-          opts.LoginPath = "/Login/Index";
-          opts.AccessDeniedPath = "/Home/AccessDenied";
+    opts.LoginPath = "/Login/Index";
+    opts.AccessDeniedPath = "/Home/AccessDenied";
         });
 
 

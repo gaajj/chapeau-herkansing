@@ -1,21 +1,27 @@
 ﻿using ChapeauHerkansing.Models;
+using ChapeauHerkansing.Repositories.Interfaces;
 using Microsoft.Data.SqlClient;
 
 namespace ChapeauHerkansing.Repositories
 {
-    public class PaymentRepository : BaseRepository, IPaymentRepository
+    public class PaymentRepository : IPaymentRepository
     {
-        public PaymentRepository(IConfiguration configuration) : base(configuration) { }
+        private readonly string _connectionString;
 
-        public void InsertPayment(Payment payment)
+        public PaymentRepository(IConfiguration configuration)
+        {
+            _connectionString = configuration.GetConnectionString("ChapeauDatabase");
+        }
+
+        public void InsertPayment(Payment payment) //  baserepo gebruiken
         {
             try
             {
-                using (SqlConnection connection = CreateConnection()) 
+                using (SqlConnection connection = new SqlConnection(_connectionString))
                 {
                     string query = @"
-                    INSERT INTO payments (orderId, amountPaid, paymentMethod, tip, feedback)
-                    VALUES (@orderId, @amountPaid, @paymentMethod, @tip, @feedback);";
+                INSERT INTO payments (orderId, amountPaid, paymentMethod, tip, feedback)
+                VALUES (@orderId, @amountPaid, @paymentMethod, @tip, @feedback);";
 
                     using (SqlCommand command = new SqlCommand(query, connection))
                     {
@@ -27,10 +33,11 @@ namespace ChapeauHerkansing.Repositories
 
                         connection.Open();
                         command.ExecuteNonQuery();
+
                     }
                 }
             }
-            catch (Exception ex) // cw weg
+            catch (Exception ex)
             {
                 Console.WriteLine("FOUT bij insert: " + ex.Message);
             }

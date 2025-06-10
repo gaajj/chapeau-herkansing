@@ -4,15 +4,33 @@ using System;
 using System.Collections.Generic;
 using ChapeauHerkansing.Models;
 using ChapeauHerkansing.Models.Enums;
+using ChapeauHerkansing.Repositories.Interfaces;
+using ChapeauHerkansing.Repositories.Readers;
 
 namespace ChapeauHerkansing.Repositories
 {
-    public class TableRepository : BaseRepository
+    public class TableRepository : BaseRepository, ITableRepository
     {
         public TableRepository(IConfiguration config) : base(config)
         {
         }
 
+        public Table? GetTableById(int tableId)
+        {
+            string query = @"
+                SELECT t.id AS tableId, t.staffId, t.seats, t.tableStatus 
+                FROM tables t
+                JOIN staff s ON s.id = t.staffId
+                WHERE t.id = @tableId;
+            ";
+
+            var parameters = new Dictionary<string, object>
+            {
+                { "@tableId", tableId }
+            };
+
+            return ExecuteSingle(query, TableReader.Read, parameters);
+        }
 
         public List<Table> GetAllTables()
         {

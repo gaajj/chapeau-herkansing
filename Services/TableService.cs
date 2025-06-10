@@ -2,18 +2,23 @@
 using System.Linq;
 using ChapeauHerkansing.Models;
 using ChapeauHerkansing.Models.Enums;
+using ChapeauHerkansing.Repositories.Interfaces;
 using ChapeauHerkansing.Repositories;
+using ChapeauHerkansing.Services.Interfaces;
 
 namespace ChapeauHerkansing.Services
 {
-    public class TableService
+    public class TableService : ITableService
     {
-        private readonly TableRepository _tableRepo;
+        private readonly ITableRepository _tableRepo;
 
-        public TableService(TableRepository tableRepo)
+        public TableService(ITableRepository tableRepo)
         {
             _tableRepo = tableRepo;
         }
+
+        public Table? GetTableById(int tableId)
+            => _tableRepo.GetTableById(tableId);
 
         public List<Table> GetAllTables()
             => _tableRepo.GetAllTables();

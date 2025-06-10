@@ -2,29 +2,47 @@
 using ChapeauHerkansing.Models.Enums;
 using ChapeauHerkansing.Repositories;
 using ChapeauHerkansing.Services;
-using Microsoft.AspNetCore.Authorization;
+using ChapeauHerkansing.Services.Interfaces;
 using ChapeauHerkansing.ViewModels.Ordering;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
+using System.Security.Claims;
 
 namespace ChapeauHerkansing.Controllers
 {
     [Authorize(Roles = "Waiter")]
     public class OrderController : Controller
     {
-        private readonly MenuService _menuService;
-        private readonly OrderService _orderService;
+        private readonly IMenuService _menuService;
+        private readonly IOrderService _orderService;
+        private readonly ITableService _tableService;
+        private readonly IStaffService _staffService;
 
-        public OrderController(MenuService menuService, OrderService orderService)
+        public OrderController(IMenuService menuService, IOrderService orderService, ITableService tableService, IStaffService staffService)
         {
             _menuService = menuService;
             _orderService = orderService;
+            _tableService = tableService;
+            _staffService = staffService;
         }
 
-        // hard coded table for now
         public IActionResult Index(int tableId = 2, MenuType? menuType = null, MenuCategory? category = null)
         {
             Order order = _orderService.GetOrderByTable(tableId);
+
+            if (order == null)
+            {
+                Table? table = _tableService.GetTableById(tableId);
+                if (table != null && (table.Status == TableStatus.Free || table.Status == TableStatus.Reserved))
+                {
+                    _orderService.CreateOrderForTable(tableId);
+                    _tableService.UpdateTableStatus(tableId, TableStatus.Occupied);
+
+                    order = _orderService.GetOrderByTable(tableId);
+                }
+            }
+
             Menu? menu = null;
 
             if (menuType.HasValue)
@@ -59,7 +77,9 @@ namespace ChapeauHerkansing.Controllers
         {
             Order order = _orderService.GetOrderById(model.OrderId);
             MenuItem menuItem = _menuService.GetMenuItemById(model.MenuItemId);
-            Staff staff = new Staff(10, "", "", "", "", Role.Waiter); // hard coded for now
+
+            int staffId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            Staff staff = _staffService.GetStaffById(staffId);
 
             try
             {
@@ -110,6 +130,12 @@ namespace ChapeauHerkansing.Controllers
             }
 
             return RedirectToAction("Index", new { model.TableId});
+        }
+
+        [HttpPost]
+        public IActionResult PayOrder(int orderId)
+        {
+            return RedirectToAction("Create", "Payment", new { orderId = orderId });
         }
     }
 }

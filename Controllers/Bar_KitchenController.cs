@@ -1,5 +1,6 @@
 ﻿using ChapeauHerkansing.Models;
 using ChapeauHerkansing.Repositories;
+using ChapeauHerkansing.Repositories.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,9 +9,9 @@ namespace ChapeauHerkansing.Controllers
     [Authorize(Roles = "Barman,Chef")]
     public class Bar_KitchenController : Controller
     {
-        private readonly OrderRepository _orderRepository;
+        private readonly IOrderRepository _orderRepository;
 
-        public Bar_KitchenController(OrderRepository orderRepository)
+        public Bar_KitchenController(IOrderRepository orderRepository)
         {
             _orderRepository = orderRepository;
         }

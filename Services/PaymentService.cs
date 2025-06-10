@@ -1,7 +1,8 @@
-﻿using ChapeauHerkansing.Interfaces;
-using ChapeauHerkansing.Models;
+﻿using ChapeauHerkansing.Models;
 using ChapeauHerkansing.Models.Enums;
 using ChapeauHerkansing.Repositories;
+using ChapeauHerkansing.Repositories.Interfaces;
+using ChapeauHerkansing.Services.Interfaces;
 using System;
 using System.Linq;
 
@@ -10,14 +11,12 @@ namespace ChapeauHerkansing.Services
     public class PaymentService : IPaymentService
     {
         private readonly IPaymentRepository _paymentRepo;
-        private readonly TableRepository _tableRepo;
-        private readonly OrderRepository _orderRepo;
+        private readonly ITableRepository _tableRepo;
 
-        public PaymentService(IPaymentRepository paymentRepo, TableRepository tableRepo, OrderRepository orderRepo)
+        public PaymentService(IPaymentRepository paymentRepo, ITableRepository tableRepo)
         {
             _paymentRepo = paymentRepo;
             _tableRepo = tableRepo;
-            _orderRepo = orderRepo;
         }
 
         public decimal CalculateTotal(Order order)
@@ -30,11 +29,10 @@ namespace ChapeauHerkansing.Services
             return payment.AmountPaid >= totalAmount;
         }
 
-        public void FinalizePayment(Payment payment, Order order)
+        public void FinalizePayment(Payment payment)
         {
             _paymentRepo.InsertPayment(payment);
             _tableRepo.UpdateTableStatus(payment.Order.Table.TableID, TableStatus.Free);
-            _orderRepo.SoftDeleteOrder(order.OrderID);
         }
     }
 }

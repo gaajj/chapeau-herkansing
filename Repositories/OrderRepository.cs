@@ -1,11 +1,12 @@
 ﻿using ChapeauHerkansing.Models;
 using ChapeauHerkansing.Models.Enums;
+using ChapeauHerkansing.Repositories.Interfaces;
 using ChapeauHerkansing.Repositories.Readers;
 using Microsoft.Data.SqlClient;
 
 namespace ChapeauHerkansing.Repositories
 {
-    public class OrderRepository : BaseRepository
+    public class OrderRepository : BaseRepository, IOrderRepository
     {
         public OrderRepository(IConfiguration configuration) : base(configuration) { }
 
@@ -116,7 +117,7 @@ namespace ChapeauHerkansing.Repositories
                 SELECT
                     o.id AS orderId,
                     o.isDeleted,
-                   o.timeCreated,
+                   o.orderTIme,
                     t.id AS tableId,
                     t.seats,
                     t.tableStatus,
@@ -147,9 +148,9 @@ namespace ChapeauHerkansing.Repositories
                 LEFT JOIN
                     dbo.staff s ON ol.staffId = s.id
                 WHERE
-                    o.isDeleted = 0 and ol.orderStatus='BeingPrepared'
+                    o.isDeleted = 0 and ol.orderStatus='Ordered'
                 ORDER BY
-                    o.timeCreated;
+                    o.orderTime;
             ";
 
             List<Order> orders = ExecuteGroupedQuery<Order>(query, MapOrderWithLines, null);
@@ -162,7 +163,7 @@ namespace ChapeauHerkansing.Repositories
                 SELECT
                     o.id AS orderId,
                     o.isDeleted,
-                   o.timeCreated,
+                   o.orderTime,
                     t.id AS tableId,
                     t.seats,
                     t.tableStatus,
@@ -195,7 +196,7 @@ namespace ChapeauHerkansing.Repositories
                 WHERE
                     o.isDeleted = 0 and ol.orderStatus='Ready'
                 ORDER BY
-                    o.timeCreated;
+                    o.orderTime;
             ";
 
             List<Order> orders = ExecuteGroupedQuery<Order>(query, MapOrderWithLines, null);
@@ -279,7 +280,7 @@ namespace ChapeauHerkansing.Repositories
         UPDATE orderLines
         SET orderStatus = 
             CASE 
-                WHEN orderStatus = 'Ready' THEN 'BeingPrepared'
+                WHEN orderStatus = 'Ready' THEN 'Ordered'
                 ELSE 'Ready'
             END
         WHERE id = @orderLineId;
@@ -340,6 +341,21 @@ namespace ChapeauHerkansing.Repositories
             };
 
             ExecuteNonQuery(query, parameters);
+        }
+
+        public void CreateOrderForTable(int tableId)
+        {
+            string query = @"
+                INSERT INTO orders (tableId, orderTime)
+                VALUES (@tableId, GETDATE());
+            ";
+
+            var parameters = new Dictionary<string, object>
+            {
+                { "@tableId", tableId }
+            };
+
+            ExecuteSingle(query, OrderReader.Read, parameters);
         }
 
         private Order MapOrderWithLines(SqlDataReader reader, Dictionary<int, Order> dict)

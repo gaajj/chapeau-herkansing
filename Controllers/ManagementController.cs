@@ -4,15 +4,16 @@ using ChapeauHerkansing.Models.Enums;
 using ChapeauHerkansing.ViewModels.Management;
 using Microsoft.AspNetCore.Authorization;
 using ChapeauHerkansing.Models;
+using ChapeauHerkansing.Services.Interfaces;
 
 namespace ChapeauHerkansing.Controllers
 {
     [Authorize(Roles = "Manager")]
     public class ManagementController : Controller
     {
-        private readonly MenuService _menuService;
+        private readonly IMenuService _menuService;
 
-        public ManagementController(MenuService menuService)
+        public ManagementController(IMenuService menuService)
         {
             _menuService = menuService;
         }

@@ -1,10 +1,11 @@
 using ChapeauHerkansing.Models;
 using Microsoft.Data.SqlClient;
 using ChapeauHerkansing.Repositories.Readers;
+using ChapeauHerkansing.Repositories.Interfaces;
 
 namespace ChapeauHerkansing.Repositories
 {
-    public class StaffRepository : BaseRepository
+    public class StaffRepository : BaseRepository, IStaffRepository
     {
         public StaffRepository(IConfiguration configuration) : base(configuration)
         {
@@ -16,7 +17,7 @@ namespace ChapeauHerkansing.Repositories
             List<Staff> staffList = new List<Staff>();
             SqlConnection connection = CreateConnection();
 
-            string query = "SELECT ID, firstName, lastName, username, password, role, isDeleted FROM dbo.staff";
+            string query = "SELECT ID AS staffId, firstName, lastName, username, password, role, isDeleted FROM dbo.staff";
             if (!includeDeleted)
             {
                 query += " WHERE isDeleted = 0";
@@ -42,7 +43,7 @@ namespace ChapeauHerkansing.Repositories
         {
             using (SqlConnection conn = CreateConnection())
             {
-                string query = "SELECT ID, firstName, lastName, username, password, role, isDeleted FROM dbo.staff WHERE ID = @id";
+                string query = "SELECT ID AS staffId, firstName, lastName, username, password, role, isDeleted FROM dbo.staff WHERE ID = @id";
                 SqlCommand cmd = new SqlCommand(query, conn);
                 cmd.Parameters.AddWithValue("@id", id);
 
