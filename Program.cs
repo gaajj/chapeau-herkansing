@@ -1,10 +1,10 @@
+using BCrypt.Net;
+using ChapeauHerkansing.Interfaces;
 using ChapeauHerkansing.Models;
 using ChapeauHerkansing.Repositories;
 using ChapeauHerkansing.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
-
 using Microsoft.AspNetCore.Identity;
-using BCrypt.Net;
 var builder = WebApplication.CreateBuilder(args);
 
 
@@ -21,12 +21,16 @@ builder.Services.AddScoped<StaffService>();
 builder.Services.AddScoped<OrderService>();
 builder.Services.AddScoped<TableRepository>();
 builder.Services.AddScoped<TableService>();
+builder.Services.AddScoped<IPaymentService, PaymentService>();
+builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
+
+
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
         .AddCookie(opts =>
         {
-    opts.LoginPath = "/Login/Index";
-    opts.AccessDeniedPath = "/Home/AccessDenied";
+          opts.LoginPath = "/Login/Index";
+          opts.AccessDeniedPath = "/Home/AccessDenied";
         });
 
 

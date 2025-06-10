@@ -14,7 +14,7 @@ namespace ChapeauHerkansing.Models
         public OrderStatus OrderStatus { get; set; }
 
 
-        public decimal VAT
+        public decimal VAT //constanten maken van de 0.21 en 0.09
         {
             get
             {
@@ -25,6 +25,7 @@ namespace ChapeauHerkansing.Models
                 return MenuItem.Price * percentage * Amount;
             }
         }
+
 
         public OrderLine(int orderLineID, Order order, MenuItem menuItem, Staff staff, int amount, DateTime? orderTime, string note, OrderStatus orderStatus)
         {

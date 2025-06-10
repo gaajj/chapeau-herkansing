@@ -3,24 +3,19 @@ using Microsoft.Data.SqlClient;
 
 namespace ChapeauHerkansing.Repositories
 {
-    public class PaymentRepository
+    public class PaymentRepository : BaseRepository, IPaymentRepository
     {
-        private readonly string _connectionString;
+        public PaymentRepository(IConfiguration configuration) : base(configuration) { }
 
-        public PaymentRepository(IConfiguration configuration)
-        {
-            _connectionString = configuration.GetConnectionString("ChapeauDatabase");
-        }
-
-        public void InsertPayment(Payment payment) //  baserepo gebruiken
+        public void InsertPayment(Payment payment)
         {
             try
             {
-                using (SqlConnection connection = new SqlConnection(_connectionString))
+                using (SqlConnection connection = CreateConnection()) 
                 {
                     string query = @"
-                INSERT INTO payments (orderId, amountPaid, paymentMethod, tip, feedback)
-                VALUES (@orderId, @amountPaid, @paymentMethod, @tip, @feedback);";
+                    INSERT INTO payments (orderId, amountPaid, paymentMethod, tip, feedback)
+                    VALUES (@orderId, @amountPaid, @paymentMethod, @tip, @feedback);";
 
                     using (SqlCommand command = new SqlCommand(query, connection))
                     {
@@ -32,11 +27,10 @@ namespace ChapeauHerkansing.Repositories
 
                         connection.Open();
                         command.ExecuteNonQuery();
-
                     }
                 }
             }
-            catch (Exception ex)
+            catch (Exception ex) // cw weg
             {
                 Console.WriteLine("FOUT bij insert: " + ex.Message);
             }

@@ -8,6 +8,7 @@ namespace ChapeauHerkansing.Repositories
     {
         public StaffRepository(IConfiguration configuration) : base(configuration)
         {
+
         }
 
         public StaffCollection GetAllStaff(bool includeDeleted = false)
@@ -133,7 +134,7 @@ namespace ChapeauHerkansing.Repositories
         public Staff? GetStaffByUsername(string username)
         {
             using var conn = CreateConnection();
-            const string sql = @"SELECT ID, firstName, lastName, username, password, role, isDeleted
+            const string sql = @"SELECT ID AS staffId, firstName, lastName, username, password, role, isDeleted
                          FROM dbo.staff
                          WHERE username = @username AND (isDeleted = 0 OR isDeleted IS NULL)";
 

@@ -19,7 +19,6 @@ namespace ChapeauHerkansing.Services
             return _staffRepo.GetAllStaff(includeDeleted);
         }
 
-
         public Staff GetStaffById(int id)
         {
             return _staffRepo.GetStaffById(id);
