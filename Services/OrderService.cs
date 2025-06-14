@@ -13,14 +13,12 @@ namespace ChapeauHerkansing.Services
         private readonly IOrderRepository _orderRepository;
         private readonly IMenuItemRepository _menuItemRepository;
         private readonly ITableService _tableService;
-        private readonly IStaffService _staffService;
 
-        public OrderService(IOrderRepository orderRepository, IMenuItemRepository menuItemRepository, ITableService tableService, IStaffService staffService)
+        public OrderService(IOrderRepository orderRepository, IMenuItemRepository menuItemRepository, ITableService tableService)
         {
             _orderRepository = orderRepository;
             _menuItemRepository = menuItemRepository;
             _tableService = tableService;
-            _staffService = staffService;
         }
 
         public MenuViewModel GetOrderView(int tableId, MenuType? menuType, MenuCategory? category)

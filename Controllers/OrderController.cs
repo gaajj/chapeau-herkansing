@@ -16,14 +16,12 @@ namespace ChapeauHerkansing.Controllers
     {
         private readonly IMenuService _menuService;
         private readonly IOrderService _orderService;
-        private readonly ITableService _tableService;
         private readonly IStaffService _staffService;
 
-        public OrderController(IMenuService menuService, IOrderService orderService, ITableService tableService, IStaffService staffService)
+        public OrderController(IMenuService menuService, IOrderService orderService, IStaffService staffService)
         {
             _menuService = menuService;
             _orderService = orderService;
-            _tableService = tableService;
             _staffService = staffService;
         }
 
