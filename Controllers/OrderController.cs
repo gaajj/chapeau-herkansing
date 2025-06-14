@@ -1,12 +1,9 @@
 ﻿using ChapeauHerkansing.Models;
 using ChapeauHerkansing.Models.Enums;
-using ChapeauHerkansing.Repositories;
-using ChapeauHerkansing.Services;
 using ChapeauHerkansing.Services.Interfaces;
 using ChapeauHerkansing.ViewModels.Ordering;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
 using System.Security.Claims;
 
 namespace ChapeauHerkansing.Controllers
@@ -27,9 +24,16 @@ namespace ChapeauHerkansing.Controllers
 
         public IActionResult Index(int tableId = 2, MenuType? menuType = null, MenuCategory? category = null)
         {
-            MenuViewModel viewModel = _orderService.GetOrderView(tableId, menuType, category);
-
-            return View(viewModel);
+            try
+            {
+                MenuViewModel viewModel = _orderService.GetOrderView(tableId, menuType, category);
+                return View(viewModel);
+            }
+            catch
+            {
+                TempData["Error"] = "Failed to load the order view.";
+                return RedirectToAction("Index", new { tableId });
+            }
         }
 
         [HttpPost]
@@ -43,13 +47,13 @@ namespace ChapeauHerkansing.Controllers
                 Staff staff = _staffService.GetStaffById(staffId);
 
                 OrderLine orderLine = new OrderLine(0, order, menuItem, staff, model.Amount, DateTime.Now, model.Note, OrderStatus.Ordered);
-
                 _orderService.AddOrderLineToOrder(orderLine);
+
                 TempData["Message"] = "Item successfully added.";
             }
             catch
             {
-                TempData["Error"] = "An error occurred while adding the menu item to the order.";
+                TempData["Error"] = "Failed to add menu item to the order.";
             }
 
             return RedirectToAction("Index", new { tableId = model.TableId });
@@ -88,9 +92,17 @@ namespace ChapeauHerkansing.Controllers
         }
 
         [HttpPost]
-        public IActionResult PayOrder(int orderId)
+        public IActionResult PayOrder(int orderId, int tableId)
         {
-            return RedirectToAction("Create", "Payment", new { orderId = orderId });
+            try
+            {
+                return RedirectToAction("Create", "Payment", new { orderId });
+            }
+            catch
+            {
+                TempData["Error"] = "Could not redirect to payment.,";
+                return RedirectToAction("Index", new { tableId });
+            }
         }
     }
 }

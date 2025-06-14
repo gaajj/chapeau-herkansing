@@ -74,6 +74,7 @@
         </strong>
         <form method="post" asp-action="PayOrder" class="ms-3">
             <input type="hidden" name="orderId" value="@Model.OrderID" />
+            <input type="hidden" name="tableId" value="@Model.Table.TableID" />
             <button type="submit" class="btn btn-success">Pay</button>
         </form>
     </li>
