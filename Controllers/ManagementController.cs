@@ -1,27 +1,30 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using ChapeauHerkansing.Services;
-using ChapeauHerkansing.Models.Enums;
-using ChapeauHerkansing.ViewModels.Management;
 using Microsoft.AspNetCore.Authorization;
 using ChapeauHerkansing.Models;
-using ChapeauHerkansing.Services.Interfaces;
+using ChapeauHerkansing.Models.Enums;
+using ChapeauHerkansing.Services;
+using ChapeauHerkansing.ViewModels.Management;
 
 namespace ChapeauHerkansing.Controllers
 {
     [Authorize(Roles = "Manager")]
     public class ManagementController : Controller
     {
-        private readonly IMenuService _menuService;
+        private readonly FinancialService _financialService;
+        private readonly MenuService _menuService;
 
-        public ManagementController(IMenuService menuService)
+        public ManagementController(MenuService menuService, FinancialService financialService)
         {
             _menuService = menuService;
+            _financialService = financialService;
         }
 
+        // Laat het beheeroverzicht van menu-items zien
         public IActionResult Index(MenuType menuType = MenuType.Lunch, MenuCategory? category = null)
         {
             Menu menu = _menuService.GetFilteredMenu(menuType, category, includeDeleted: true);
-            MenuManagementViewModel viewModel = new MenuManagementViewModel
+
+            MenuManagementViewModel viewModel = new()
             {
                 Menu = menu,
                 SelectedMenuType = menuType,
@@ -30,53 +33,50 @@ namespace ChapeauHerkansing.Controllers
                 Categories = Enum.GetValues(typeof(MenuCategory)).Cast<MenuCategory>().ToList()
             };
 
-
             return View(viewModel);
         }
 
-
-
-
+        // Toont het formulier om een nieuw menu-item aan te maken
         [HttpGet]
         public IActionResult Create()
         {
             return View(new MenuItemCreateViewModel());
         }
 
-
+        // Verwerkt het formulier om een nieuw menu-item toe te voegen
         [HttpPost]
         public IActionResult Create(MenuItemCreateViewModel model)
         {
             if (!ModelState.IsValid)
-            { // alle teksten in het engels
-                TempData["Error"] = "Formulier is ongeldig. Controleer alle velden.";
+            {
+                TempData["Error"] = "The form is invalid. Please check all fields.";
                 return View(model);
             }
+
 
             try
             {
                 _menuService.AddMenuItem(model);
-                TempData["Message"] = "Gerecht succesvol toegevoegd.";
+                TempData["Message"] = "Menu item successfully added.";
                 return RedirectToAction("Index");
             }
             catch (Exception ex)
             {
-                TempData["Error"] = $"Fout bij toevoegen: {ex.Message}";
+                TempData["Error"] = $"Error while adding item: {ex.Message}";
                 return View(model);
             }
-
         }
 
 
-
+        // Toont het formulier om een bestaand menu-item te bewerken
         [HttpGet]
         public IActionResult Edit(int id)
         {
-            var item = _menuService.GetMenuItemById(id);
+            MenuItem item = _menuService.GetMenuItemById(id);
             if (item == null)
                 return NotFound();
 
-            var model = new MenuItemCreateViewModel
+            MenuItemCreateViewModel model = new()
             {
                 Name = item.Name,
                 Price = item.Price,
@@ -89,62 +89,99 @@ namespace ChapeauHerkansing.Controllers
             return View(model);
         }
 
+        // Verwerkt het bewerken van een bestaand menu-item
         [HttpPost]
         public IActionResult Edit(int id, MenuItemCreateViewModel model)
         {
             if (!ModelState.IsValid)
             {
-                TempData["Error"] = "Formulier is ongeldig. Controleer de invoer.";
+                TempData["Error"] = "The form is invalid. Please check your input.";
                 return View(model);
             }
 
             try
             {
                 _menuService.UpdateMenuItem(id, model);
-                TempData["Message"] = "Gerecht succesvol bijgewerkt.";
+                TempData["Message"] = "Menu item successfully updated.";
                 return RedirectToAction("Index");
             }
-            catch
+            catch (Exception ex)
             {
-                TempData["Error"] = "Er ging iets mis bij het bijwerken van het gerecht.";
+                TempData["Error"] = $"Something went wrong while updating the menu item: {ex.Message}";
                 return View(model);
             }
         }
 
-
-
+        // Zet een menu-item aan of uit (soft delete)
         public IActionResult ToggleActive(int id)
         {
             try
             {
                 bool toggled = _menuService.ToggleMenuItemActive(id);
-                TempData["Message"] = toggled ? "Gerecht is gedeactiveerd." : "Gerecht is opnieuw geactiveerd.";
+                TempData["Message"] = toggled ? "Menu item deactivated." : "Menu item reactivated.";
             }
-            catch
+            catch (Exception ex)
             {
-                TempData["Error"] = "Er ging iets mis bij het aanpassen van de status.";
+                TempData["Error"] = $"Failed to change the item's active status: {ex.Message}";
             }
 
             return RedirectToAction("Index");
         }
 
+        // Toont het financiële overzicht op basis van periode of aangepaste datums
         public IActionResult Financial(DateTime? startDate, DateTime? endDate, string period = "month")
         {
-            var viewModel = new FinancialOverviewViewModel
+            if (period == "custom")
             {
-                SelectedPeriod = period,
-                StartDate = startDate ?? DateTime.Now.AddMonths(-1),
-                EndDate = endDate ?? DateTime.Now,
-                // Deze worden later gevuld met data uit je Order- en PaymentRepository
-                TotalSalesByType = new Dictionary<string, int>(),
-                TotalIncomeByType = new Dictionary<string, decimal>(),
-                TotalTipAmount = 0
-            };
+                if (!startDate.HasValue || !endDate.HasValue)
+                {
+                    TempData["Error"] = "Please select both a start and end date for the custom period.";
+                    return RedirectToAction("Financial");
+                }
 
-            return View(viewModel);
+                if (startDate > endDate)
+                {
+                    TempData["Error"] = "Start date cannot be after end date.";
+                    return RedirectToAction("Financial");
+                }
+            }
+
+            (DateTime start, DateTime end) = GetStartEndDateByPeriod(period, startDate, endDate);
+
+            try
+            {
+                List<FinancialData> data = _financialService.GetFinancialOverview(start, end);
+
+                FinancialOverviewViewModel model = new()
+                {
+                    SelectedPeriod = period,
+                    StartDate = start,
+                    EndDate = end,
+                    ReportItems = data
+                };
+
+                return View(model);
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = $"Error loading financial data: {ex.Message}";
+                return RedirectToAction("Index");
+            }
         }
 
+        // Bepaalt begin- en einddatum op basis van geselecteerde periode
+        private (DateTime Start, DateTime End) GetStartEndDateByPeriod(string period, DateTime? startDate, DateTime? endDate)
+        {
+            DateTime now = DateTime.Now;
 
-
+            return period switch
+            {
+                "month" => (now.AddMonths(-1), now),
+                "quarter" => (now.AddMonths(-3), now),
+                "year" => (now.AddYears(-1), now),
+                "custom" when startDate.HasValue && endDate.HasValue => (startDate.Value, endDate.Value),
+                _ => (now.AddMonths(-1), now)
+            };
+        }
     }
 }

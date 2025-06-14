@@ -1,4 +1,5 @@
 ﻿@model ChapeauHerkansing.ViewModels.Management.FinancialOverviewViewModel
+@using ChapeauHerkansing.Models
 
 @{
     ViewData["Title"] = "Financial Overview";
@@ -6,27 +7,37 @@
 
 <partial name="_ManagementTabs" />
 
+<h2 class="mb-4">Financial Overview</h2>
 
-<h2>Financial Overview</h2>
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @TempData["Error"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
 
 <form method="get" class="row g-3 mb-4">
     <div class="col-md-3">
         <label class="form-label">Period:</label>
         <select name="period" class="form-select">
-            <option value="month" selected>Last Month</option>
-            <option value="quarter">Last Quarter</option>
-            <option value="year">Last Year</option>
-            <option value="custom">Custom</option>
+            <option value="month" selected="@(Model.SelectedPeriod == "month")">Last Month</option>
+            <option value="quarter" selected="@(Model.SelectedPeriod == "quarter")">Last Quarter</option>
+            <option value="year" selected="@(Model.SelectedPeriod == "year")">Last Year</option>
+            <option value="custom" selected="@(Model.SelectedPeriod == "custom")">Custom</option>
         </select>
     </div>
+
     <div class="col-md-3">
         <label class="form-label">Start Date:</label>
         <input type="date" name="startDate" class="form-control" value="@Model.StartDate.ToString("yyyy-MM-dd")" />
     </div>
+
     <div class="col-md-3">
         <label class="form-label">End Date:</label>
         <input type="date" name="endDate" class="form-control" value="@Model.EndDate.ToString("yyyy-MM-dd")" />
     </div>
+
     <div class="col-md-3 d-flex align-items-end">
         <button type="submit" class="btn btn-primary w-100">Show</button>
     </div>
@@ -34,27 +45,38 @@
 
 <hr />
 
-<h4>Sales Per Menu Type</h4>
-<ul class="list-group mb-3">
-    @foreach (var pair in Model.TotalSalesByType)
-    {
-        <li class="list-group-item d-flex justify-content-between">
-            <span>@pair.Key</span>
-            <span>@pair.Value orders</span>
-        </li>
-    }
-</ul>
+@if (Model.ReportItems != null && Model.ReportItems.Any())
+{
+    <h4>Sales, Revenue & Tips Per Menu Type</h4>
+    <ul class="list-group mb-3">
+        @foreach (FinancialData item in Model.ReportItems)
+        {
+            <li class="list-group-item">
+                <strong>@item.MenuType</strong><br />
+                Sales: @item.TotalSales orders<br />
+                Revenue: € @item.Revenue.ToString("0.00")<br />
+                Tips: € @item.Tips.ToString("0.00")<br />
+                Total Income: € @item.TotalIncome.ToString("0.00")
+            </li>
+        }
+    </ul>
 
-<h4>Income Per Menu Type</h4>
-<ul class="list-group mb-3">
-    @foreach (var pair in Model.TotalIncomeByType)
-    {
-        <li class="list-group-item d-flex justify-content-between">
-            <span>@pair.Key</span>
-            <span>€ @pair.Value.ToString("0.00")</span>
-        </li>
-    }
-</ul>
-
-<h4>Total Tip Amount</h4>
-<p class="fs-5">€ @Model.TotalTipAmount.ToString("0.00")</p>
+    <div class="row">
+        <div class="col-md-6">
+            <h4>Total Income from All Sales</h4>
+            <p class="fs-5 fw-semibold">
+                € @Model.ReportItems.Sum(r => r.TotalIncome).ToString("0.00")
+            </p>
+        </div>
+        <div class="col-md-6">
+            <h4>Total Tip Amount</h4>
+            <p class="fs-5 fw-semibold">
+                € @Model.ReportItems.Sum(r => r.Tips).ToString("0.00")
+            </p>
+        </div>
+    </div>
+}
+else
+{
+    <p>No financial data available for this period.</p>
+}

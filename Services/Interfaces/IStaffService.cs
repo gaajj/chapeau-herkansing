@@ -6,11 +6,12 @@ namespace ChapeauHerkansing.Services.Interfaces
 {
     public interface IStaffService
     {
-        StaffCollection GetAllStaff(bool includeDeleted = false);
+        List<Staff> GetAllStaff(bool includeDeleted = false);
         Staff GetStaffById(int id);
         void AddStaff(StaffCreateViewModel model);
         void UpdateStaff(int id, StaffEditViewModel model);
         bool ToggleStaffActive(int id);
         Staff? GetByUsername(string username);
+        public bool UsernameExists(string username);
     }
 }

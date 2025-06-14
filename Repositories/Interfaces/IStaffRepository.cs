@@ -6,7 +6,7 @@ namespace ChapeauHerkansing.Repositories.Interfaces
 {
     public interface IStaffRepository
     {
-        StaffCollection GetAllStaff(bool includeDeleted = false);
+        List<Staff> GetAllStaff(bool includeDeleted = false);
         Staff GetStaffById(int id);
         void AddStaff(Staff staff);
         void UpdateStaff(Staff staff);
