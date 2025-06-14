@@ -15,7 +15,7 @@ namespace ChapeauHerkansing.Repositories
             List<Staff> staffList = new();
             using SqlConnection connection = CreateConnection();
 
-            string query = "SELECT ID AS staffId, firstName, lastName, username, password, role, isDeleted FROM dbo.staff";
+            string query = "SELECT ID, firstName, lastName, username, password, role, isDeleted FROM dbo.staff";
             if (!includeDeleted)
                 query += " WHERE isDeleted = 0";
 

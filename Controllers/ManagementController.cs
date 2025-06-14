@@ -4,6 +4,7 @@ using ChapeauHerkansing.Models;
 using ChapeauHerkansing.Models.Enums;
 using ChapeauHerkansing.Services;
 using ChapeauHerkansing.ViewModels.Management;
+using ChapeauHerkansing.Services.Interfaces;
 
 namespace ChapeauHerkansing.Controllers
 {
@@ -11,9 +12,9 @@ namespace ChapeauHerkansing.Controllers
     public class ManagementController : Controller
     {
         private readonly FinancialService _financialService;
-        private readonly MenuService _menuService;
+        private readonly IMenuService _menuService;
 
-        public ManagementController(MenuService menuService, FinancialService financialService)
+        public ManagementController(IMenuService menuService, FinancialService financialService)
         {
             _menuService = menuService;
             _financialService = financialService;
