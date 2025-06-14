@@ -6,9 +6,8 @@ namespace ChapeauHerkansing.Repositories.Interfaces
     public interface IOrderRepository
     {
         Order GetOrderById(int orderId);
-        List<Order> GetAll();
-        List<Order> GetAllNotReady();
-        List<Order> GetAllReady();
+        List<Order> GetAllOrders();
+        List<Order> GetAllOrdersByStatus( OrderStatus orderStatus);
         Order GetOrderByTable(int tableId);
         void AddMenuItemToOrder(Order order, MenuItem menuItem, Staff staff, int amount, OrderStatus status);
         void ToggleOrderLineStatus(int orderLineId);

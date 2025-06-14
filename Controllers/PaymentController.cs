@@ -29,7 +29,7 @@ namespace ChapeauHerkansing.Controllers
         [HttpGet]
         public IActionResult Create(int orderId)
         {
-            List<Order> orders = _orderRepo.GetAll().Where(o => !o.IsDeleted).ToList();
+            List<Order> orders = _orderRepo.GetAllOrders().Where(o => !o.IsDeleted).ToList();
             Order order = orders.FirstOrDefault(o => o.OrderID == orderId);
 
             PaymentViewModel model = new PaymentViewModel
@@ -46,7 +46,7 @@ namespace ChapeauHerkansing.Controllers
         [HttpPost]
         public IActionResult Create(PaymentViewModel viewModel)
         {
-            Order order = _orderRepo.GetAll().FirstOrDefault(o => o.OrderID == viewModel.OrderId);
+            Order order = _orderRepo.GetAllOrders().FirstOrDefault(o => o.OrderID == viewModel.OrderId);
             if (order == null) return NotFound();
 
             decimal total = _paymentService.CalculateTotal(order);

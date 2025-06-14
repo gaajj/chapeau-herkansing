@@ -3,6 +3,7 @@ using ChapeauHerkansing.Models.Enums;
 using ChapeauHerkansing.Repositories.Interfaces;
 using ChapeauHerkansing.Repositories.Readers;
 using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace ChapeauHerkansing.Repositories
 {
@@ -63,7 +64,7 @@ namespace ChapeauHerkansing.Repositories
         }
 
 
-        public List<Order> GetAll()
+        public List<Order> GetAllOrders()
         {
             string query = @"
                 SELECT
@@ -111,7 +112,7 @@ namespace ChapeauHerkansing.Repositories
             return orders;
         }
 
-        public List<Order> GetAllNotReady()
+        public List<Order> GetAllOrdersByStatus(OrderStatus orderStatus)
         {
             string query = @"
                 SELECT
@@ -136,7 +137,9 @@ namespace ChapeauHerkansing.Repositories
                     mi.itemName,
                     mi.price,
                     mi.category,
-                    mi.isAlcoholic
+                    mi.isAlcoholic,
+                mi.menuType,
+                    mi.stockAmount
                 FROM
                     dbo.orders o
                 INNER JOIN
@@ -148,58 +151,17 @@ namespace ChapeauHerkansing.Repositories
                 LEFT JOIN
                     dbo.staff s ON ol.staffId = s.id
                 WHERE
-                    o.isDeleted = 0 and ol.orderStatus='Ordered'
+                    o.isDeleted = 0 and ol.orderStatus=@orderStatus
                 ORDER BY
                     o.orderTime;
             ";
+            var parameters = new Dictionary<string, object>
+            {
+                { "@orderStatus", orderStatus.ToString()  }
+            };
 
-            List<Order> orders = ExecuteGroupedQuery<Order>(query, MapOrderWithLines, null);
-            return orders;
-        }
 
-        public List<Order> GetAllReady() // parameters toevoegen zodat het 1 query wordt
-        {
-            string query = @"
-                SELECT
-                    o.id AS orderId,
-                    o.isDeleted,
-                   o.orderTime,
-                    t.id AS tableId,
-                    t.seats,
-                    t.tableStatus,
-                    s.id AS ID,
-                    s.firstName,
-                    s.lastName,
-                    s.username,
-                    s.password,
-                    s.role,
-                    ol.id AS orderLineId,
-                    ol.amount,
-                    ol.orderTime,
-                    ol.note,
-                    ol.orderStatus,
-                    mi.id AS menuItemId,
-                    mi.itemName,
-                    mi.price,
-                    mi.category,
-                    mi.isAlcoholic
-                FROM
-                    dbo.orders o
-                INNER JOIN
-                    dbo.tables t ON o.tableId = t.id
-                inner JOIN
-                    dbo.orderLines ol ON o.id = ol.orderId
-                LEFT JOIN
-                    dbo.menuItems mi ON ol.menuItemId = mi.id
-                LEFT JOIN
-                    dbo.staff s ON ol.staffId = s.id
-                WHERE
-                    o.isDeleted = 0 and ol.orderStatus='Ready'
-                ORDER BY
-                    o.orderTime;
-            ";
-
-            List<Order> orders = ExecuteGroupedQuery<Order>(query, MapOrderWithLines, null);
+            List<Order> orders = ExecuteGroupedQuery<Order>(query, MapOrderWithLines, parameters);
             return orders;
         }
 
