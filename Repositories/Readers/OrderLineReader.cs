@@ -14,7 +14,7 @@ namespace ChapeauHerkansing.Repositories.Readers
                 MenuItemReader.Read(reader),
                 StaffReader.Read(reader),
                 reader.GetInt32(reader.GetOrdinal("stockAmount")),
-                reader.GetDateTime(reader.GetOrdinal("OrderTime")),
+                reader.GetDateTime(reader.GetOrdinal("orderLineOrderTime")),
                 reader.IsDBNull(reader.GetOrdinal("note")) ? null : reader.GetString(reader.GetOrdinal("note")),
                 ParseOrderStatus(reader.GetString(reader.GetOrdinal("orderStatus")))
             );

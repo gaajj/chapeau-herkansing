@@ -30,6 +30,7 @@ namespace ChapeauHerkansing.Controllers
         public IActionResult Create(int orderId)
         {
             List<Order> orders = _orderRepo.GetAllOrders().Where(o => !o.IsDeleted).ToList();
+            //filteren in de query zelf vgm 
             Order order = orders.FirstOrDefault(o => o.OrderID == orderId);
 
             PaymentViewModel model = new PaymentViewModel

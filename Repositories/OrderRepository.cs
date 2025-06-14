@@ -238,12 +238,13 @@ namespace ChapeauHerkansing.Repositories
 
         public void ToggleOrderLineStatus(int orderLineId)
         {
+            //zorgt ervoor dat orders die op ready of (iets anders) teruggaan naar ordered op het moment dat de methode wordt aangeroepen
             string query = @"
         UPDATE orderLines
         SET orderStatus = 
             CASE 
-                WHEN orderStatus = 'Ready' THEN 'Ordered'
-                ELSE 'Ready'
+                WHEN orderStatus = 'Ordered' THEN 'Ready'
+                ELSE 'Ordered'
             END
         WHERE id = @orderLineId;
     ";

@@ -12,7 +12,7 @@ namespace ChapeauHerkansing.Repositories.Readers
                 reader.GetInt32(reader.GetOrdinal("orderId")),
                 TableReader.Read(reader),
                 reader.GetBoolean(reader.GetOrdinal("isDeleted")),
-                reader.GetDateTime(reader.GetOrdinal("OrderTime"))
+                reader.GetDateTime(reader.GetOrdinal("orderOrderTime"))
             ); 
         }
 

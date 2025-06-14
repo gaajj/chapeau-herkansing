@@ -21,6 +21,7 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<FinancialRepository>();
 
 builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<IBar_KitchenService, Bar_KitchenService>();  
 builder.Services.AddScoped<IMenuService, MenuService>();
 builder.Services.AddScoped<IStaffService, StaffService>();
 builder.Services.AddScoped<ITableService, TableService>();
