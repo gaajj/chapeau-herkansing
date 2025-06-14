@@ -4,6 +4,7 @@ using ChapeauHerkansing.Repositories;
 using ChapeauHerkansing.Repositories.Interfaces;
 using ChapeauHerkansing.Services.Interfaces;
 using ChapeauHerkansing.ViewModels.Ordering;
+using System.Security.Claims;
 
 namespace ChapeauHerkansing.Services
 {
@@ -12,12 +13,14 @@ namespace ChapeauHerkansing.Services
         private readonly IOrderRepository _orderRepository;
         private readonly IMenuItemRepository _menuItemRepository;
         private readonly ITableService _tableService;
+        private readonly IStaffService _staffService;
 
-        public OrderService(IOrderRepository orderRepository, IMenuItemRepository menuItemRepository, ITableService tableService)
+        public OrderService(IOrderRepository orderRepository, IMenuItemRepository menuItemRepository, ITableService tableService, IStaffService staffService)
         {
             _orderRepository = orderRepository;
             _menuItemRepository = menuItemRepository;
             _tableService = tableService;
+            _staffService = staffService;
         }
 
         public MenuViewModel GetOrderView(int tableId, MenuType? menuType, MenuCategory? category)
@@ -77,21 +80,25 @@ namespace ChapeauHerkansing.Services
             return _menuItemRepository.GetMenuItemById(menuItemId);
         }
 
-        public void AddMenuItemToOrder(Order order, MenuItem menuItem, Staff staff, MenuItemAddViewModel model)
+        public void AddOrderLineToOrder(OrderLine line)
         {
-            OrderLine? existingLine = order.OrderLines
-                .FirstOrDefault(line => line.MenuItem.MenuItemID == menuItem.MenuItemID && line.Note == model.Note);
+            if (line.MenuItem.StockAmount < line.Amount)
+                throw new InvalidOperationException("Not enough stock available to add this item.");
+
+            OrderLine existingLine = line.Order.OrderLines
+                .FirstOrDefault(l => l.MenuItem.MenuItemID == line.MenuItem.MenuItemID && l.Note == line.Note);
 
             if (existingLine != null)
             {
-                _orderRepository.UpdateOrderLineAmount(existingLine.OrderLineID, existingLine.Amount + model.Amount);
+                int newAmount = existingLine.Amount + line.Amount;
+                _orderRepository.UpdateOrderLineAmount(existingLine.OrderLineID, newAmount);
             }
             else
             {
-                _orderRepository.AddMenuItemToOrder(order, menuItem, staff, model.Amount, OrderStatus.Ordered);
+                _orderRepository.AddMenuItemToOrder(line.Order, line.MenuItem, line.Staff, line.Amount, line.OrderStatus);
             }
 
-            _menuItemRepository.UpdateStock(menuItem.MenuItemID, -model.Amount);
+            _menuItemRepository.UpdateStock(line.MenuItem.MenuItemID, -line.Amount);
         }
 
         public void RemoveOrderLine(int orderLineId, int menuItemId, int amount)

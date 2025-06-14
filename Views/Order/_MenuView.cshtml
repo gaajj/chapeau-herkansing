@@ -34,6 +34,7 @@
                             <form method="post" asp-action="AddMenuItemToOrder" class="d-inline">
                                 <input type="hidden" name="orderId" value="@Model.Order.OrderID" />
                                 <input type="hidden" name="menuItemId" value="@item.MenuItemID" />
+                                <input type="hidden" name="tableId" value="@Model.Order.Table.TableID" />
                                 <input type="number" name="amount" value="1" min="1" class="form-control d-inline w-auto me-2" />
                                 <button type="submit" 
                                     class="btn btn-sm 

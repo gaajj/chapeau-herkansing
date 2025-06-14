@@ -37,29 +37,24 @@ namespace ChapeauHerkansing.Controllers
         [HttpPost]
         public IActionResult AddMenuItemToOrder(MenuItemAddViewModel model)
         {
-            Order order = _orderService.GetOrderById(model.OrderId);
-            MenuItem menuItem = _menuService.GetMenuItemById(model.MenuItemId);
-
-            int staffId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
-            Staff staff = _staffService.GetStaffById(staffId);
-
             try
             {
-                if (menuItem.StockAmount < model.Amount)
-                {
-                    TempData["Error"] = "Not enough stock available to add this item.";
-                    return RedirectToAction("Index", new { tableId = order.Table.TableID });
-                }
+                Order order = _orderService.GetOrderById(model.OrderId);
+                MenuItem menuItem = _menuService.GetMenuItemById(model.MenuItemId);
+                int staffId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+                Staff staff = _staffService.GetStaffById(staffId);
 
-                _orderService.AddMenuItemToOrder(order, menuItem, staff, model);
-                TempData["Message"] = "Menu item successfully added.";
+                OrderLine orderLine = new OrderLine(0, order, menuItem, staff, model.Amount, DateTime.Now, model.Note, OrderStatus.Ordered);
+
+                _orderService.AddOrderLineToOrder(orderLine);
+                TempData["Message"] = "Item successfully added.";
             }
             catch
             {
                 TempData["Error"] = "An error occurred while adding the menu item to the order.";
             }
 
-            return RedirectToAction("Index", new { tableId = order.Table.TableID });
+            return RedirectToAction("Index", new { tableId = model.TableId });
         }
 
         [HttpPost]
