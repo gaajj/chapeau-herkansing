@@ -29,47 +29,9 @@ namespace ChapeauHerkansing.Controllers
 
         public IActionResult Index(int tableId = 2, MenuType? menuType = null, MenuCategory? category = null)
         {
-            Order order = _orderService.GetOrderByTable(tableId);
+            MenuViewModel viewModel = _orderService.GetOrderView(tableId, menuType, category);
 
-            if (order == null)
-            {
-                Table? table = _tableService.GetTableById(tableId);
-                if (table != null && (table.Status == TableStatus.Free || table.Status == TableStatus.Reserved))
-                {
-                    _orderService.CreateOrderForTable(tableId);
-                    _tableService.UpdateTableStatus(tableId, TableStatus.Occupied);
-
-                    order = _orderService.GetOrderByTable(tableId);
-                }
-            }
-
-            Menu? menu = null;
-
-            if (menuType.HasValue)
-            {
-                menu = _menuService.GetMenuItemsByMenuType(menuType.Value);
-
-                if (menu == null || (menu.MenuItems.Count == 0 && category != null))
-                {
-                    menu = new Menu(); // forces no items message instead of going back to index
-                }
-                else if (category != null)
-                {
-                    menu.MenuItems = menu.MenuItems
-                        .Where(item => item.Category == category.Value)
-                        .ToList();
-                }
-            }
-
-            MenuViewModel model = new MenuViewModel
-            {
-                Order = order,
-                Menu = menu,
-                SelectedCategory = category,
-                MenuType = menuType
-            };
-
-            return View(model);
+            return View(viewModel);
         }
 
         [HttpPost]

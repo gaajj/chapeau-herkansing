@@ -1,10 +1,12 @@
 ﻿using ChapeauHerkansing.Models;
+using ChapeauHerkansing.Models.Enums;
 using ChapeauHerkansing.ViewModels.Ordering;
 
 namespace ChapeauHerkansing.Services.Interfaces
 {
     public interface IOrderService
     {
+        MenuViewModel GetOrderView(int tableId, MenuType? menuType, MenuCategory? category);
         Order GetOrderByTable(int tableId);
         Order GetOrderById(int orderId);
         MenuItem GetMenuItemById(int menuItemId);

@@ -11,11 +11,55 @@ namespace ChapeauHerkansing.Services
     {
         private readonly IOrderRepository _orderRepository;
         private readonly IMenuItemRepository _menuItemRepository;
+        private readonly ITableService _tableService;
 
-        public OrderService(IOrderRepository orderRepository, IMenuItemRepository menuItemRepository)
+        public OrderService(IOrderRepository orderRepository, IMenuItemRepository menuItemRepository, ITableService tableService)
         {
             _orderRepository = orderRepository;
             _menuItemRepository = menuItemRepository;
+            _tableService = tableService;
+        }
+
+        public MenuViewModel GetOrderView(int tableId, MenuType? menuType, MenuCategory? category)
+        {
+            Order order = GetOrderByTable(tableId);
+
+            if (order == null)
+            {
+                Table? table = _tableService.GetTableById(tableId);
+                if (table != null && (table.Status == TableStatus.Free || table.Status == TableStatus.Reserved))
+                {
+                    CreateOrderForTable(tableId);
+                    _tableService.UpdateTableStatus(tableId, TableStatus.Occupied);
+                    order = GetOrderByTable(tableId);
+                }
+            }
+
+            Menu menu = null;
+
+            if (menuType.HasValue)
+            {
+                menu = _menuItemRepository.GetMenuItemsByMenuType(menuType.Value);
+
+                if ((menu == null || menu.MenuItems.Count == 0) && category != null)
+                {
+                    menu = new Menu(); // show empty state
+                }
+                else if (category != null)
+                {
+                    menu.MenuItems = menu.MenuItems
+                        .Where(item => item.Category == category.Value)
+                        .ToList();
+                }
+            }
+
+            return new MenuViewModel
+            {
+                Order = order,
+                Menu = menu,
+                SelectedCategory = category,
+                MenuType = menuType
+            };
         }
 
         public Order GetOrderByTable(int tableId)
