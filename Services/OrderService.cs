@@ -23,44 +23,51 @@ namespace ChapeauHerkansing.Services
 
         public MenuViewModel GetOrderView(int tableId, MenuType? menuType, MenuCategory? category)
         {
-            Order order = GetOrderByTable(tableId);
-
-            if (order == null)
+            try
             {
-                Table? table = _tableService.GetTableById(tableId);
-                if (table != null && (table.Status == TableStatus.Free || table.Status == TableStatus.Reserved))
+                Order order = GetOrderByTable(tableId);
+
+                if (order == null)
                 {
-                    CreateOrderForTable(tableId);
-                    _tableService.UpdateTableStatus(tableId, TableStatus.Occupied);
-                    order = GetOrderByTable(tableId);
+                    Table? table = _tableService.GetTableById(tableId);
+                    if (table != null && (table.Status == TableStatus.Free || table.Status == TableStatus.Reserved))
+                    {
+                        CreateOrderForTable(tableId);
+                        _tableService.UpdateTableStatus(tableId, TableStatus.Occupied);
+                        order = GetOrderByTable(tableId);
+                    }
                 }
+
+                Menu menu = null;
+
+                if (menuType.HasValue)
+                {
+                    menu = _menuItemRepository.GetMenuItemsByMenuType(menuType.Value);
+
+                    if ((menu == null || menu.MenuItems.Count == 0) && category != null)
+                    {
+                        menu = new Menu(); // show empty state
+                    }
+                    else if (category != null)
+                    {
+                        menu.MenuItems = menu.MenuItems
+                            .Where(item => item.Category == category.Value)
+                            .ToList();
+                    }
+                }
+
+                return new MenuViewModel
+                {
+                    Order = order,
+                    Menu = menu,
+                    SelectedCategory = category,
+                    MenuType = menuType
+                };
             }
-
-            Menu menu = null;
-
-            if (menuType.HasValue)
+            catch (Exception ex)
             {
-                menu = _menuItemRepository.GetMenuItemsByMenuType(menuType.Value);
-
-                if ((menu == null || menu.MenuItems.Count == 0) && category != null)
-                {
-                    menu = new Menu(); // show empty state
-                }
-                else if (category != null)
-                {
-                    menu.MenuItems = menu.MenuItems
-                        .Where(item => item.Category == category.Value)
-                        .ToList();
-                }
+                throw new ApplicationException("Failed to build the order view.", ex);
             }
-
-            return new MenuViewModel
-            {
-                Order = order,
-                Menu = menu,
-                SelectedCategory = category,
-                MenuType = menuType
-            };
         }
 
         public Order GetOrderByTable(int tableId)
@@ -101,7 +108,11 @@ namespace ChapeauHerkansing.Services
 
         public void RemoveOrderLine(int orderLineId, int menuItemId, int amount)
         {
-            if (amount > 1)
+            if (amount <= 0)
+            {
+                throw new ArgumentException("Invalid item amount.");
+            }
+            else if (amount > 1)
             {
                 _orderRepository.UpdateOrderLineAmount(orderLineId, amount - 1);
                 _menuItemRepository.UpdateStock(menuItemId, 1);
@@ -112,8 +123,6 @@ namespace ChapeauHerkansing.Services
                 _menuItemRepository.UpdateStock(menuItemId, amount);
             }
         }
-
-
 
         public void UpdateOrderLineNote(int orderLineId, string note)
         {

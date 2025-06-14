@@ -100,7 +100,7 @@ namespace ChapeauHerkansing.Controllers
             }
             catch
             {
-                TempData["Error"] = "Could not redirect to payment.,";
+                TempData["Error"] = "Could not redirect to payment.";
                 return RedirectToAction("Index", new { tableId });
             }
         }
