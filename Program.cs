@@ -16,6 +16,9 @@ builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<IMenuItemRepository, MenuItemRepository>();
 builder.Services.AddScoped<IStaffRepository, StaffRepository>();
 builder.Services.AddScoped<ITableRepository, TableRepository>();
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<IAuthService, AuthService>();
+
 
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IMenuService, MenuService>();
