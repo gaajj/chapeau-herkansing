@@ -8,7 +8,7 @@ namespace ChapeauHerkansing.Repositories
     {
         public StaffRepository(IConfiguration configuration) : base(configuration) { }
 
-        // Haalt alle medewerkers op, optioneel inclusief gedeactiveerden
+        // Haalt alle medewerkers op (optioneel inclusief gedeactiveerden)
         public List<Staff> GetAllStaff(bool includeDeleted = false)
         {
             List<Staff> staffList = new();
@@ -19,17 +19,26 @@ namespace ChapeauHerkansing.Repositories
                 query += " WHERE isDeleted = 0";
 
             using SqlCommand command = new(query, connection);
-            connection.Open();
-            using SqlDataReader reader = command.ExecuteReader();
-
-            while (reader.Read())
-                staffList.Add(StaffReader.Read(reader));
+            try
+            {
+                connection.Open();
+                using SqlDataReader reader = command.ExecuteReader();
+                while (reader.Read())
+                    staffList.Add(StaffReader.Read(reader));
+            }
+            catch (SqlException sqlEx)
+            {
+                throw new Exception("Database error while retrieving staff list.", sqlEx);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Unexpected error while retrieving staff.", ex);
+            }
 
             return staffList;
         }
 
-
-        // Haalt één medewerker op op basis van ID
+        // Haalt één medewerker op via ID
         public Staff GetStaffById(int id)
         {
             using SqlConnection conn = CreateConnection();
@@ -38,12 +47,23 @@ namespace ChapeauHerkansing.Repositories
             using SqlCommand cmd = new(query, conn);
             cmd.Parameters.AddWithValue("@id", id);
 
-            conn.Open();
-            using SqlDataReader reader = cmd.ExecuteReader();
-            return reader.Read() ? StaffReader.Read(reader) : null;
+            try
+            {
+                conn.Open();
+                using SqlDataReader reader = cmd.ExecuteReader();
+                return reader.Read() ? StaffReader.Read(reader) : null;
+            }
+            catch (SqlException sqlEx)
+            {
+                throw new Exception("Database error while retrieving staff member by ID.", sqlEx);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Unexpected error while retrieving staff by ID.", ex);
+            }
         }
 
-        // Voegt een nieuwe medewerker toe
+        // Voegt nieuwe medewerker toe aan de database
         public void AddStaff(Staff staff)
         {
             using SqlConnection conn = CreateConnection();
@@ -59,11 +79,22 @@ namespace ChapeauHerkansing.Repositories
             cmd.Parameters.AddWithValue("@role", staff.Role.ToString());
             cmd.Parameters.AddWithValue("@isDeleted", staff.IsDeleted);
 
-            conn.Open();
-            cmd.ExecuteNonQuery();
+            try
+            {
+                conn.Open();
+                cmd.ExecuteNonQuery();
+            }
+            catch (SqlException sqlEx)
+            {
+                throw new Exception("Database error while adding staff member.", sqlEx);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Unexpected error while adding staff member.", ex);
+            }
         }
 
-        // Update bestaande medewerker
+        // Werkt gegevens van een bestaande medewerker bij
         public void UpdateStaff(Staff staff)
         {
             using SqlConnection conn = CreateConnection();
@@ -82,47 +113,58 @@ namespace ChapeauHerkansing.Repositories
             cmd.Parameters.AddWithValue("@isDeleted", staff.IsDeleted);
             cmd.Parameters.AddWithValue("@id", staff.Id);
 
-            conn.Open();
-            cmd.ExecuteNonQuery();
-        }
-
-        // Zet medewerker aan/uit (soft delete)
-        public bool ToggleStaffActive(int id)
-        {
-            using (SqlConnection conn = CreateConnection())
+            try
             {
-                string query = @"
-            UPDATE dbo.staff
-            SET isDeleted = CASE 
-                WHEN isDeleted IS NULL OR isDeleted = 0 THEN 1 
-                ELSE 0 
-            END
-            OUTPUT INSERTED.isDeleted
-            WHERE ID = @id";
-
-                using (SqlCommand cmd = new SqlCommand(query, conn))
-                {
-                    cmd.Parameters.AddWithValue("@id", id);
-                    conn.Open();
-
-                    using (SqlDataReader reader = cmd.ExecuteReader())
-                    {
-                        if (reader.Read())
-                        {
-                            // Type-safe read of the returned value
-                            bool isDeleted = reader.GetBoolean(reader.GetOrdinal("isDeleted"));
-                            return isDeleted;
-                        }
-
-                        // No rows affected  throw meaningful exception
-                        throw new Exception("Staff member not found or status was not changed.");
-                    }
-                }
+                conn.Open();
+                cmd.ExecuteNonQuery();
+            }
+            catch (SqlException sqlEx)
+            {
+                throw new Exception("Database error while updating staff member.", sqlEx);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Unexpected error while updating staff.", ex);
             }
         }
 
+        // Zet medewerker aan/uit (soft delete toggle)
+        public bool ToggleStaffActive(int id)
+        {
+            using SqlConnection conn = CreateConnection();
+            string query = @"
+                UPDATE dbo.staff
+                SET isDeleted = CASE WHEN isDeleted IS NULL OR isDeleted = 0 THEN 1 ELSE 0 END
+                OUTPUT INSERTED.isDeleted
+                WHERE ID = @id";
 
-        // Haalt medewerker op via gebruikersnaam (voor login)
+            using SqlCommand cmd = new(query, conn);
+            cmd.Parameters.AddWithValue("@id", id);
+
+            try
+            {
+                conn.Open();
+                using SqlDataReader reader = cmd.ExecuteReader();
+
+                if (reader.Read())
+                {
+                    bool isDeleted = reader.GetBoolean(reader.GetOrdinal("isDeleted"));
+                    return isDeleted;
+                }
+
+                throw new Exception("Staff member not found or no status was changed.");
+            }
+            catch (SqlException sqlEx)
+            {
+                throw new Exception("Database error while toggling staff active status.", sqlEx);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Unexpected error while toggling staff status.", ex);
+            }
+        }
+
+        // Login: zoek medewerker op gebruikersnaam
         public Staff? GetStaffByUsername(string username)
         {
             using SqlConnection conn = CreateConnection();

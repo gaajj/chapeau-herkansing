@@ -30,10 +30,11 @@
     </div>
 
     <div class="mb-3">
-        <label asp-for="Password" class="form-label">Wachtwoord</label>
-        <input asp-for="Password" class="form-control" type="password" />
+        <label asp-for="Password" class="form-label">New Password (leave empty to keep current)</label>
+        <input asp-for="Password" type="password" class="form-control" />
         <span asp-validation-for="Password" class="text-danger"></span>
     </div>
+
 
     <div class="mb-3">
         <label asp-for="Role" class="form-label">Rol</label>

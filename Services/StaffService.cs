@@ -59,5 +59,12 @@ namespace ChapeauHerkansing.Services
         {
             return _staffRepo.GetStaffByUsername(username);
         }
+
+
+        public bool UsernameExists(string username)
+        {
+            return _staffRepo.GetStaffByUsername(username) != null;
+        }
+
     }
 }

@@ -19,11 +19,12 @@ namespace ChapeauHerkansing.Controllers
             _financialService = financialService;
         }
 
+        // Laat het beheeroverzicht van menu-items zien
         public IActionResult Index(MenuType menuType = MenuType.Lunch, MenuCategory? category = null)
         {
             Menu menu = _menuService.GetFilteredMenu(menuType, category, includeDeleted: true);
 
-            MenuManagementViewModel viewModel = new MenuManagementViewModel
+            MenuManagementViewModel viewModel = new()
             {
                 Menu = menu,
                 SelectedMenuType = menuType,
@@ -35,12 +36,14 @@ namespace ChapeauHerkansing.Controllers
             return View(viewModel);
         }
 
+        // Toont het formulier om een nieuw menu-item aan te maken
         [HttpGet]
         public IActionResult Create()
         {
             return View(new MenuItemCreateViewModel());
         }
 
+        // Verwerkt het formulier om een nieuw menu-item toe te voegen
         [HttpPost]
         public IActionResult Create(MenuItemCreateViewModel model)
         {
@@ -49,6 +52,7 @@ namespace ChapeauHerkansing.Controllers
                 TempData["Error"] = "The form is invalid. Please check all fields.";
                 return View(model);
             }
+
 
             try
             {
@@ -63,16 +67,16 @@ namespace ChapeauHerkansing.Controllers
             }
         }
 
+
+        // Toont het formulier om een bestaand menu-item te bewerken
         [HttpGet]
         public IActionResult Edit(int id)
         {
             MenuItem item = _menuService.GetMenuItemById(id);
             if (item == null)
-            {
                 return NotFound();
-            }
 
-            MenuItemCreateViewModel model = new MenuItemCreateViewModel
+            MenuItemCreateViewModel model = new()
             {
                 Name = item.Name,
                 Price = item.Price,
@@ -85,6 +89,7 @@ namespace ChapeauHerkansing.Controllers
             return View(model);
         }
 
+        // Verwerkt het bewerken van een bestaand menu-item
         [HttpPost]
         public IActionResult Edit(int id, MenuItemCreateViewModel model)
         {
@@ -100,13 +105,14 @@ namespace ChapeauHerkansing.Controllers
                 TempData["Message"] = "Menu item successfully updated.";
                 return RedirectToAction("Index");
             }
-            catch
+            catch (Exception ex)
             {
-                TempData["Error"] = "Something went wrong while updating the menu item.";
+                TempData["Error"] = $"Something went wrong while updating the menu item: {ex.Message}";
                 return View(model);
             }
         }
 
+        // Zet een menu-item aan of uit (soft delete)
         public IActionResult ToggleActive(int id)
         {
             try
@@ -114,14 +120,15 @@ namespace ChapeauHerkansing.Controllers
                 bool toggled = _menuService.ToggleMenuItemActive(id);
                 TempData["Message"] = toggled ? "Menu item deactivated." : "Menu item reactivated.";
             }
-            catch
+            catch (Exception ex)
             {
-                TempData["Error"] = "Failed to change the item's active status.";
+                TempData["Error"] = $"Failed to change the item's active status: {ex.Message}";
             }
 
             return RedirectToAction("Index");
         }
 
+        // Toont het financiële overzicht op basis van periode of aangepaste datums
         public IActionResult Financial(DateTime? startDate, DateTime? endDate, string period = "month")
         {
             if (period == "custom")
@@ -141,21 +148,28 @@ namespace ChapeauHerkansing.Controllers
 
             (DateTime start, DateTime end) = GetStartEndDateByPeriod(period, startDate, endDate);
 
-            List<FinancialData> data = _financialService.GetFinancialOverview(start, end);
-
-            FinancialOverviewViewModel model = new FinancialOverviewViewModel
+            try
             {
-                SelectedPeriod = period,
-                StartDate = start,
-                EndDate = end,
-                ReportItems = data
-            };
+                List<FinancialData> data = _financialService.GetFinancialOverview(start, end);
 
-            System.Diagnostics.Debug.WriteLine($"Aantal records in financial data: {data.Count}");
+                FinancialOverviewViewModel model = new()
+                {
+                    SelectedPeriod = period,
+                    StartDate = start,
+                    EndDate = end,
+                    ReportItems = data
+                };
 
-            return View(model);
+                return View(model);
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = $"Error loading financial data: {ex.Message}";
+                return RedirectToAction("Index");
+            }
         }
 
+        // Bepaalt begin- en einddatum op basis van geselecteerde periode
         private (DateTime Start, DateTime End) GetStartEndDateByPeriod(string period, DateTime? startDate, DateTime? endDate)
         {
             DateTime now = DateTime.Now;
@@ -169,6 +183,5 @@ namespace ChapeauHerkansing.Controllers
                 _ => (now.AddMonths(-1), now)
             };
         }
-
     }
 }

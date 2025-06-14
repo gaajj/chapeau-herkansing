@@ -14,19 +14,21 @@ namespace ChapeauHerkansing.Controllers
             _staffService = staffService;
         }
 
+        // Laat alle medewerkers zien (ook gedeactiveerde)
         public IActionResult Index()
         {
-            // Haalt alle medewerkers op (ook gedeactiveerden als true)
-            List<Staff> staffList = _staffService.GetAllStaff(true);
+            List<Staff> staffList = _staffService.GetAllStaff(includeDeleted: true);
             return View(staffList);
         }
 
+        // Toont het formulier om een nieuwe medewerker toe te voegen
         [HttpGet]
         public IActionResult Create()
         {
-            return View();
+            return View(new StaffCreateViewModel());
         }
 
+        // Verwerkt het formulier en voegt de medewerker toe
         [HttpPost]
         public IActionResult Create(StaffCreateViewModel model)
         {
@@ -36,30 +38,40 @@ namespace ChapeauHerkansing.Controllers
                 return View(model);
             }
 
-            // Hashing gebeurt binnen de service
-            _staffService.AddStaff(model);
-            TempData["Message"] = "Staff member successfully added.";
-            return RedirectToAction("Index");
+            if (_staffService.UsernameExists(model.Username))
+            {
+                TempData["Error"] = "This username is already taken.";
+                return View(model);
+            }
+
+            try
+            {
+                _staffService.AddStaff(model);
+                TempData["Message"] = "Staff member successfully added.";
+                return RedirectToAction("Index");
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = $"Failed to add staff member: {ex.Message}";
+                return View(model);
+            }
         }
 
+        // Toont het formulier om een medewerker te bewerken (zonder wachtwoord)
         [HttpGet]
         public IActionResult Edit(int staffId)
         {
-            // Haalt de medewerker op die aangepast moet worden
             Staff staff = _staffService.GetStaffById(staffId);
             if (staff == null)
-            {
                 return NotFound();
-            }
 
-            // Zet bestaande data in een edit viewmodel
-            StaffEditViewModel model = new StaffEditViewModel
+            StaffEditViewModel model = new()
             {
                 Id = staff.Id,
                 FirstName = staff.FirstName,
                 LastName = staff.LastName,
                 Username = staff.Username,
-                Password = staff.Password,
+                // Password wordt niet meegegeven!
                 Role = staff.Role,
                 IsDeleted = staff.IsDeleted
             };
@@ -67,6 +79,7 @@ namespace ChapeauHerkansing.Controllers
             return View(model);
         }
 
+        // Verwerkt de bewerking van een medewerker
         [HttpPost]
         public IActionResult Edit(int staffId, StaffEditViewModel model)
         {
@@ -76,38 +89,62 @@ namespace ChapeauHerkansing.Controllers
                 return View(model);
             }
 
-            Staff existingStaff = _staffService.GetStaffById(staffId);
-
-            // Als er geen nieuw wachtwoord is ingevoerd, houd het oude wachtwoord
-            StaffEditViewModel updatedModel = new StaffEditViewModel
+            try
             {
-                Id = staffId,
-                FirstName = model.FirstName,
-                LastName = model.LastName,
-                Username = model.Username,
-                Password = string.IsNullOrWhiteSpace(model.Password) ? existingStaff.Password : model.Password,
-                Role = model.Role,
-                IsDeleted = model.IsDeleted
-            };
+                Staff existingStaff = _staffService.GetStaffById(staffId);
+                if (existingStaff == null)
+                    return NotFound();
 
-            _staffService.UpdateStaff(staffId, updatedModel);
-            TempData["Message"] = "Staff member successfully updated.";
-            return RedirectToAction("Index");
+                // Gebruik het bestaande wachtwoord als er geen nieuw is opgegeven
+                string finalPassword;
+
+                if (string.IsNullOrWhiteSpace(model.Password))
+                {
+                    // Geen nieuw wachtwoord ingevuld = gebruik het oude
+                    finalPassword = existingStaff.Password;
+                }
+                else
+                {
+                    // Nieuw wachtwoord ingevuld = gebruik het nieuwe
+                    finalPassword = model.Password;
+                }
+
+
+                StaffEditViewModel updatedModel = new()
+                {
+                    Id = staffId,
+                    FirstName = model.FirstName,
+                    LastName = model.LastName,
+                    Username = model.Username,
+                    Password = finalPassword,
+                    Role = model.Role,
+                    IsDeleted = model.IsDeleted
+                };
+
+                _staffService.UpdateStaff(staffId, updatedModel);
+                TempData["Message"] = "Staff member successfully updated.";
+                return RedirectToAction("Index");
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = $"Failed to update staff member: {ex.Message}";
+                return View(model);
+            }
         }
 
+        // Zet medewerker aan of uit (soft delete)
         public IActionResult ToggleActive(int id)
         {
             try
             {
-                // Activeer of deactiveer medewerker
                 bool isNowInactive = _staffService.ToggleStaffActive(id);
                 TempData["Message"] = isNowInactive
                     ? "Staff member deactivated."
                     : "Staff member reactivated.";
             }
-            catch
+            catch (Exception ex)
             {
-                TempData["Error"] = "Failed to update staff status.";
+                TempData["Error"] = $"Failed to update staff status: {ex.Message}";
             }
 
             return RedirectToAction("Index");
