@@ -27,7 +27,7 @@ namespace ChapeauHerkansing.Repositories
                 JOIN orderLines ol ON o.id = ol.orderId
                 JOIN menuItems mi ON ol.menuItemId = mi.id
                 JOIN payments p ON o.id = p.orderId
-                WHERE o.orderTime BETWEEN @from AND @to AND o.isDeleted = 0 AND p.isDeleted = 0";
+                WHERE p.isDeleted = 0";
 
             if (filter != null)
             {
