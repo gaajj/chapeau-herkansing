@@ -1,12 +1,9 @@
 ﻿using ChapeauHerkansing.Models;
 using ChapeauHerkansing.Models.Enums;
-using ChapeauHerkansing.Repositories;
-using ChapeauHerkansing.Services;
 using ChapeauHerkansing.Services.Interfaces;
 using ChapeauHerkansing.ViewModels.Ordering;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
 using System.Security.Claims;
 
 namespace ChapeauHerkansing.Controllers
@@ -16,88 +13,54 @@ namespace ChapeauHerkansing.Controllers
     {
         private readonly IMenuService _menuService;
         private readonly IOrderService _orderService;
-        private readonly ITableService _tableService;
         private readonly IStaffService _staffService;
 
-        public OrderController(IMenuService menuService, IOrderService orderService, ITableService tableService, IStaffService staffService)
+        public OrderController(IMenuService menuService, IOrderService orderService, IStaffService staffService)
         {
             _menuService = menuService;
             _orderService = orderService;
-            _tableService = tableService;
             _staffService = staffService;
         }
 
         public IActionResult Index(int tableId = 2, MenuType? menuType = null, MenuCategory? category = null)
         {
-            Order order = _orderService.GetOrderByTable(tableId);
-
-            if (order == null)
+            try
             {
-                Table? table = _tableService.GetTableById(tableId);
-                if (table != null && (table.Status == TableStatus.Free || table.Status == TableStatus.Reserved))
-                {
-                    _orderService.CreateOrderForTable(tableId);
-                    _tableService.UpdateTableStatus(tableId, TableStatus.Occupied);
-
-                    order = _orderService.GetOrderByTable(tableId);
-                }
+                MenuViewModel viewModel = _orderService.GetOrderView(tableId, menuType, category);
+                return View(viewModel);
             }
-
-            Menu? menu = null;
-
-            if (menuType.HasValue)
+            catch
             {
-                menu = _menuService.GetMenuItemsByMenuType(menuType.Value);
-
-                if (menu == null || (menu.MenuItems.Count == 0 && category != null))
-                {
-                    menu = new Menu(); // forces no items message instead of going back to index
-                }
-                else if (category != null)
-                {
-                    menu.MenuItems = menu.MenuItems
-                        .Where(item => item.Category == category.Value)
-                        .ToList();
-                }
+                TempData["Error"] = "Failed to load the order view.";
+                return RedirectToAction("Index", new { tableId });
             }
-
-            MenuViewModel model = new MenuViewModel
-            {
-                Order = order,
-                Menu = menu,
-                SelectedCategory = category,
-                MenuType = menuType
-            };
-
-            return View(model);
         }
 
         [HttpPost]
         public IActionResult AddMenuItemToOrder(MenuItemAddViewModel model)
         {
-            Order order = _orderService.GetOrderById(model.OrderId);
-            MenuItem menuItem = _menuService.GetMenuItemById(model.MenuItemId);
-
-            int staffId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
-            Staff staff = _staffService.GetStaffById(staffId);
-
             try
             {
-                if (menuItem.StockAmount < model.Amount)
-                {
-                    TempData["Error"] = "Not enough stock available to add this item.";
-                    return RedirectToAction("Index", new { tableId = order.Table.TableID });
-                }
+                Order order = _orderService.GetOrderById(model.OrderId);
+                MenuItem menuItem = _menuService.GetMenuItemById(model.MenuItemId);
+                int staffId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+                Staff staff = _staffService.GetStaffById(staffId);
 
-                _orderService.AddMenuItemToOrder(order, menuItem, staff, model);
-                TempData["Message"] = "Menu item successfully added.";
+                OrderLine orderLine = new OrderLine(0, order, menuItem, staff, model.Amount, DateTime.Now, model.Note, OrderStatus.Ordered);
+                _orderService.AddOrderLineToOrder(orderLine);
+
+                TempData["Message"] = "Item successfully added.";
+            }
+            catch (InvalidOperationException ex)
+            {
+                TempData["Error"] = ex.Message;
             }
             catch
             {
-                TempData["Error"] = "An error occurred while adding the menu item to the order.";
+                TempData["Error"] = "Failed to add menu item to the order.";
             }
 
-            return RedirectToAction("Index", new { tableId = order.Table.TableID });
+            return RedirectToAction("Index", new { tableId = model.TableId });
         }
 
         [HttpPost]
@@ -133,9 +96,17 @@ namespace ChapeauHerkansing.Controllers
         }
 
         [HttpPost]
-        public IActionResult PayOrder(int orderId)
+        public IActionResult PayOrder(int orderId, int tableId)
         {
-            return RedirectToAction("Create", "Payment", new { orderId = orderId });
+            try
+            {
+                return RedirectToAction("Create", "Payment", new { orderId });
+            }
+            catch
+            {
+                TempData["Error"] = "Could not redirect to payment.";
+                return RedirectToAction("Index", new { tableId });
+            }
         }
     }
 }

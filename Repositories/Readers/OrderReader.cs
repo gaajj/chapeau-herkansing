@@ -15,5 +15,21 @@ namespace ChapeauHerkansing.Repositories.Readers
                 reader.GetDateTime(reader.GetOrdinal("OrderTime"))
             ); 
         }
+
+        public static Order ReadWithLines(SqlDataReader reader)
+        {
+            Order order = OrderReader.Read(reader);
+
+            do
+            {
+                if (!reader.IsDBNull(reader.GetOrdinal("orderLineId")))
+                {
+                    OrderLine orderLine = OrderLineReader.Read(reader, order);
+                    order.OrderLines.Add(orderLine);
+                }
+            } while (reader.Read() && reader.GetInt32(reader.GetOrdinal("orderId")) == order.OrderID);
+
+            return order;
+        }
     }
 }
