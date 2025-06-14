@@ -2,7 +2,6 @@
 using ChapeauHerkansing.Models.Enums;
 using Microsoft.Data.SqlClient;
 using System;
-using System.Collections.Generic;
 
 namespace ChapeauHerkansing.Repositories
 {
