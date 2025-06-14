@@ -40,7 +40,7 @@ else
             {
                 <li class="list-group-item">
                     @item.MenuItem.Name – @item.Amount x €@item.MenuItem.Price.ToString("F2")
-                    → btw: €@item.VAT.ToString("F2")
+                    → btw: €@item.VAT.ToString("F2") (@(item.MenuItem.IsAlcoholic ? "21%" : "9%"))
                 </li>
             }
         </ul>

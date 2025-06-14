@@ -8,8 +8,6 @@ namespace ChapeauHerkansing.Repositories
 {
     public class OrderRepository : BaseRepository, IOrderRepository
     {
-
-
         public OrderRepository(IConfiguration configuration) : base(configuration) { }
 
         public Order GetOrderById(int orderId)

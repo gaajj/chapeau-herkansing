@@ -147,14 +147,5 @@ namespace ChapeauHerkansing.Repositories
             }
             return list;
         }
-
-
-        public void SetTableFree(int tableId) // in de controller vrij zetten
-        {
-            UpdateTableStatus(tableId, TableStatus.Free);
-        }
-
-
-
     }
 }
