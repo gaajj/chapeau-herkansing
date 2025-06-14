@@ -51,6 +51,10 @@ namespace ChapeauHerkansing.Controllers
 
                 TempData["Message"] = "Item successfully added.";
             }
+            catch (InvalidOperationException ex)
+            {
+                TempData["Error"] = ex.Message;
+            }
             catch
             {
                 TempData["Error"] = "Failed to add menu item to the order.";
