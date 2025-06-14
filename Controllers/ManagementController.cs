@@ -123,7 +123,7 @@ namespace ChapeauHerkansing.Controllers
             }
             catch (Exception ex)
             {
-                TempData["Error"] = $"Failed to change the item's active status: {ex.Message}";
+                TempData["Error"] = $"Failed to change the item's active stateus: {ex.Message}";
             }
 
             return RedirectToAction("Index");
