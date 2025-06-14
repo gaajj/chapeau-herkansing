@@ -1,30 +1,54 @@
-﻿@model IEnumerable<ChapeauHerkansing.Models.User>
-
-@{
-    ViewData["Title"] = "Users List";
+﻿@{
+    ViewData["Title"] = "Home";
 }
 
-<h1>@ViewData["Title"]</h1>
+<div class="container mt-5 text-center">
+    <img src="~/images/logo.png" alt="Chapeau Logo" style="height:100px;" class="mb-4" />
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>First Name</th>
-            <th>Last Name</th>
-            <th>Username</th>
-            <th>Role</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var user in Model)
-        {
-            <tr>
-                <td>@user.FirstName</td>
-                <td>@user.LastName</td>
-                <td>@user.Username</td>
-                <td>@user.Role</td>
-            </tr>
-        }
-    </tbody>
-</table>
+    <h1 class="display-4 fw-bold" style="color: darkorange; font-family: Tahoma;">
+        Welcome to Chapeau!
+    </h1>
 
+    <p class="lead mt-3 mb-4" style="font-family: Tahoma;">
+        Your digital assistant for seamless restaurant operations.
+        Whether you're managing orders, preparing dishes, or handling payments.
+    </p>
+
+    <div class="row justify-content-center mb-5">
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <i class="bi bi-table" style="font-size: 2rem; color: #8AD2B0;"></i>
+                    <h5 class="card-title mt-2">Table Overview</h5>
+                    <p class="card-text">Monitor and manage all your tables in real-time.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <i class="bi bi-cup-straw" style="font-size: 2rem; color: #FFB347;"></i>
+                    <h5 class="card-title mt-2">Order Management</h5>
+                    <p class="card-text">Quickly take and track orders from any device.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <i class="bi bi-credit-card" style="font-size: 2rem; color: #FF8080;"></i>
+                    <h5 class="card-title mt-2">Payments</h5>
+                    <p class="card-text">Process bills efficiently and keep your workflow smooth.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <a href="@Url.Action("Index", "Login")" class="btn btn-primary btn-lg" style="font-family: Tahoma;">
+        Get Started
+    </a>
+</div>
+
+@section Scripts {
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
+}

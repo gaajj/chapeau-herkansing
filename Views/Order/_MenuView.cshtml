@@ -1,0 +1,48 @@
+﻿@model ChapeauHerkansing.ViewModels.Ordering.MenuViewModel
+
+<h3 class="text-center mb-3 text-capitalize">@Model.MenuType Menu</h3>
+
+<div class="menu-categories mt-4">
+    @foreach (var categoryGroup in Model.Menu.MenuItems.GroupBy(i => i.Category))
+    {
+        <div class="category-section mb-4">
+            <h4 class="text-primary fw-bold text-capitalize">@categoryGroup.Key</h4>
+            <ul class="list-group shadow-sm rounded">
+                @foreach (var item in categoryGroup)
+                {
+                    <li class="list-group-item d-flex justify-content-between align-items-center py-2 px-3">
+                        <!-- Name and Alcoholic Tag -->
+                        <div class="d-flex align-items-center flex-grow-1 text-wrap" style="min-width: 0;">
+                            <span class="fw-bold me-2">@item.Name</span>
+                            @if (item.IsAlcoholic)
+                            {
+                                <span class="badge bg-danger ms-2">Alcoholic</span>
+                            }
+                            @if (item.StockAmount == 0)
+                            {
+                                <span class="badge bg-secondary ms-2">Out of Stock</span>
+                            }
+                            else if (item.StockAmount <= 10)
+                            {
+                                <span class="badge bg-warning text-dark ms-2">Stock Left: @item.StockAmount</span>
+                            }
+                        </div>
+
+                        <!-- Price and Add Button -->
+                        <div class="d-flex align-items-center text-nowrap">
+                            <span class="text-muted me-3">€ @item.Price.ToString("0.00")</span>
+                            <form method="post" asp-action="AddMenuItemToOrder" class="d-inline">
+                                <input type="hidden" name="orderId" value="@Model.Order.OrderID" />
+                                <input type="hidden" name="menuItemId" value="@item.MenuItemID" />
+                                <input type="number" name="amount" value="1" min="1" class="form-control d-inline w-auto me-2" />
+                                <button type="submit" 
+                                    class="btn btn-sm 
+                                        @(item.StockAmount == 0 ? "btn-secondary disabled" : "btn-primary")">Add</button>
+                            </form>
+                        </div>
+                    </li>
+                }
+            </ul>
+        </div>
+    }
+</div>

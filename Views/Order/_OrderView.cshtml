@@ -1,0 +1,79 @@
+﻿@model ChapeauHerkansing.Models.Order
+
+<h3 class="text-center mb-3">Order Summary</h3>
+
+<ul class="list-group">
+    @foreach (OrderLine line in Model.OrderLines)
+    {
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+            <!-- Amount -->
+            <div class="d-flex align-items-center me-3">
+                <span class="badge bg-primary rounded-pill me-2">@line.Amount</span>
+            </div>
+
+            <!-- Item Name, Note, and Price -->
+            <div class="flex-grow-1 me-3">
+                <div class="fw-bold d-flex justify-content-between">
+                    <div class="d-flex align-items-center">
+                        <span>@line.MenuItem.Name</span>
+                        @if (line.MenuItem.IsAlcoholic)
+                        {
+                            <span class="badge bg-danger ms-2">Alcoholic</span>
+                        }
+                    </div>
+                    <span class="text-muted">€ @(line.MenuItem.Price * line.Amount)</span>
+                </div>
+                @if (!string.IsNullOrEmpty(line.Note))
+                {
+                    <small class="text-muted">@line.Note</small>
+                }
+            </div>
+
+
+            <!-- Action Buttons -->
+            <div class="d-flex align-items-center">
+                <!-- Edit Note Button -->
+                <button class="btn btn-warning btn-sm me-2" type="button" data-bs-toggle="collapse" data-bs-target="#editNoteForm-@line.OrderLineID">
+                    Edit Note
+                </button>
+                <!-- Inline Collapsible Form -->
+                <div class="collapse mt-2 w-100" id="editNoteForm-@line.OrderLineID">
+                    <form method="post" asp-action="EditOrderLineNote" class="d-flex align-items-center mt-2">
+                        <input type="hidden" name="OrderLineId" value="@line.OrderLineID" />
+                        <input type="hidden" name="TableId" value="@Model.Table.TableID" />
+                        <input type="text" name="Note" value="@line.Note" class="form-control me-2" placeholder="Enter note..." />
+                        <button type="submit" class="btn btn-primary btn-sm">Save</button>
+                    </form>
+                </div>
+                <!-- Remove 1 -->
+                <form method="post" asp-action="RemoveOrderLine" class="d-inline me-2">
+                    <input type="hidden" name="OrderLineId" value="@line.OrderLineID" />
+                    <input type="hidden" name="Amount" value="@line.Amount" />
+                    <input type="hidden" name="TableId" value="@Model.Table.TableID" />
+                    <input type="hidden" name="MenuItemId" value="@line.MenuItem.MenuItemID" />
+                    <button type="submit" class="btn btn-danger btn-sm">–</button>
+                </form>
+                <!-- Add 1 -->
+                <form method="post" asp-action="AddMenuItemToOrder" class="d-inline">
+                    <input type="hidden" name="orderId" value="@Model.OrderID" />
+                    <input type="hidden" name="menuItemId" value="@line.MenuItem.MenuItemID" />
+                    <input type="hidden" name="amount" value="1" />
+                    <input type="hidden" name="note" value="@line.Note" />
+                    <button type="submit" class="btn btn-success btn-sm">+</button>
+                </form>
+            </div>
+        </li>
+    }
+
+    <!-- Total Price and Pay Button -->
+    <li class="list-group-item d-flex justify-content-between align-items-center">
+        <strong>Total:</strong>
+        <strong class="text-primary">
+            € @(Model.OrderLines.Sum(line => (decimal)(line.MenuItem.Price * line.Amount)))
+        </strong>
+        <form method="post" asp-action="PayOrder" class="ms-3">
+            <input type="hidden" name="orderId" value="@Model.OrderID" />
+            <button type="submit" class="btn btn-success">Pay</button>
+        </form>
+    </li>
+</ul>

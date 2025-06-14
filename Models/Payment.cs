@@ -1,22 +1,27 @@
+using ChapeauHerkansing.Models.Enums;
+
 namespace ChapeauHerkansing.Models
 {
     public class Payment
     {
         public int PaymentID { get; set; }
-        public int? OrderID { get; set; }
-        public decimal? AmountPaid { get; set; }
-        public string PaymentMethod { get; set; }
-        public decimal? Tip { get; set; }
+        public Order Order { get; set; }
+        public decimal AmountPaid { get; set; }
+        public PaymentMethod paymentMethodEnum { get; set; }
+        public decimal Tip { get; set; }
+        public string? Feedback { get; set; }
 
-        // Basic Constructor
-        public Payment(int paymentID, int? orderID, decimal? amountPaid, string paymentMethod, decimal? tip)
+
+        public Payment(int paymentID, Order order, decimal amountPaid, PaymentMethod paymentMethodEnum, decimal tip, string feedback)
         {
             PaymentID = paymentID;
-            OrderID = orderID;
+            Order = order;
             AmountPaid = amountPaid;
-            PaymentMethod = paymentMethod;
+            this.paymentMethodEnum = paymentMethodEnum;
             Tip = tip;
+            Feedback = feedback;
         }
+
+        public Payment() { }
     }
 }
-

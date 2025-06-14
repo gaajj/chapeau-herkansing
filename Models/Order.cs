@@ -1,20 +1,32 @@
+using ChapeauHerkansing.Models.Enums;
+
 namespace ChapeauHerkansing.Models
 {
     public class Order
     {
         public int OrderID { get; set; }
-        public int? TableID { get; set; }
-        public string Feedback { get; set; }
-        public bool? IsDeleted { get; set; }
+        public Table? Table { get; set; }
+     
+        public bool IsDeleted { get; set; }
 
-        // Basic Constructor
-        public Order(int orderID, int? tableID, string feedback, bool? isDeleted)
+        public DateTime Timecreated { get; set; } 
+
+
+
+        public List<OrderLine> OrderLines { get; set; } = new List<OrderLine>();
+
+        public Order(int orderID, Table table, bool isDeleted, DateTime timeCreated)
         {
             OrderID = orderID;
-            TableID = tableID;
-            Feedback = feedback;
+            Table = table;
+
             IsDeleted = isDeleted;
+            Timecreated = timeCreated;
+
+
+            OrderLines = new List<OrderLine>(); // 1 van de 2 kan weg 
         }
+
+        public Order() { }
     }
 }
-

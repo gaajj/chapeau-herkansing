@@ -1,0 +1,65 @@
+﻿@model List<ChapeauHerkansing.Models.Staff>
+
+@{
+    ViewData["Title"] = "Manage Employees";
+}
+<partial name="_ManagementTabs" />
+
+@if (TempData["Message"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["Message"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @TempData["Error"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+
+<h2>@ViewData["Title"]</h2>
+
+<a class="btn btn-success mb-3" asp-controller="Staff" asp-action="Create">+ Add Employee</a>
+
+<table class="table table-bordered mt-3">
+    <thead class="table-dark">
+        <tr>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Username</th>
+            <th>Role</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var employee in Model)
+        {
+            var rowClass = employee.IsDeleted == true ? "table-secondary text-muted" : "";
+
+            <tr class="@rowClass">
+                <td>@employee.FirstName</td>
+                <td>@employee.LastName</td>
+                <td>@employee.Username</td>
+                <td>@employee.Role</td>
+                <td>@(employee.IsDeleted == true ? "Inactive" : "Active")</td>
+                <td>
+                    <a asp-controller="Staff" asp-action="Edit" asp-route-id="@employee.Id" class="btn btn-sm btn-primary">Edit</a>
+                    @if (employee.IsDeleted == true)
+                    {
+                        <a asp-controller="Staff" asp-action="ToggleActive" asp-route-id="@employee.Id" class="btn btn-sm btn-success ms-1">Activate</a>
+                    }
+                    else
+                    {
+                        <a asp-controller="Staff" asp-action="ToggleActive" asp-route-id="@employee.Id" class="btn btn-sm btn-danger ms-1">Deactivate</a>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -1,11 +1,38 @@
+using ChapeauHerkansing.Models;
 using ChapeauHerkansing.Repositories;
-
+using ChapeauHerkansing.Services;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using ChapeauHerkansing.Services.Interfaces;
+using ChapeauHerkansing.Repositories.Interfaces;
+using Microsoft.AspNetCore.Identity;
+using BCrypt.Net;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Configuration.AddEnvironmentVariables();
 
 builder.Services.AddControllersWithViews();
-builder.Services.AddScoped<IUsersRepository, UsersRepository>();
+
+builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+builder.Services.AddScoped<IMenuItemRepository, MenuItemRepository>();
+builder.Services.AddScoped<IStaffRepository, StaffRepository>();
+builder.Services.AddScoped<ITableRepository, TableRepository>();
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<FinancialRepository>();
+
+builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<IMenuService, MenuService>();
+builder.Services.AddScoped<IStaffService, StaffService>();
+builder.Services.AddScoped<ITableService, TableService>();
+builder.Services.AddScoped<FinancialService>();
+
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+        .AddCookie(opts =>
+        {
+    opts.LoginPath = "/Login/Index";
+    opts.AccessDeniedPath = "/Home/AccessDenied";
+        });
+
 
 var app = builder.Build();
 
@@ -18,12 +45,18 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseStaticFiles();
 app.UseRouting();
-
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    pattern: "{controller=Login}/{action=Index}/{id?}");
+
+app.MapControllerRoute(
+    name: "Bar_Kitchen",
+    pattern: "Bar/{action=Index}/{id?}",
+    defaults: new { controller = "Bar_Kitchen" });    
 
 app.Run();

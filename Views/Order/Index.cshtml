@@ -1,0 +1,70 @@
+﻿@model ChapeauHerkansing.ViewModels.Ordering.MenuViewModel  
+
+<h2 class="text-center text-capitalize">Order of table #@Model.Order.Table.TableID</h2>
+
+<div class="container mt-4" style="max-width: 800px;">  
+    @if (TempData["Message"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["Message"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <!-- Menu Buttons -->
+    <div class="d-flex justify-content-center mb-4">
+        <form method="get" asp-action="Index" class="w-100">
+            <input type="hidden" name="tableId" value="@Model.Order.Table.TableID" />
+            <div class="btn-group w-100" role="group">
+                <button type="submit" name="menuType" value="lunch" class="btn btn-primary">Lunch</button>
+                <button type="submit" name="menuType" value="dinner" class="btn btn-primary">Dinner</button>
+                <button type="submit" name="menuType" value="drinks" class="btn btn-primary">Drinks</button>
+                @if (Model.Menu != null)
+                {
+                    <button type="submit" name="menuType" value="" class="btn btn-secondary">Back to Order</button>
+                }
+            </div>
+        </form>
+    </div>
+
+    <!-- Category Filter -->
+    @if (Model.Menu != null)
+    {
+        <form method="get" asp-action="Index" class="d-flex justify-content-center mb-3">
+            <input type="hidden" name="tableId" value="@Model.Order.Table.TableID" />
+            <input type="hidden" name="menuType" value="@Model.MenuType" />
+            <select name="category" class="form-select w-auto" onchange="this.form.submit()">
+                <option value="">All Categories</option>
+                @foreach (MenuCategory category in Enum.GetValues(typeof(MenuCategory)))
+                {
+                    <option value="@category" selected="@(Model.SelectedCategory == category ? "selected" : null)">@category</option>
+                }
+            </select>
+        </form>
+    }
+
+    <div id="contentSection">
+        @if (Model.Menu == null)
+        {
+            <partial name="_OrderView" model="Model.Order" />
+        }
+        else if (Model.Menu.MenuItems.Count > 0)
+        {
+            <partial name="_MenuView" model="Model" />
+        }
+        else
+        {
+            <div class="alert alert-warning text-center" role="alert">
+                No items available for the selected category.
+            </div>
+        }
+    </div>
+</div>
