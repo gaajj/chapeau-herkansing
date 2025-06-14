@@ -13,6 +13,5 @@ namespace ChapeauHerkansing.Repositories.Interfaces
         bool HasUnfinishedOrders(int tableId);
         void UpdateTableStatus(int tableId, TableStatus status);
         List<string> GetRunningOrderStatuses(int tableId);
-        void SetTableFree(int tableId);
     }
 }
