@@ -63,23 +63,31 @@
                 }
             </button>
 
-            <!-- Hier voegen we de dynamische order-statussen toe -->
+           
+
             <p style="font-family:Tahoma; font-size:12px; margin-top:6px; color:#333;">
                 Order status:
-                @{
-                    var statuses = Model.RunningOrderStatuses.ContainsKey(table.TableID)
-                    ? Model.RunningOrderStatuses[table.TableID]
-                    : new List<string>();
-                }
-                @if (statuses.Any())
-                {
-                    @string.Join(", ", statuses)
-                }
-                else
-                {
+                    @{
+                        var statuses = Model.RunningOrderStatuses.ContainsKey(table.TableID)
+                        ? Model.RunningOrderStatuses[table.TableID]
+                        : new List<string>();
+                        // filter 'none' uit de lijst
+                        var meaningful = statuses
+                        .Where(s => !s.Equals("none", StringComparison.OrdinalIgnoreCase))
+                        .ToList();
+                    }
+                    @* Als tafel vrij is, of alleen nog 'none' overblijft, toon italic none *@
+                    @if (table.Status == TableStatus.Free || !meaningful.Any())
+                    {
                     <em>none</em>
-                }
+                    }
+                    else
+                    {
+                        @string.Join(", ", meaningful)
+                    }
             </p>
+
+         
 
             @if (statuses.Any(s => s.Equals("Ready", StringComparison.OrdinalIgnoreCase)))
 

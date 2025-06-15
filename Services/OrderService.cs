@@ -4,6 +4,7 @@ using ChapeauHerkansing.Repositories;
 using ChapeauHerkansing.Repositories.Interfaces;
 using ChapeauHerkansing.Services.Interfaces;
 using ChapeauHerkansing.ViewModels.Ordering;
+using System.Security.Claims;
 
 namespace ChapeauHerkansing.Services
 {
@@ -11,11 +12,62 @@ namespace ChapeauHerkansing.Services
     {
         private readonly IOrderRepository _orderRepository;
         private readonly IMenuItemRepository _menuItemRepository;
+        private readonly ITableService _tableService;
 
-        public OrderService(IOrderRepository orderRepository, IMenuItemRepository menuItemRepository)
+        public OrderService(IOrderRepository orderRepository, IMenuItemRepository menuItemRepository, ITableService tableService)
         {
             _orderRepository = orderRepository;
             _menuItemRepository = menuItemRepository;
+            _tableService = tableService;
+        }
+
+        public OrderMenuViewModel GetOrderView(int tableId, MenuType? menuType, MenuCategory? category)
+        {
+            try
+            {
+                Order order = GetOrderByTable(tableId);
+
+                if (order == null)
+                {
+                    Table? table = _tableService.GetTableById(tableId);
+                    if (table != null)
+                    {
+                        CreateOrderForTable(tableId);
+                        _tableService.UpdateTableStatus(tableId, TableStatus.Occupied);
+                        order = GetOrderByTable(tableId);
+                    }
+                }
+
+                Menu menu = null;
+
+                if (menuType.HasValue)
+                {
+                    menu = _menuItemRepository.GetMenuItemsByMenuType(menuType.Value);
+
+                    if ((menu == null || menu.MenuItems.Count == 0) && category != null)
+                    {
+                        menu = new Menu(); // show empty state
+                    }
+                    else if (category != null)
+                    {
+                        menu.MenuItems = menu.MenuItems
+                            .Where(item => item.Category == category.Value)
+                            .ToList();
+                    }
+                }
+
+                return new OrderMenuViewModel
+                {
+                    Order = order,
+                    Menu = menu,
+                    SelectedCategory = category,
+                    MenuType = menuType
+                };
+            }
+            catch (Exception ex)
+            {
+                throw new ApplicationException("Failed to build the order view.", ex);
+            }
         }
 
         public Order GetOrderByTable(int tableId)
@@ -28,43 +80,44 @@ namespace ChapeauHerkansing.Services
             return _orderRepository.GetOrderById(orderId);
         }
 
-        public MenuItem GetMenuItemById(int menuItemId)
+        public void AddOrderLineToOrder(OrderLine line)
         {
-            return _menuItemRepository.GetMenuItemById(menuItemId);
-        }
+            if (line.MenuItem.StockAmount < line.Amount)
+                throw new InvalidOperationException("Not enough stock available to add this item.");
 
-        public void AddMenuItemToOrder(Order order, MenuItem menuItem, Staff staff, MenuItemAddViewModel model)
-        {
-            OrderLine? existingLine = order.OrderLines
-                .FirstOrDefault(line => line.MenuItem.MenuItemID == menuItem.MenuItemID && line.Note == model.Note);
+            OrderLine existingLine = line.Order.OrderLines
+                .FirstOrDefault(l => l.MenuItem.MenuItemID == line.MenuItem.MenuItemID && l.Note == line.Note);
 
             if (existingLine != null)
             {
-                _orderRepository.UpdateOrderLineAmount(existingLine.OrderLineID, existingLine.Amount + model.Amount);
+                int newAmount = existingLine.Amount + line.Amount;
+                _orderRepository.UpdateOrderLineAmount(existingLine.OrderLineID, newAmount);
             }
             else
             {
-                _orderRepository.AddMenuItemToOrder(order, menuItem, staff, model.Amount, OrderStatus.Ordered);
+                _orderRepository.AddMenuItemToOrder(line.Order, line.MenuItem, line.Staff, line.Amount, line.OrderStatus);
             }
 
-            _menuItemRepository.UpdateStock(menuItem.MenuItemID, -model.Amount);
+            _menuItemRepository.UpdateStock(line.MenuItem.MenuItemID, -line.Amount);
         }
 
-        public void RemoveOrderLine(int orderLineId, int menuItemId, int amount)
+        public void RemoveOrderLine(int orderLineId, int menuItemId, int amount, bool removeAll)
         {
-            if (amount > 1)
+            if (amount <= 0)
             {
-                _orderRepository.UpdateOrderLineAmount(orderLineId, amount - 1);
-                _menuItemRepository.UpdateStock(menuItemId, 1);
+                throw new ArgumentException("Invalid item amount.");
             }
-            else
+            if (removeAll || amount == 1)
             {
                 _orderRepository.RemoveOrderLine(orderLineId);
                 _menuItemRepository.UpdateStock(menuItemId, amount);
             }
+            else
+            {
+                _orderRepository.UpdateOrderLineAmount(orderLineId, amount - 1);
+                _menuItemRepository.UpdateStock(menuItemId, 1);
+            }
         }
-
-
 
         public void UpdateOrderLineNote(int orderLineId, string note)
         {
@@ -74,11 +127,6 @@ namespace ChapeauHerkansing.Services
         public void UpdateStock(int menuItemId, int amount)
         {
             _menuItemRepository.UpdateStock(menuItemId, amount);
-        }
-
-        public void UpdateOrderLineAmount(int orderLineId, int amount)
-        {
-            _orderRepository.UpdateOrderLineAmount(orderLineId, amount);
         }
 
         public void CreateOrderForTable(int tableId)

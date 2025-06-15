@@ -1,20 +1,29 @@
-﻿@model ChapeauHerkansing.ViewModels.Ordering.MenuViewModel  
+﻿@model ChapeauHerkansing.ViewModels.Ordering.OrderMenuViewModel
 
-<h2 class="text-center text-capitalize">Order of table #@Model.Order.Table.TableID</h2>
+@{
+    var alertType = TempData["Message"] != null ? "success" :
+                    TempData["Error"] != null ? "danger" : null;
+    var alertText = TempData["Message"] ?? TempData["Error"];
+}
 
-<div class="container mt-4" style="max-width: 800px;">  
-    @if (TempData["Message"] != null)
+<h2 class="text-center text-capitalize">
+    @if (Model?.Order?.Table != null)
     {
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            @TempData["Message"]
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
+        @:Order of table #@Model.Order.Table.TableID
     }
-
-    @if (TempData["Error"] != null)
+    else
     {
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            @TempData["Error"]
+        <span class="text-danger">Error loading order information</span>
+    }
+</h2>
+
+<div class="container mt-4" style="max-width: 800px;">
+
+    <!-- Alerts -->
+    @if (alertType != null)
+    {
+        <div class="alert alert-@alertType alert-dismissible fade show" role="alert">
+            @alertText
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     }
@@ -52,11 +61,17 @@
     }
 
     <div id="contentSection">
-        @if (Model.Menu == null)
+        @if (Model?.Order == null)
+        {
+            <div class="alert alert-danger text-center" role="alert">
+                Unable to load order details. Please try again later.
+            </div>
+        }
+        else if (Model.Menu == null)
         {
             <partial name="_OrderView" model="Model.Order" />
         }
-        else if (Model.Menu.MenuItems.Count > 0)
+        else if (Model.Menu?.MenuItems?.Any() == true)
         {
             <partial name="_MenuView" model="Model" />
         }

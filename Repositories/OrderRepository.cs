@@ -54,12 +54,12 @@ namespace ChapeauHerkansing.Repositories
                     ol.orderTime;
             ";
 
-            var parameters = new Dictionary<string, object>
+            Dictionary<string, object> parameters = new Dictionary<string, object>
             {
                 { "@orderId", orderId }
             };
 
-            return ExecuteSingle(query, ReadOrderWithLines, parameters);
+            return ExecuteSingle(query, OrderReader.ReadWithLines, parameters);
         }
 
 
@@ -67,7 +67,7 @@ namespace ChapeauHerkansing.Repositories
         {
             string query = @"
                 SELECT
-                    o.id AS orderId,
+                   o.id AS orderId,
                     o.isDeleted,
                     o.orderTime AS orderOrderTime,
                     t.id AS tableId,
@@ -117,7 +117,7 @@ namespace ChapeauHerkansing.Repositories
                 SELECT
                     o.id AS orderId,
                     o.isDeleted,
-                   o.orderTIme,
+                    o.orderTime AS orderOrderTime,
                     t.id AS tableId,
                     t.seats,
                     t.tableStatus,
@@ -129,14 +129,16 @@ namespace ChapeauHerkansing.Repositories
                     s.role,
                     ol.id AS orderLineId,
                     ol.amount,
-                    ol.orderTime,
+                    ol.orderTime AS orderLineOrderTime,
                     ol.note,
                     ol.orderStatus,
                     mi.id AS menuItemId,
                     mi.itemName,
                     mi.price,
                     mi.category,
-                    mi.isAlcoholic
+                    mi.isAlcoholic,
+                    mi.menuType,
+                    mi.stockAmount
                 FROM
                     dbo.orders o
                 INNER JOIN
@@ -163,7 +165,7 @@ namespace ChapeauHerkansing.Repositories
                 SELECT
                     o.id AS orderId,
                     o.isDeleted,
-                   o.orderTime,
+                    o.orderTime AS orderOrderTime,
                     t.id AS tableId,
                     t.seats,
                     t.tableStatus,
@@ -175,14 +177,16 @@ namespace ChapeauHerkansing.Repositories
                     s.role,
                     ol.id AS orderLineId,
                     ol.amount,
-                    ol.orderTime,
+                    ol.orderTime AS orderLineOrderTime,
                     ol.note,
                     ol.orderStatus,
                     mi.id AS menuItemId,
                     mi.itemName,
                     mi.price,
                     mi.category,
-                    mi.isAlcoholic
+                    mi.isAlcoholic,
+                    mi.menuType,
+                    mi.stockAmount
                 FROM
                     dbo.orders o
                 INNER JOIN
@@ -247,12 +251,12 @@ namespace ChapeauHerkansing.Repositories
                     ol.orderTime;
             ";
 
-            var parameters = new Dictionary<string, object>
+            Dictionary<string, object> parameters = new Dictionary<string, object>
             {
                 { "@tableId", tableId }
             };
 
-            return ExecuteQuery(query, ReadOrderWithLines, parameters).FirstOrDefault();
+            return ExecuteGroupedQuery<Order>(query, MapOrderWithLines, parameters).FirstOrDefault();
         }
 
         public void AddMenuItemToOrder(Order order, MenuItem menuItem, Staff staff, int amount, OrderStatus status)
@@ -302,7 +306,7 @@ namespace ChapeauHerkansing.Repositories
                 WHERE id = @orderLineId;
             ";
 
-            var parameters = new Dictionary<string, object>
+            Dictionary<string, object> parameters = new Dictionary<string, object>
             {
                 { "@amount", newAmount },
                 { "@orderLineId", orderLineId }
@@ -318,7 +322,7 @@ namespace ChapeauHerkansing.Repositories
                 WHERE id = @orderLineId;
             ";
 
-            var parameters = new Dictionary<string, object>
+            Dictionary<string, object> parameters = new Dictionary<string, object>
             {
                 { "@orderLineId", orderLineId }
             };
@@ -334,7 +338,7 @@ namespace ChapeauHerkansing.Repositories
                 WHERE id = @orderLineId;
             ";
 
-            var parameters = new Dictionary<string, object>
+            Dictionary<string, object> parameters = new Dictionary<string, object>
             {
                 { "@note", string.IsNullOrWhiteSpace(note) ? DBNull.Value : note },
                 { "@orderLineId", orderLineId }
@@ -346,11 +350,11 @@ namespace ChapeauHerkansing.Repositories
         public void CreateOrderForTable(int tableId)
         {
             string query = @"
-                INSERT INTO orders (tableId, orderTime)
-                VALUES (@tableId, GETDATE());
+                INSERT INTO orders (tableId)
+                VALUES (@tableId);
             ";
 
-            var parameters = new Dictionary<string, object>
+            Dictionary<string, object> parameters = new Dictionary<string, object>
             {
                 { "@tableId", tableId }
             };
@@ -377,23 +381,6 @@ namespace ChapeauHerkansing.Repositories
 
             return order;
         }
-        
-        private Order ReadOrderWithLines(SqlDataReader reader)
-        {
-            Order order = OrderReader.Read(reader);
-
-            do
-            {
-                if (!reader.IsDBNull(reader.GetOrdinal("orderLineId")))
-                {
-                    OrderLine orderLine = OrderLineReader.Read(reader, order);
-                    order.OrderLines.Add(orderLine);
-                }
-            } while (reader.Read() && reader.GetInt32(reader.GetOrdinal("orderId")) == order.OrderID);
-
-            return order;
-        }
-
 
         public void SoftDeleteOrder(int orderId)
         {
