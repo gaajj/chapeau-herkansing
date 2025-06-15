@@ -134,11 +134,6 @@ namespace ChapeauHerkansing.Services
             _menuItemRepository.UpdateStock(menuItemId, amount);
         }
 
-        public void UpdateOrderLineAmount(int orderLineId, int amount)
-        {
-            _orderRepository.UpdateOrderLineAmount(orderLineId, amount);
-        }
-
         public void CreateOrderForTable(int tableId)
         {
             _orderRepository.CreateOrderForTable(tableId);

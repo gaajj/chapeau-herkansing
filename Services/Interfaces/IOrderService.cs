@@ -14,7 +14,6 @@ namespace ChapeauHerkansing.Services.Interfaces
         void RemoveOrderLine(int orderLineId, int menuItemId, int amount, bool removeAll);
         void UpdateOrderLineNote(int orderLineId, string note);
         void UpdateStock(int menuItemId, int amount);
-        void UpdateOrderLineAmount(int orderLineId, int amount);
         void CreateOrderForTable(int tableId);
     }
 }
