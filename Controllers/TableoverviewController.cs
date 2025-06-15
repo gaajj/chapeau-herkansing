@@ -62,7 +62,8 @@ namespace ChapeauHerkansing.Controllers
         [HttpPost]
         public IActionResult SetTableStatus(int tableId, string newStatus)
         {
-            if (!Enum.TryParse<TableStatus>(newStatus, true, out var status))
+            // Controleer of de string newStatus zonder hoofdlettergevoeligheid overeenkomt met een TableStatus, en sla deze op in status; ga het if-blok in als dat mislukte.
+            if (!Enum.TryParse<TableStatus>(newStatus, true, out var status)) // 
             {
                 TempData["ErrorMessage"] = "Invalid status.";
                 return RedirectToAction(nameof(Index));

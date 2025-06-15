@@ -30,7 +30,7 @@ public class LoginController : Controller
             ViewBag.Error = "Username en password verplicht";
             return View();
         }
-
+         
         // Laat de AuthService het zware werk doen
         var principal = await auth.TryLoginAsync(vm.Username, vm.Password);
 

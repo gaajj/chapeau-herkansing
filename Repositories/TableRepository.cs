@@ -137,7 +137,7 @@ namespace ChapeauHerkansing.Repositories
         FROM dbo.orderLines ol
         JOIN dbo.orders      o ON o.id = ol.orderId
         WHERE o.tableId          = @tableId
-          AND ol.orderStatus NOT IN ('served', 'none', 'order') -- << extra filter
+          AND ol.orderStatus NOT IN ('served', 'none', 'order') 
           AND ol.isDeleted        = 0";
 
             using var conn = GetConnection();
