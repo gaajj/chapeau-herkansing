@@ -11,7 +11,7 @@ namespace ChapeauHerkansing.Services.Interfaces
         Order GetOrderById(int orderId);
         MenuItem GetMenuItemById(int menuItemId);
         void AddOrderLineToOrder(OrderLine line);
-        void RemoveOrderLine(int orderLineId, int menuItemId, int amount);
+        void RemoveOrderLine(int orderLineId, int menuItemId, int amount, bool removeAll);
         void UpdateOrderLineNote(int orderLineId, string note);
         void UpdateStock(int menuItemId, int amount);
         void UpdateOrderLineAmount(int orderLineId, int amount);

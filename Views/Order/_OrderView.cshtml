@@ -23,7 +23,7 @@
                                 <span class="badge bg-danger ms-2">Alcoholic</span>
                             }
                         </div>
-                        <span class="text-muted">€ @(line.MenuItem.Price* line.Amount)</span>
+                        <span class="text-muted text-nowrap ms-3">€ @(line.MenuItem.Price* line.Amount)</span>
                     </div>
                     @if (!string.IsNullOrEmpty(line.Note))
                     {
@@ -33,13 +33,13 @@
 
 
                 <!-- Action Buttons -->
-                <div class="d-flex align-items-center">
+                <div class="d-flex flex-nowrap align-items-start text-nowrap">
                     <!-- Edit Note Button -->
                     <button class="btn btn-warning btn-sm me-2" type="button" data-bs-toggle="collapse" data-bs-target="#editNoteForm-@line.OrderLineID">
                         Edit Note
                     </button>
-                    <!-- Inline Collapsible Form -->
-                    <div class="collapse mt-2 w-100" id="editNoteForm-@line.OrderLineID">
+                    <!-- Note Input -->
+                    <div id="editNoteForm-@line.OrderLineID" class="collapse mt-2 w-100">
                         <form method="post" asp-action="EditOrderLineNote" class="d-flex align-items-center mt-2">
                             <input type="hidden" name="OrderLineId" value="@line.OrderLineID" />
                             <input type="hidden" name="TableId" value="@Model.Table.TableID" />
@@ -48,21 +48,31 @@
                         </form>
                     </div>
                     <!-- Remove 1 -->
-                    <form method="post" asp-action="RemoveOrderLine" class="d-inline me-2">
+                    <form method="post" asp-action="RemoveOrderLine" class="d-inline ms-2">
                         <input type="hidden" name="OrderLineId" value="@line.OrderLineID" />
                         <input type="hidden" name="Amount" value="@line.Amount" />
                         <input type="hidden" name="TableId" value="@Model.Table.TableID" />
                         <input type="hidden" name="MenuItemId" value="@line.MenuItem.MenuItemID" />
+                        <input type="hidden" name="RemoveAll" value="false" />
                         <button type="submit" class="btn btn-danger btn-sm">–</button>
                     </form>
                     <!-- Add 1 -->
-                    <form method="post" asp-action="AddMenuItemToOrder" class="d-inline">
+                    <form method="post" asp-action="AddMenuItemToOrder" class="d-inline ms-2">
                         <input type="hidden" name="orderId" value="@Model.OrderID" />
                         <input type="hidden" name="menuItemId" value="@line.MenuItem.MenuItemID" />
                         <input type="hidden" name="amount" value="1" />
                         <input type="hidden" name="note" value="@line.Note" />
                         <input type="hidden" name="tableId" value="@Model.Table.TableID" />
                         <button type="submit" class="btn btn-success btn-sm">+</button>
+                    </form>
+                    <!-- Remove All -->
+                    <form method="post" asp-action="RemoveOrderLine" class="d-inline ms-2">
+                        <input type="hidden" name="OrderLineId" value="@line.OrderLineID" />
+                        <input type="hidden" name="Amount" value="@line.Amount" />
+                        <input type="hidden" name="TableId" value="@Model.Table.TableID" />
+                        <input type="hidden" name="MenuItemId" value="@line.MenuItem.MenuItemID" />
+                        <input type="hidden" name="RemoveAll" value="true" />
+                        <button type="submit" class="btn btn-outline-danger btn-sm">Remove All</button>
                     </form>
                 </div>
             </li>

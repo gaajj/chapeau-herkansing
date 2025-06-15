@@ -106,21 +106,21 @@ namespace ChapeauHerkansing.Services
             _menuItemRepository.UpdateStock(line.MenuItem.MenuItemID, -line.Amount);
         }
 
-        public void RemoveOrderLine(int orderLineId, int menuItemId, int amount)
+        public void RemoveOrderLine(int orderLineId, int menuItemId, int amount, bool removeAll)
         {
             if (amount <= 0)
             {
                 throw new ArgumentException("Invalid item amount.");
             }
-            else if (amount > 1)
-            {
-                _orderRepository.UpdateOrderLineAmount(orderLineId, amount - 1);
-                _menuItemRepository.UpdateStock(menuItemId, 1);
-            }
-            else
+            if (removeAll || amount == 1)
             {
                 _orderRepository.RemoveOrderLine(orderLineId);
                 _menuItemRepository.UpdateStock(menuItemId, amount);
+            }
+            else
+            {
+                _orderRepository.UpdateOrderLineAmount(orderLineId, amount - 1);
+                _menuItemRepository.UpdateStock(menuItemId, 1);
             }
         }
 
