@@ -9,7 +9,6 @@ namespace ChapeauHerkansing.Services.Interfaces
         MenuViewModel GetOrderView(int tableId, MenuType? menuType, MenuCategory? category);
         Order GetOrderByTable(int tableId);
         Order GetOrderById(int orderId);
-        MenuItem GetMenuItemById(int menuItemId);
         void AddOrderLineToOrder(OrderLine line);
         void RemoveOrderLine(int orderLineId, int menuItemId, int amount, bool removeAll);
         void UpdateOrderLineNote(int orderLineId, string note);

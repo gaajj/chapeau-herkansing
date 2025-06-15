@@ -80,11 +80,6 @@ namespace ChapeauHerkansing.Services
             return _orderRepository.GetOrderById(orderId);
         }
 
-        public MenuItem GetMenuItemById(int menuItemId)
-        {
-            return _menuItemRepository.GetMenuItemById(menuItemId);
-        }
-
         public void AddOrderLineToOrder(OrderLine line)
         {
             if (line.MenuItem.StockAmount < line.Amount)
