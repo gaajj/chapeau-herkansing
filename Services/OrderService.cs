@@ -21,7 +21,7 @@ namespace ChapeauHerkansing.Services
             _tableService = tableService;
         }
 
-        public MenuViewModel GetOrderView(int tableId, MenuType? menuType, MenuCategory? category)
+        public OrderMenuViewModel GetOrderView(int tableId, MenuType? menuType, MenuCategory? category)
         {
             try
             {
@@ -56,7 +56,7 @@ namespace ChapeauHerkansing.Services
                     }
                 }
 
-                return new MenuViewModel
+                return new OrderMenuViewModel
                 {
                     Order = order,
                     Menu = menu,
@@ -80,11 +80,6 @@ namespace ChapeauHerkansing.Services
             return _orderRepository.GetOrderById(orderId);
         }
 
-        public MenuItem GetMenuItemById(int menuItemId)
-        {
-            return _menuItemRepository.GetMenuItemById(menuItemId);
-        }
-
         public void AddOrderLineToOrder(OrderLine line)
         {
             if (line.MenuItem.StockAmount < line.Amount)
@@ -106,21 +101,21 @@ namespace ChapeauHerkansing.Services
             _menuItemRepository.UpdateStock(line.MenuItem.MenuItemID, -line.Amount);
         }
 
-        public void RemoveOrderLine(int orderLineId, int menuItemId, int amount)
+        public void RemoveOrderLine(int orderLineId, int menuItemId, int amount, bool removeAll)
         {
             if (amount <= 0)
             {
                 throw new ArgumentException("Invalid item amount.");
             }
-            else if (amount > 1)
-            {
-                _orderRepository.UpdateOrderLineAmount(orderLineId, amount - 1);
-                _menuItemRepository.UpdateStock(menuItemId, 1);
-            }
-            else
+            if (removeAll || amount == 1)
             {
                 _orderRepository.RemoveOrderLine(orderLineId);
                 _menuItemRepository.UpdateStock(menuItemId, amount);
+            }
+            else
+            {
+                _orderRepository.UpdateOrderLineAmount(orderLineId, amount - 1);
+                _menuItemRepository.UpdateStock(menuItemId, 1);
             }
         }
 
@@ -132,11 +127,6 @@ namespace ChapeauHerkansing.Services
         public void UpdateStock(int menuItemId, int amount)
         {
             _menuItemRepository.UpdateStock(menuItemId, amount);
-        }
-
-        public void UpdateOrderLineAmount(int orderLineId, int amount)
-        {
-            _orderRepository.UpdateOrderLineAmount(orderLineId, amount);
         }
 
         public void CreateOrderForTable(int tableId)
