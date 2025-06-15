@@ -67,7 +67,7 @@ namespace ChapeauHerkansing.Repositories
         {
             string query = @"
                 SELECT
-                    o.id AS orderId,
+                   o.id AS orderId,
                     o.isDeleted,
                     o.orderTime AS orderOrderTime,
                     t.id AS tableId,
@@ -117,7 +117,7 @@ namespace ChapeauHerkansing.Repositories
                 SELECT
                     o.id AS orderId,
                     o.isDeleted,
-                   o.orderTIme,
+                    o.orderTime AS orderOrderTime,
                     t.id AS tableId,
                     t.seats,
                     t.tableStatus,
@@ -129,14 +129,16 @@ namespace ChapeauHerkansing.Repositories
                     s.role,
                     ol.id AS orderLineId,
                     ol.amount,
-                    ol.orderTime,
+                    ol.orderTime AS orderLineOrderTime,
                     ol.note,
                     ol.orderStatus,
                     mi.id AS menuItemId,
                     mi.itemName,
                     mi.price,
                     mi.category,
-                    mi.isAlcoholic
+                    mi.isAlcoholic,
+                    mi.menuType,
+                    mi.stockAmount
                 FROM
                     dbo.orders o
                 INNER JOIN
@@ -163,7 +165,7 @@ namespace ChapeauHerkansing.Repositories
                 SELECT
                     o.id AS orderId,
                     o.isDeleted,
-                   o.orderTime,
+                    o.orderTime AS orderOrderTime,
                     t.id AS tableId,
                     t.seats,
                     t.tableStatus,
@@ -175,14 +177,16 @@ namespace ChapeauHerkansing.Repositories
                     s.role,
                     ol.id AS orderLineId,
                     ol.amount,
-                    ol.orderTime,
+                    ol.orderTime AS orderLineOrderTime,
                     ol.note,
                     ol.orderStatus,
                     mi.id AS menuItemId,
                     mi.itemName,
                     mi.price,
                     mi.category,
-                    mi.isAlcoholic
+                    mi.isAlcoholic,
+                    mi.menuType,
+                    mi.stockAmount
                 FROM
                     dbo.orders o
                 INNER JOIN

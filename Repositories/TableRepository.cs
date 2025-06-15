@@ -131,20 +131,21 @@ namespace ChapeauHerkansing.Repositories
             const string sql = @"
         SELECT DISTINCT ol.orderStatus
         FROM dbo.orderLines ol
-        JOIN dbo.orders o ON ol.orderId = o.id
-        WHERE o.tableId        = @tableId
-          AND ol.orderStatus  <> 'served'
-          AND ol.isDeleted    = 0";
+        JOIN dbo.orders      o ON o.id = ol.orderId
+        WHERE o.tableId          = @tableId
+          AND ol.orderStatus NOT IN ('served', 'none', 'order') -- << extra filter
+          AND ol.isDeleted        = 0";
+
             using var conn = GetConnection();
             using var cmd = new SqlCommand(sql, conn);
             cmd.Parameters.AddWithValue("@tableId", tableId);
             conn.Open();
-            using var reader = cmd.ExecuteReader();
+
             var list = new List<string>();
+            using var reader = cmd.ExecuteReader();
             while (reader.Read())
-            {
                 list.Add(reader.GetString(0));
-            }
+
             return list;
         }
     }

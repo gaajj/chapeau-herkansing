@@ -3,6 +3,7 @@ using ChapeauHerkansing.Repositories.Interfaces;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using ChapeauHerkansing.Services.Interfaces;
+using ChapeauHerkansing.Models;
 
 
 public class AuthService : IAuthService
@@ -19,21 +20,21 @@ public class AuthService : IAuthService
     public async Task<ClaimsPrincipal?> TryLoginAsync(string username, string password)
     {
         // Zoek de medewerker op basis van username
-        var staff = repo.GetStaffByUsername(username);
+        Staff staff = repo.GetStaffByUsername(username);
 
         // 2. Bestaat hij niet of klopt het wachtwoord niet? -> login mislukt
         if (staff == null || !BCrypt.Net.BCrypt.Verify(password, staff.Password))
             return null;
 
-       // Bouw de claims: hier staat wie je bent en welke rol je hebt
-        var claims = new[]
+        // Bouw de claims: hier staat wie je bent en welke rol je hebt
+        Claim[] claims = new[]
         {
             new Claim(ClaimTypes.NameIdentifier, staff.Id.ToString()),
             new Claim(ClaimTypes.Name,         staff.Username),
             new Claim(ClaimTypes.Role,         staff.Role.ToString())
         };
 
-        var principal = new ClaimsPrincipal(
+        ClaimsPrincipal principal = new ClaimsPrincipal(
             new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme));
 
          // Zet de auth-cookie, zo blijft de gebruiker ingelogd
