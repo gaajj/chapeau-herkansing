@@ -67,11 +67,20 @@ namespace ChapeauHerkansing.Controllers
                 TempData["ErrorMessage"] = "Invalid status.";
                 return RedirectToAction(nameof(Index));
             }
-            if (status == TableStatus.Free && _tableService.HasUnfinishedOrders(tableId))
+            bool hasUnfinished = _tableService.HasUnfinishedOrders(tableId);
+
+            if (status == TableStatus.Free && hasUnfinished)
             {
                 TempData["ErrorMessage"] = "Cannot free table with unfinished orders.";
                 return RedirectToAction(nameof(Index));
             }
+
+            if (status == TableStatus.Reserved && hasUnfinished)
+            {
+                TempData["ErrorMessage"] = "Cannot reserve table with running orders.";
+                return RedirectToAction(nameof(Index));
+            }
+
             _tableService.UpdateTableStatus(tableId, status);
             return RedirectToAction(nameof(Index));
         }
