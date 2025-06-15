@@ -30,7 +30,7 @@ namespace ChapeauHerkansing.Services
                 if (order == null)
                 {
                     Table? table = _tableService.GetTableById(tableId);
-                    if (table != null && (table.Status == TableStatus.Free || table.Status == TableStatus.Reserved))
+                    if (table != null)
                     {
                         CreateOrderForTable(tableId);
                         _tableService.UpdateTableStatus(tableId, TableStatus.Occupied);
