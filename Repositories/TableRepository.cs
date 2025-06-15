@@ -98,10 +98,13 @@ namespace ChapeauHerkansing.Repositories
         {
             const string sql = @"
         SELECT COUNT(*)
-        FROM dbo.orderLines l
-        JOIN dbo.orders o ON o.id = l.orderId
-        WHERE o.tableId        = @tableId
-          AND l.orderStatus   <> 'served'";
+        FROM   dbo.orderLines l
+        JOIN   dbo.orders     o ON o.id = l.orderId
+        WHERE  o.tableId      = @tableId
+          AND  l.isDeleted    = 0
+          AND  l.orderStatus NOT IN ('served', 'none')  
+    ";
+
             using var conn = GetConnection();
             using var cmd = new SqlCommand(sql, conn);
             cmd.Parameters.AddWithValue("@tableId", tableId);
@@ -109,6 +112,7 @@ namespace ChapeauHerkansing.Repositories
             var count = (int)cmd.ExecuteScalar();
             return count > 0;
         }
+
 
 
         public void UpdateTableStatus(int tableId, TableStatus status)
