@@ -21,7 +21,7 @@ namespace ChapeauHerkansing.Services
             _tableService = tableService;
         }
 
-        public MenuViewModel GetOrderView(int tableId, MenuType? menuType, MenuCategory? category)
+        public OrderMenuViewModel GetOrderView(int tableId, MenuType? menuType, MenuCategory? category)
         {
             try
             {
@@ -56,7 +56,7 @@ namespace ChapeauHerkansing.Services
                     }
                 }
 
-                return new MenuViewModel
+                return new OrderMenuViewModel
                 {
                     Order = order,
                     Menu = menu,

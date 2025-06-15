@@ -6,7 +6,7 @@ namespace ChapeauHerkansing.Services.Interfaces
 {
     public interface IOrderService
     {
-        MenuViewModel GetOrderView(int tableId, MenuType? menuType, MenuCategory? category);
+        OrderMenuViewModel GetOrderView(int tableId, MenuType? menuType, MenuCategory? category);
         Order GetOrderByTable(int tableId);
         Order GetOrderById(int orderId);
         void AddOrderLineToOrder(OrderLine line);

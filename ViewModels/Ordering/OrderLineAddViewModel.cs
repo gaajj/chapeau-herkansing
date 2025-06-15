@@ -2,7 +2,7 @@
 
 namespace ChapeauHerkansing.ViewModels.Ordering
 {
-    public class MenuItemAddViewModel
+    public class OrderLineAddViewModel
     {
         public int OrderId { get; set; }
         public int MenuItemId { get; set; }
