@@ -47,6 +47,7 @@
             TableStatus.Reserved => "background-color:#FF8080;",
             _ => "background-color:#C4C4C4;"
         };
+        // Haal het aantal ‘klaar om te serveren’-bestellingen op voor deze tafel als die bestaat, anders gebruik 0, kijken of table id in dicton voorkomt
         var ready = Model.ReadyOrderCounts.ContainsKey(table.TableID)
         ? Model.ReadyOrderCounts[table.TableID]
         : 0;
@@ -71,13 +72,13 @@
                         var statuses = Model.RunningOrderStatuses.ContainsKey(table.TableID)
                         ? Model.RunningOrderStatuses[table.TableID]
                         : new List<string>();
-                        // filter 'none' uit de lijst
+                      
                         var meaningful = statuses
-                        .Where(s => !s.Equals("none", StringComparison.OrdinalIgnoreCase))
+					.Where(s => !s.Equals("none", StringComparison.OrdinalIgnoreCase)) // kijken ongeacht kleine of grote letters op none
                         .ToList();
                     }
                     @* Als tafel vrij is, of alleen nog 'none' overblijft, toon italic none *@
-                    @if (table.Status == TableStatus.Free || !meaningful.Any())
+                    @if (table.Status == TableStatus.Free || !meaningful.Any()) // deze lijst is leeg
                     {
                     <em>none</em>
                     }

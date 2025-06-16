@@ -25,7 +25,7 @@ builder.Services.AddScoped<IMenuService, MenuService>();
 builder.Services.AddScoped<IStaffService, StaffService>();
 builder.Services.AddScoped<ITableService, TableService>();
 builder.Services.AddScoped<FinancialService>();
-
+// Schakel authenticatie in met het standaard “Cookies” schema
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
         .AddCookie(opts =>
         {
