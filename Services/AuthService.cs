@@ -33,7 +33,7 @@ public class AuthService : IAuthService
             new Claim(ClaimTypes.Name,         staff.Username),
             new Claim(ClaimTypes.Role,         staff.Role.ToString())
         };
-
+        // Maak een ClaimsPrincipal met de opgegeven claims voor cookie-authenticatie
         ClaimsPrincipal principal = new ClaimsPrincipal(
             new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme));
 
@@ -46,5 +46,5 @@ public class AuthService : IAuthService
 
     public Task SignOutAsync() =>
         // Verwijdert de auth-cookie: gebruiker is uitgelogd
-        ctx.HttpContext!.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+        ctx.HttpContext!.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme); 
 }

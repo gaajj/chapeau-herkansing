@@ -27,7 +27,7 @@ namespace ChapeauHerkansing.Controllers
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
 
-        [AllowAnonymous] // uitvinden wat het doet
+        [AllowAnonymous] 
         public IActionResult AccessDenied()
         {
             return View();
