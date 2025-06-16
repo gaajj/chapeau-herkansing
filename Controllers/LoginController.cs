@@ -40,7 +40,7 @@ public class LoginController : Controller
             return View();
         }
 
-        // Gelukt: doorschakelen op basis van rol
+        // Gelukt: doorschakelen op basis van rol, zoeken naar de eerst waarde uit de claims wat type is (role)
         return RedirectBasedOnRole(principal.FindFirstValue(ClaimTypes.Role));
     }
 
@@ -49,7 +49,7 @@ public class LoginController : Controller
     public async Task<IActionResult> Logout()
     {
         await auth.SignOutAsync();       // Cookie weg, klaar
-        return RedirectToAction(nameof(Index));
+        return RedirectToAction(nameof(Index)); // terug naar de loginpagina
     }
 
     // Bepaalt welke pagina bij welke rol hoort

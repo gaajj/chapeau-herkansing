@@ -15,7 +15,7 @@ namespace ChapeauHerkansing.Repositories
         {
         }
 
-        public Table? GetTableById(int tableId)
+        public Table? GetTableById(int tableId) 
         {
             string query = @"
                 SELECT t.id AS tableId, t.staffId, t.seats, t.tableStatus 
@@ -29,7 +29,7 @@ namespace ChapeauHerkansing.Repositories
                 { "@tableId", tableId }
             };
 
-            return ExecuteSingle(query, TableReader.Read, parameters);
+            return ExecuteSingle(query, TableReader.Read, parameters); 
         }
 
         public List<Table> GetAllTables()
@@ -42,11 +42,11 @@ namespace ChapeauHerkansing.Repositories
             SqlCommand cmd = new SqlCommand(sql, conn);
             conn.Open();
             SqlDataReader reader = cmd.ExecuteReader();
-            while (reader.Read())
+            while (reader.Read()) // voorkomt hardcoding
             {
                 int tableId = reader.GetInt32(0);
-                int? seats = reader.IsDBNull(2) ? null : (int?)reader.GetInt32(2);
-                TableStatus status = Enum.Parse<TableStatus>(reader.GetString(3), true);
+                int? seats = reader.IsDBNull(2) ? null : (int?)reader.GetInt32(2); // // controleer of kolom 'seats' leeg (NULL) is, zo niet, lees het getal uit en zet het in de nullable int
+                TableStatus status = Enum.Parse<TableStatus>(reader.GetString(3), true); //  tekst status omzetten naar enum
                 tables.Add(new Table(tableId, null, seats, status));
             }
             return tables;
@@ -54,7 +54,7 @@ namespace ChapeauHerkansing.Repositories
 
 
 
-        public int GetReadyOrdersCount(int tableId, string orderStatus, bool includeDeleted) // geen magic waardes meer
+        public int GetReadyOrdersCount(int tableId, string orderStatus, bool includeDeleted) 
         {
             const string sql = @"
         SELECT COUNT(*)
@@ -62,7 +62,7 @@ namespace ChapeauHerkansing.Repositories
         JOIN dbo.orders o ON ol.orderId = o.id
         WHERE o.tableId       = @tableId
           AND ol.orderStatus  = @orderStatus
-          AND ol.isDeleted    = @isDeleted";
+          AND ol.isDeleted    = @isDeleted"; 
 
             using SqlConnection conn = GetConnection();
             using SqlCommand cmd = new SqlCommand(sql, conn);
