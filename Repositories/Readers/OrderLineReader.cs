@@ -13,7 +13,7 @@ namespace ChapeauHerkansing.Repositories.Readers
                 order,
                 MenuItemReader.Read(reader),
                 StaffReader.Read(reader),
-                reader.GetInt32(reader.GetOrdinal("stockAmount")),
+                reader.GetInt32(reader.GetOrdinal("amount")),
                 reader.GetDateTime(reader.GetOrdinal("orderLineOrderTime")),
                 reader.IsDBNull(reader.GetOrdinal("note")) ? null : reader.GetString(reader.GetOrdinal("note")),
                 ParseOrderStatus(reader.GetString(reader.GetOrdinal("orderStatus")))
