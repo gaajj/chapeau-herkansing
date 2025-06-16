@@ -35,6 +35,17 @@ namespace ChapeauHerkansing.Repositories
                         command.ExecuteNonQuery();
 
                     }
+
+                    string updateSql = @"
+                UPDATE dbo.orderLines
+                SET orderStatus = 'none'
+                WHERE orderId = @orderId;
+            ";
+                    using (SqlCommand updateCmd = new SqlCommand(updateSql, connection))
+                    {
+                        updateCmd.Parameters.AddWithValue("@orderId", payment.Order.OrderID);
+                        updateCmd.ExecuteNonQuery();
+                    }
                 }
             }
             catch (Exception ex)

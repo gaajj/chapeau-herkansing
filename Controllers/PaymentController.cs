@@ -1,4 +1,4 @@
-﻿using ChapeauHerkansing.Models;
+using ChapeauHerkansing.Models;
 using ChapeauHerkansing.Repositories;
 using ChapeauHerkansing.Services;
 using ChapeauHerkansing.ViewModels;
@@ -47,7 +47,21 @@ namespace ChapeauHerkansing.Controllers
         [HttpPost]
         public IActionResult Create(PaymentViewModel viewModel)
         {
-            Order order = _orderRepo.GetAllOrders().FirstOrDefault(o => o.OrderID == viewModel.OrderId);
+            if (!viewModel.PaymentMethodEnum.HasValue)
+            {
+                // repopuleer alleen wat de view nodig heeft
+                var orders = _orderRepo.GetAll().Where(o => !o.IsDeleted).ToList();
+                viewModel.Orders = orders;
+                viewModel.Order = orders.FirstOrDefault(o => o.OrderID == viewModel.OrderId);
+                viewModel.VatAmount = viewModel.Order?.OrderLines.Sum(o => o.VAT) ?? 0;
+
+                ModelState.AddModelError(
+                    nameof(viewModel.PaymentMethodEnum),
+                    "Kies een betaalmethode."
+                );
+                return View(viewModel);
+            }
+            Order order = _orderRepo.GetAll().FirstOrDefault(o => o.OrderID == viewModel.OrderId);
             if (order == null) return NotFound();
 
             decimal total = _paymentService.CalculateTotal(order);

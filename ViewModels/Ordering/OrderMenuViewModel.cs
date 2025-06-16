@@ -3,7 +3,7 @@ using ChapeauHerkansing.Models.Enums;
 
 namespace ChapeauHerkansing.ViewModels.Ordering
 {
-    public class MenuViewModel
+    public class OrderMenuViewModel
     {
         public Order Order { get; set; }
         public Menu Menu { get; set; }
