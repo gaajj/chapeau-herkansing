@@ -25,28 +25,25 @@ namespace ChapeauHerkansing.Repositories
             FROM menuItems
             WHERE isDeleted IS NULL OR isDeleted = 0";
 
-            return ExecuteMenuQuery(query, null, null);
+            return ExecuteMenuQuery(query, null, null, false);
         }
 
         // Haal menu-items op op basis van type en categorie, eventueel inclusief verwijderde items
-        public Menu GetMenuItemsByFilter(MenuType menuType, MenuCategory? category, bool includeDeleted = false)
+        public Menu GetMenuItemsByFilter(MenuType menuType, MenuCategory? category, bool includeDeleted)
         {
             string query = @"
             SELECT id AS MenuItemID, itemName, price, category, isAlcoholic, isDeleted, stockAmount, menuType
             FROM menuItems
-            WHERE menuType = @menuType";
+            WHERE menuType = @menuType
+            AND (@category IS NULL OR category = @category)
+            AND (@includeDeleted = 1 OR isDeleted IS NULL OR isDeleted = 0)";
 
-            if (category != null)
-                query += " AND category = @category";
-
-            if (!includeDeleted)
-                query += " AND (isDeleted IS NULL OR isDeleted = 0)";
-
-            return ExecuteMenuQuery(query, menuType, category);
+            return ExecuteMenuQuery(query, menuType, category, includeDeleted);
         }
 
+
         // Herbruikbare methode voor menu-queries met optionele filters
-        private Menu ExecuteMenuQuery(string query, MenuType? menuType, MenuCategory? category)
+        private Menu ExecuteMenuQuery(string query, MenuType? menuType, MenuCategory? category, bool includeDeleted)
         {
             List<MenuItem> items = new();
 
@@ -54,10 +51,9 @@ namespace ChapeauHerkansing.Repositories
             {
                 SqlCommand command = new(query, connection);
 
-                if (menuType != null)
-                    command.Parameters.AddWithValue("@menuType", (int)menuType);
-                if (category != null)
-                    command.Parameters.AddWithValue("@category", category.ToString().ToLower());
+                command.Parameters.AddWithValue("@menuType", (int)menuType);
+                command.Parameters.AddWithValue("@category", category == null ? DBNull.Value : category.Value.ToString().ToLower());
+                command.Parameters.AddWithValue("@includeDeleted", includeDeleted ? 1 : 0);
 
                 connection.Open();
                 SqlDataReader reader = command.ExecuteReader();
@@ -68,8 +64,9 @@ namespace ChapeauHerkansing.Repositories
                 reader.Close();
             }
 
-            return new Menu(items); // Geef een Menu-object terug (met lijst van items)
+            return new Menu(items);
         }
+
 
         // Voeg een nieuw menu-item toe aan de database en retourneer het nieuwe ID
         public int InsertMenuItem(MenuItemCreateViewModel model)
@@ -177,10 +174,7 @@ namespace ChapeauHerkansing.Repositories
 
                 string query = @"
                 UPDATE menuItems
-                SET isDeleted = CASE 
-                    WHEN isDeleted IS NULL OR isDeleted = 0 THEN 1 
-                    ELSE 0 
-                END
+                SET isDeleted = CASE WHEN isDeleted IS NULL OR isDeleted = 0 THEN 1 ELSE 0 END
                 OUTPUT INSERTED.isDeleted
                 WHERE id = @id";
 

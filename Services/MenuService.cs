@@ -22,13 +22,10 @@ namespace ChapeauHerkansing.Services
             return _menuItemRepository.GetAllMenuItems();
         }
 
-
-        public Menu GetFilteredMenu(MenuType menuType, MenuCategory? category, bool includeDeleted = false)
+        public Menu GetFilteredMenu(MenuType menuType, MenuCategory? category, bool includeDeleted)
         {
             return _menuItemRepository.GetMenuItemsByFilter(menuType, category, includeDeleted);
         }
-
-
 
         public void AddMenuItem(MenuItemCreateViewModel model)
         {
@@ -54,7 +51,6 @@ namespace ChapeauHerkansing.Services
         {
             return _menuItemRepository.GetMenuItemsByMenuType(menuType);
         }
-
 
     }
 }

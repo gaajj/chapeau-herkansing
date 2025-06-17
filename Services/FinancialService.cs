@@ -16,7 +16,7 @@ namespace ChapeauHerkansing.Services
 
         public List<FinancialData> GetFinancialOverview(DateTime start, DateTime end)
         {
-            return _repository.GetFinancialData(start, end, null);
+            return _repository.GetFinancialData(start, end);
         }
     }
 }
