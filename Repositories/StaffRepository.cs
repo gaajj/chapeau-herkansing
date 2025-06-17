@@ -55,7 +55,15 @@ namespace ChapeauHerkansing.Repositories
             {
                 conn.Open();
                 using SqlDataReader reader = cmd.ExecuteReader();
-                return reader.Read() ? StaffReader.Read(reader) : null;
+
+                if (reader.Read())
+                {
+                    return StaffReader.Read(reader);
+                }
+                else
+                {
+                    throw new Exception("No staff member found with the given ID.");
+                }
             }
             catch (SqlException sqlEx)
             {
@@ -66,6 +74,7 @@ namespace ChapeauHerkansing.Repositories
                 throw new Exception("Unexpected error while retrieving staff by ID.", ex);
             }
         }
+
 
         // Voegt nieuwe medewerker toe aan de database
         public void AddStaff(Staff staff)

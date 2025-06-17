@@ -23,7 +23,7 @@ namespace ChapeauHerkansing.Controllers
         // Laat het beheeroverzicht van menu-items zien
         public IActionResult Index(MenuType menuType = MenuType.Lunch, MenuCategory? category = null)
         {
-            Menu menu = _menuService.GetFilteredMenu(menuType, category, includeDeleted: true);
+            Menu menu = _menuService.GetFilteredMenu(menuType, category);
 
             MenuManagementViewModel viewModel = new()
             {
