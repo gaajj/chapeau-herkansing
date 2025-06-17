@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Authorization;
 using ChapeauHerkansing.Models.Enums;
 using ChapeauHerkansing.Services;
 using ChapeauHerkansing.ViewModels.Tables;
-using ChapeauHerkansing.Models.Enums;
 using ChapeauHerkansing.ViewModels;
 using ChapeauHerkansing.Models;
 using ChapeauHerkansing.Services.Interfaces;

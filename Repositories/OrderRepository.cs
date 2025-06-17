@@ -1,8 +1,10 @@
-﻿using ChapeauHerkansing.Models;
+using ChapeauHerkansing.Models;
 using ChapeauHerkansing.Models.Enums;
 using ChapeauHerkansing.Repositories.Interfaces;
 using ChapeauHerkansing.Repositories.Readers;
 using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using System.Collections.Generic;
 
 namespace ChapeauHerkansing.Repositories
 {
@@ -63,7 +65,7 @@ namespace ChapeauHerkansing.Repositories
         }
 
 
-        public List<Order> GetAll()
+        public List<Order> GetAllOrders()
         {
             string query = @"
                 SELECT
@@ -111,102 +113,9 @@ namespace ChapeauHerkansing.Repositories
             return orders;
         }
 
-        public List<Order> GetAllNotReady()
-        {
-            string query = @"
-                SELECT
-                    o.id AS orderId,
-                    o.isDeleted,
-                    o.orderTime AS orderOrderTime,
-                    t.id AS tableId,
-                    t.seats,
-                    t.tableStatus,
-                    s.id AS ID,
-                    s.firstName,
-                    s.lastName,
-                    s.username,
-                    s.password,
-                    s.role,
-                    ol.id AS orderLineId,
-                    ol.amount,
-                    ol.orderTime AS orderLineOrderTime,
-                    ol.note,
-                    ol.orderStatus,
-                    mi.id AS menuItemId,
-                    mi.itemName,
-                    mi.price,
-                    mi.category,
-                    mi.isAlcoholic,
-                    mi.menuType,
-                    mi.stockAmount
-                FROM
-                    dbo.orders o
-                INNER JOIN
-                    dbo.tables t ON o.tableId = t.id
-                inner JOIN
-                    dbo.orderLines ol ON o.id = ol.orderId
-                LEFT JOIN
-                    dbo.menuItems mi ON ol.menuItemId = mi.id
-                LEFT JOIN
-                    dbo.staff s ON ol.staffId = s.id
-                WHERE
-                    o.isDeleted = 0 and ol.orderStatus='Ordered'
-                ORDER BY
-                    o.orderTime;
-            ";
+       
 
-            List<Order> orders = ExecuteGroupedQuery<Order>(query, MapOrderWithLines, null);
-            return orders;
-        }
-
-        public List<Order> GetAllReady() // parameters toevoegen zodat het 1 query wordt
-        {
-            string query = @"
-                SELECT
-                    o.id AS orderId,
-                    o.isDeleted,
-                    o.orderTime AS orderOrderTime,
-                    t.id AS tableId,
-                    t.seats,
-                    t.tableStatus,
-                    s.id AS ID,
-                    s.firstName,
-                    s.lastName,
-                    s.username,
-                    s.password,
-                    s.role,
-                    ol.id AS orderLineId,
-                    ol.amount,
-                    ol.orderTime AS orderLineOrderTime,
-                    ol.note,
-                    ol.orderStatus,
-                    mi.id AS menuItemId,
-                    mi.itemName,
-                    mi.price,
-                    mi.category,
-                    mi.isAlcoholic,
-                    mi.menuType,
-                    mi.stockAmount
-                FROM
-                    dbo.orders o
-                INNER JOIN
-                    dbo.tables t ON o.tableId = t.id
-                inner JOIN
-                    dbo.orderLines ol ON o.id = ol.orderId
-                LEFT JOIN
-                    dbo.menuItems mi ON ol.menuItemId = mi.id
-                LEFT JOIN
-                    dbo.staff s ON ol.staffId = s.id
-                WHERE
-                    o.isDeleted = 0 and ol.orderStatus='Ready'
-                ORDER BY
-                    o.orderTime;
-            ";
-
-            List<Order> orders = ExecuteGroupedQuery<Order>(query, MapOrderWithLines, null);
-            return orders;
-        }
-
+       
         public Order GetOrderByTable(int tableId)
         {
             string query = @"
@@ -278,25 +187,7 @@ namespace ChapeauHerkansing.Repositories
             ExecuteNonQuery(query, parameters);
         }
 
-        public void ToggleOrderLineStatus(int orderLineId)
-        {
-            string query = @"
-        UPDATE orderLines
-        SET orderStatus = 
-            CASE 
-                WHEN orderStatus = 'Ready' THEN 'Ordered'
-                ELSE 'Ready'
-            END
-        WHERE id = @orderLineId;
-    ";
-
-            var parameters = new Dictionary<string, object>
-    {
-        { "@orderLineId", orderLineId }
-    };
-
-            ExecuteNonQuery(query, parameters);
-        }
+        
 
         public void UpdateOrderLineAmount(int orderLineId, int newAmount)
         {

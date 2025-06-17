@@ -1,4 +1,4 @@
-﻿using ChapeauHerkansing.Models;
+using ChapeauHerkansing.Models;
 using ChapeauHerkansing.Repositories;
 using ChapeauHerkansing.Services;
 using ChapeauHerkansing.ViewModels;
@@ -29,7 +29,8 @@ namespace ChapeauHerkansing.Controllers
         [HttpGet]
         public IActionResult Create(int orderId)
         {
-            List<Order> orders = _orderRepo.GetAll().Where(o => !o.IsDeleted).ToList();
+            List<Order> orders = _orderRepo.GetAllOrders().Where(o => !o.IsDeleted).ToList();
+            //filteren in de query zelf vgm 
             Order order = orders.FirstOrDefault(o => o.OrderID == orderId);
 
             PaymentViewModel model = new PaymentViewModel
@@ -49,7 +50,7 @@ namespace ChapeauHerkansing.Controllers
             if (!viewModel.PaymentMethodEnum.HasValue)
             {
                 // repopuleer alleen wat de view nodig heeft
-                var orders = _orderRepo.GetAll().Where(o => !o.IsDeleted).ToList();
+                var orders = _orderRepo.GetAllOrders().Where(o => !o.IsDeleted).ToList();
                 viewModel.Orders = orders;
                 viewModel.Order = orders.FirstOrDefault(o => o.OrderID == viewModel.OrderId);
                 viewModel.VatAmount = viewModel.Order?.OrderLines.Sum(o => o.VAT) ?? 0;
@@ -60,7 +61,7 @@ namespace ChapeauHerkansing.Controllers
                 );
                 return View(viewModel);
             }
-            Order order = _orderRepo.GetAll().FirstOrDefault(o => o.OrderID == viewModel.OrderId);
+            Order order = _orderRepo.GetAllOrders().FirstOrDefault(o => o.OrderID == viewModel.OrderId);
             if (order == null) return NotFound();
 
             decimal total = _paymentService.CalculateTotal(order);
