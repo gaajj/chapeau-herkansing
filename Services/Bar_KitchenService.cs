@@ -14,14 +14,14 @@ namespace ChapeauHerkansing.Services
             _orderRepository = orderRepository;
         }
 
-        public List<Order> GetOngoingOrders()
+        public List<Order> GetOngoingOrders(Role role)
         {
-            return _orderRepository.GetAllOrdersByStatus(OrderStatus.Ordered);
+            return _orderRepository.GetAllOrdersByStatusAndCategory(OrderStatus.Ordered, role);
         }
 
-        public List<Order> GetFinishedOrders()
+        public List<Order> GetFinishedOrders(Role role)
         {
-            return _orderRepository.GetAllOrdersByStatus(OrderStatus.Ready);
+            return _orderRepository.GetAllOrdersByStatusAndCategory(OrderStatus.Ready, role);
         }
 
         public void ToggleOrderLineStatus(int orderlineId)

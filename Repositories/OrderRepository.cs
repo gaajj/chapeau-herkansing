@@ -4,6 +4,7 @@ using ChapeauHerkansing.Repositories.Interfaces;
 using ChapeauHerkansing.Repositories.Readers;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using System.Collections.Generic;
 
 namespace ChapeauHerkansing.Repositories
 {
@@ -112,8 +113,9 @@ namespace ChapeauHerkansing.Repositories
             return orders;
         }
 
-        public List<Order> GetAllOrdersByStatus(OrderStatus orderStatus)
+        public List<Order> GetAllOrdersByStatusAndCategory(OrderStatus orderStatus, Role role)
         {
+       
             string query = @"
                 SELECT
                     o.id AS orderId,
@@ -151,18 +153,57 @@ namespace ChapeauHerkansing.Repositories
                 LEFT JOIN
                     dbo.staff s ON ol.staffId = s.id
                 WHERE
-                    o.isDeleted = 0 and ol.orderStatus=@orderStatus
+                    o.isDeleted = 0 and ol.orderStatus=@orderStatus and mi.category in (_categories)
                 ORDER BY
                     o.orderTime;
             ";
-            var parameters = new Dictionary<string, object>
+    
+            
+            ApplyCategoryFilter(role, out string categoryFilter, out Dictionary<string, object> categoryParams);
+
+            Dictionary<string, object> parameters = new Dictionary<string, object>
             {
                 { "@orderStatus", orderStatus.ToString()  }
+                 
             };
 
+            foreach (var param in categoryParams)
+            {
+                parameters.Add(param.Key, param.Value);
+            }
+
+            query = query.Replace("_categories", categoryFilter);
 
             List<Order> orders = ExecuteGroupedQuery<Order>(query, MapOrderWithLines, parameters);
             return orders;
+        }
+
+        private void ApplyCategoryFilter(Role role, out string categoryFilter, out Dictionary<string, object> categoryParams)
+        {
+       
+          List<MenuCategory> categoriesToUse;
+
+            if (role.Equals(Role.Chef))
+            { categoriesToUse =  new List<MenuCategory> {  MenuCategory.Tussengerecht,
+        MenuCategory.Hoofdgerecht,
+        MenuCategory.Voorgerecht,
+        MenuCategory.Nagerecht }; }
+            else if (role.Equals(Role.Barman))
+            { categoriesToUse = new List<MenuCategory> { MenuCategory.Dranken }; }
+
+            else
+            {
+                throw new ArgumentException("Unsupported role: " + role);
+            }
+
+            categoryFilter = string.Join(", ", categoriesToUse.Select((c, i) => $"@cat{i}"));
+            categoryParams = new Dictionary<string, object>();
+
+            for (int i = 0; i < categoriesToUse.Count; i++)
+            {
+                string paramName = $"@cat{i}";
+                categoryParams[paramName] = categoriesToUse[i].ToString();
+            }
         }
 
         public Order GetOrderByTable(int tableId)

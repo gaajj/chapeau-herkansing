@@ -7,7 +7,7 @@ namespace ChapeauHerkansing.Repositories.Interfaces
     {
         Order GetOrderById(int orderId);
         List<Order> GetAllOrders();
-        List<Order> GetAllOrdersByStatus( OrderStatus orderStatus);
+        List<Order> GetAllOrdersByStatusAndCategory( OrderStatus orderStatus, Role role);
         Order GetOrderByTable(int tableId);
         void AddMenuItemToOrder(Order order, MenuItem menuItem, Staff staff, int amount, OrderStatus status);
         void ToggleOrderLineStatus(int orderLineId);

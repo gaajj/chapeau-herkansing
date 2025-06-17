@@ -6,6 +6,11 @@ using ChapeauHerkansing.Repositories.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ChapeauHerkansing.Services;
+using ChapeauHerkansing.ViewModels.Bar_Kitchen;
+using System.Security.Claims;
+using System.Data;
+using static NuGet.Packaging.PackagingConstants;
+using System.Collections.Generic;
 
 namespace ChapeauHerkansing.Controllers
 {
@@ -13,24 +18,26 @@ namespace ChapeauHerkansing.Controllers
     public class Bar_KitchenController : Controller
     {
         private readonly IBar_KitchenService _bar_KitchenService;
-
+       
         public Bar_KitchenController(IBar_KitchenService bar_KitchenService)
         {
             _bar_KitchenService = bar_KitchenService;
+
         }
 
         public IActionResult Index()
         {
-            List<Order> orders = _bar_KitchenService.GetOngoingOrders();
-            // views op een andere manier ophalen
-            // view model
-            return View("~/Views/Bar_Kitchen/Index.cshtml", orders);
+            Role role = GetUserRole();
+           
+            OrdersViewModel ordersViewModel = BuildOrderViewModel(false);
+
+            return View("~/Views/Bar_Kitchen/Index.cshtml", ordersViewModel);
         }
 
         public IActionResult GetOngoingOrders()
         {
-            List<Order> orders = _bar_KitchenService.GetOngoingOrders();
-            return PartialView("_OrdersPartial", orders);
+            OrdersViewModel ordersViewModel = BuildOrderViewModel(false);
+            return PartialView("_OrdersPartial", ordersViewModel);
         }
         [HttpPost]
         public IActionResult ToggleStatus([FromBody] int orderlineid)
@@ -41,18 +48,34 @@ namespace ChapeauHerkansing.Controllers
 
         public IActionResult FinishedOrders()
         {
+            OrdersViewModel ordersViewModel = BuildOrderViewModel(true);
 
-
-            List<Order> orders = _bar_KitchenService.GetFinishedOrders();
-
-            return View("FinishedOrders", orders);
+            return View("~/Views/Bar_Kitchen/Index.cshtml", ordersViewModel);
         }
         public IActionResult GetFinishedOrders()
-        {
-            List<Order> orders = _bar_KitchenService.GetFinishedOrders();
-            return PartialView("_OrdersPartial", orders);
+        {  OrdersViewModel ordersViewModel = BuildOrderViewModel(true);
+            return PartialView("_OrdersPartial", ordersViewModel);
         }
 
+        private Role GetUserRole()
+        {
+            return Enum.Parse<Role>(User.FindFirstValue(ClaimTypes.Role));
+        }
+
+        private OrdersViewModel BuildOrderViewModel(bool isFinished)
+        {
+            Role role = GetUserRole();
+            List<Order> orders = isFinished
+                ? _bar_KitchenService.GetFinishedOrders(role)
+                : _bar_KitchenService.GetOngoingOrders(role);
+
+            return new OrdersViewModel
+            {
+                Orders = orders,
+                Role = role,
+                isFinished = isFinished 
+            };
+        }
 
     }
 }

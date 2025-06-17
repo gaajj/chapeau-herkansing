@@ -1,16 +1,19 @@
-﻿@model List<ChapeauHerkansing.Models.Order>
+﻿@model ChapeauHerkansing.ViewModels.Bar_Kitchen.OrdersViewModel
 
 <div class="row">
-    @foreach (Order order in Model)
+    @foreach (Order order in Model.Orders)
     {
         <div class="col-md-4 mb-3">
-            <div class="card border-warning h-100">
+            <div class="card border-warning d-flex flex-column rounded">
                 <div class="card-header bg-warning text-dark text-center fw-bold">
                     Order ID: @order.OrderID Table ID: @order.Table.TableID
                     <div class="waiting-time" data-timecreated="@order.Timecreated.ToString("O")">
                         Waiting time: <span class="time-display"></span>
                     </div>
-                    <ul class="list-group">
+                </div>
+
+                <div class="card-body flex-grow-1 p-0">
+                    <ul class="list-group list-group-flush">
                         @foreach (OrderLine orderline in order.OrderLines)
                         {
                             <li class="list-group-item p-0">
@@ -29,5 +32,4 @@
                 </div>
             </div>
         </div>
-    }
-</div>
+}
