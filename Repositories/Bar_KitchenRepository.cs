@@ -15,7 +15,7 @@ namespace ChapeauHerkansing.Repositories
 
         public List<Order> GetAllOrdersByStatusAndCategory(OrderStatus orderStatus, Role role)
         {
-       
+
             string query = @"
                 SELECT
                     o.id AS orderId,
@@ -57,14 +57,14 @@ namespace ChapeauHerkansing.Repositories
                 ORDER BY
                     o.orderTime;
             ";
-    
-            
+
+
             ApplyCategoryFilter(role, out string categoryFilter, out Dictionary<string, object> categoryParams);
 
             Dictionary<string, object> parameters = new Dictionary<string, object>
             {
                 { "@orderStatus", orderStatus.ToString()  }
-                 
+
             };
 
             foreach (var param in categoryParams)
@@ -74,8 +74,15 @@ namespace ChapeauHerkansing.Repositories
 
             query = query.Replace("_categories", categoryFilter);
 
-            List<Order> orders = ExecuteGroupedQuery<Order>(query, MapOrderWithLines, parameters);
-            return orders;
+
+            try
+            {
+                return ExecuteGroupedQuery<Order>(query, MapOrderWithLines, parameters);
+            }
+            catch (SqlException ex)
+            {
+                throw new InvalidOperationException($"Kon orders niet ophalen (status={orderStatus}, rol={role}).", ex);
+            }
         }
 
         private void ApplyCategoryFilter(Role role, out string categoryFilter, out Dictionary<string, object> categoryParams)
@@ -123,8 +130,15 @@ namespace ChapeauHerkansing.Repositories
     {
         { "@orderLineId", orderLineId }
     };
-
-            ExecuteNonQuery(query, parameters);
+            try
+            {
+                ExecuteNonQuery(query, parameters);
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException(
+          $"Kon status orderregel #{orderLineId} niet bijwerken.", ex);
+            }
         }
 
       

@@ -7,13 +7,14 @@ namespace ChapeauHerkansing.ViewModels.Bar_Kitchen
     {
         public List<Order> Orders { get; set; }
         public Role Role { get; set; }
-        public Boolean isFinished { get; set; } = false;
+        public Boolean IsFinished { get; set; } = false;
+        public string? ErrorMessage { get; set; } 
 
         public String Title
         {
             get
             {
-                return (isFinished ? "Finished" : "Ongoing") + (Role == Role.Chef ? " Kitchen" : " Bar") + " Orders";
+                return (IsFinished ? "Finished" : "Ongoing") + (Role == Role.Chef ? " Kitchen" : " Bar") + " Orders";
             }
         }
 

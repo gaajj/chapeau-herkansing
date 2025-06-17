@@ -42,8 +42,18 @@ namespace ChapeauHerkansing.Controllers
         [HttpPost]
         public IActionResult ToggleStatus([FromBody] int orderlineid)
         {
-           _bar_KitchenService.ToggleOrderLineStatus(orderlineid);
-            return Ok();
+
+            try
+            {
+                _bar_KitchenService.ToggleOrderLineStatus(orderlineid);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                // return 400 with the exception message
+                return BadRequest(ex.Message);
+            }
+           
         }
 
 
@@ -68,17 +78,49 @@ namespace ChapeauHerkansing.Controllers
 
         private OrdersViewModel BuildOrderViewModel(bool isFinished)
         {
-            Role role = GetUserRole();
-            List<Order> orders = isFinished
-                ? _bar_KitchenService.GetFinishedOrders(role)
-                : _bar_KitchenService.GetOngoingOrders(role);
-
-            return new OrdersViewModel
+            Role role;
+            try
             {
-                Orders = orders,
-                Role = role,
-                isFinished = isFinished 
+                role = GetUserRole();
+            }
+            catch
+            {
+                return new OrdersViewModel
+                {
+                    Orders = new List<Order>(),
+                    Role = Role.Chef,
+                    IsFinished = isFinished,
+                    ErrorMessage = "Ongeldig gebruikersrol."
+                };
+            }
+
+            OrdersViewModel vm = new OrdersViewModel
+            {
+                Role = GetUserRole(),
+                IsFinished = isFinished
             };
+
+            try
+            {
+           
+            vm.Orders = isFinished
+                ? _bar_KitchenService.GetFinishedOrders(vm.Role)
+                : _bar_KitchenService.GetOngoingOrders(vm.Role);
+
+
+                if (vm.Orders == null)
+                {
+                    vm.Orders = new List<Order>();
+                }
+
+            }
+            catch (Exception ex)
+            {
+                // olaat een lege lijst zien plus de specifieke error bericht
+                vm.Orders = new List<Order>();
+                vm.ErrorMessage = ex.Message;
+            }
+            return vm;
         }
 
     }

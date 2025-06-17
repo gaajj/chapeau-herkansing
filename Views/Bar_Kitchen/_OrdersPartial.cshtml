@@ -1,7 +1,12 @@
 ﻿@model ChapeauHerkansing.ViewModels.Bar_Kitchen.OrdersViewModel
-
+@if (!string.IsNullOrEmpty(Model.ErrorMessage))
+{
+    <div class="alert alert-danger">
+        @Model.ErrorMessage
+    </div>
+}
 <div class="row">
-    @foreach (Order order in Model.Orders)
+    @foreach (Order order in Model.Orders ?? Enumerable.Empty<Order>())
     {
         IEnumerable<IGrouping<MenuCategory, OrderLine>> groupedOrderLines = order.OrderLines
     .GroupBy(orderLine => orderLine.MenuItem.Category).OrderBy(g => g.Key);
@@ -28,7 +33,7 @@
                                           data-category="@categoryGroup.Key"
                                            onclick="toggleCategory(this)">
                                 
-                                      @(Model.isFinished ? "Alles ongedaan maken"     
+                                      @(Model.IsFinished ? "Alles ongedaan maken"     
                                         : "Alles gereed markeren" 
                                       )
                                 </button>
