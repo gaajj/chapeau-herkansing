@@ -15,15 +15,6 @@ namespace ChapeauHerkansing.Models
         public MenuType MenuType { get; set; } // Via JOIN opgehaald
 
         // Constructors
-        public MenuItem(int menuItemID, string name, decimal price, MenuCategory category, bool isAlcoholic)
-        {
-            MenuItemID = menuItemID;
-            Name = name;
-            Price = price;
-            Category = category;
-            IsAlcoholic = isAlcoholic;
-        }
-
         public MenuItem(int menuItemID, string name, decimal price, MenuCategory category, bool isAlcoholic, bool? isDeleted, int stockAmount, MenuType menuType)
         {
             MenuItemID = menuItemID;

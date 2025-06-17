@@ -7,7 +7,7 @@ namespace ChapeauHerkansing.Repositories.Interfaces
     public interface IMenuItemRepository
     {
         Menu GetAllMenuItems();
-        Menu GetMenuItemsByFilter(MenuType menuType, MenuCategory? category, bool includeDeleted);
+        Menu GetMenuItemsByFilter(MenuType menuType, MenuCategory? category);
         int InsertMenuItem(MenuItemCreateViewModel model);
         MenuItem GetMenuItemById(int id);
         void UpdateMenuItem(int id, MenuItemCreateViewModel model);

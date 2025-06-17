@@ -7,7 +7,7 @@ namespace ChapeauHerkansing.Services.Interfaces
     public interface IMenuService
     {
         Menu GetAllMenu();
-        Menu GetFilteredMenu(MenuType menuType, MenuCategory? category, bool includeDeleted);
+        Menu GetFilteredMenu(MenuType menuType, MenuCategory? category);
         void AddMenuItem(MenuItemCreateViewModel model);
         MenuItem GetMenuItemById(int id);
         void UpdateMenuItem(int id, MenuItemCreateViewModel model);
