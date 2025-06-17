@@ -7,11 +7,11 @@ namespace ChapeauHerkansing.Repositories.Interfaces
     {
         Order GetOrderById(int orderId);
         List<Order> GetAllOrders();
-        List<Order> GetAllOrdersByStatusAndCategory( OrderStatus orderStatus, Role role);
+       
         Order GetOrderByTable(int tableId);
-        void AddMenuItemToOrder(Order order, MenuItem menuItem, Staff staff, int amount, OrderStatus status);
-        void ToggleOrderLineStatus(int orderLineId);
+     
         void UpdateOrderLineAmount(int orderLineId, int newAmount);
+        void AddMenuItemToOrder(Order order, MenuItem menuItem, Staff staff, int amount, OrderStatus orderStatus);
         void RemoveOrderLine(int orderLineId);
         void UpdateOrderLineNote(int orderLineId, string note);
         void CreateOrderForTable(int tableId);

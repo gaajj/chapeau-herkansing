@@ -46,6 +46,8 @@ namespace ChapeauHerkansing.Controllers
             return Ok();
         }
 
+
+
         public IActionResult FinishedOrders()
         {
             OrdersViewModel ordersViewModel = BuildOrderViewModel(true);
@@ -56,6 +58,8 @@ namespace ChapeauHerkansing.Controllers
         {  OrdersViewModel ordersViewModel = BuildOrderViewModel(true);
             return PartialView("_OrdersPartial", ordersViewModel);
         }
+
+        
 
         private Role GetUserRole()
         {

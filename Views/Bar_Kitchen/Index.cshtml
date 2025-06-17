@@ -50,6 +50,7 @@
             .catch(error => console.error('Error fetching orders:', error));
     }
 
+
     function updateAllWaitingTimes() {
         const waitingTimeElements = document.querySelectorAll(".waiting-time");
 
@@ -71,6 +72,26 @@
             element.querySelector(".time-display").textContent = displayTime;
         });
     }
+
+        window.toggleCategory = function(headerCheckbox) {
+      const shouldBeChecked = headerCheckbox.checked;
+     
+      const card = headerCheckbox.closest('.card');
+      const category = headerCheckbox.getAttribute('data-category');
+
+      
+      const items = card.querySelectorAll(
+        `.status-checkbox[data-category="${category}"]`
+      );
+
+      items.forEach(item => {
+        if (item.checked !== shouldBeChecked) {
+          item.checked = shouldBeChecked;
+          
+          toggleStatus(item);
+        }
+      });
+    };
 
     window.toggleStatus = function (checkbox) {
         const orderLineId = checkbox.getAttribute("data-id");
