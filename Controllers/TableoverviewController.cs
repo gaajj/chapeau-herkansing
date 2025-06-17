@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Authorization;
 using ChapeauHerkansing.Models.Enums;
 using ChapeauHerkansing.Services;
 using ChapeauHerkansing.ViewModels.Tables;
-using ChapeauHerkansing.Models.Enums;
 using ChapeauHerkansing.ViewModels;
 using ChapeauHerkansing.Models;
 using ChapeauHerkansing.Services.Interfaces;
@@ -62,7 +61,6 @@ namespace ChapeauHerkansing.Controllers
         [HttpPost]
         public IActionResult SetTableStatus(int tableId, string newStatus)
         {
-            // Controleer of de string newStatus zonder hoofdlettergevoeligheid overeenkomt met een TableStatus, en sla deze op in status; ga het if-blok in als dat mislukte.
             if (!Enum.TryParse<TableStatus>(newStatus, true, out var status)) // 
             {
                 TempData["ErrorMessage"] = "Invalid status.";

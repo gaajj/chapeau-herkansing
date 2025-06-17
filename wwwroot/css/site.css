@@ -8,6 +8,7 @@ html {
   }
 }
 
+
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
   box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
 }
@@ -102,4 +103,30 @@ tr.table-secondary td {
     display: block;
     margin-bottom: 6px;
 }
+
+#orders-container {
+    overflow-x: auto; /* enable horizontal scroll */
+    overflow-y: hidden; /* hide vertical overflow */
+    
+}
+
+    #orders-container .row {
+        display: flex; /* flex layout */
+        flex-wrap: nowrap; /* no wrapping onto new lines */
+        margin-left: 0; /* reset bootstrap negative gutters if desired */
+        margin-right: 0;
+    }
+.form-check-input.status-checkbox {
+    /* pick your desired size */
+    width: 1.5rem;
+    height: 1.5rem;
+    /* zero out any padding so it stays that exact size */
+    padding: 0;
+    margin: 0;
+    /* ensure width/height ratio is locked */
+    aspect-ratio: 1 / 1;
+    /* optional: center the checkmark inside */
+    
+
+       
 

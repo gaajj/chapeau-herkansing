@@ -42,11 +42,11 @@ namespace ChapeauHerkansing.Repositories
             SqlCommand cmd = new SqlCommand(sql, conn);
             conn.Open();
             SqlDataReader reader = cmd.ExecuteReader();
-            while (reader.Read()) // voorkomt hardcoding
+            while (reader.Read()) 
             {
                 int tableId = reader.GetInt32(0);
-                int? seats = reader.IsDBNull(2) ? null : (int?)reader.GetInt32(2); // // controleer of kolom 'seats' leeg (NULL) is, zo niet, lees het getal uit en zet het in de nullable int
-                TableStatus status = Enum.Parse<TableStatus>(reader.GetString(3), true); //  tekst status omzetten naar enum
+                int? seats = reader.IsDBNull(2) ? null : (int?)reader.GetInt32(2); 
+                TableStatus status = Enum.Parse<TableStatus>(reader.GetString(3), true);
                 tables.Add(new Table(tableId, null, seats, status));
             }
             return tables;

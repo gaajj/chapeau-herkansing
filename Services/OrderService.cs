@@ -27,6 +27,7 @@ namespace ChapeauHerkansing.Services
             {
                 Order order = GetOrderByTable(tableId);
 
+                // If no order exists, make one and mark table as occupied
                 if (order == null)
                 {
                     Table? table = _tableService.GetTableById(tableId);
@@ -40,13 +41,15 @@ namespace ChapeauHerkansing.Services
 
                 Menu menu = null;
 
+                // If menu is selected (Lunch,Dinner,Drinks) get menu items by the menu type
                 if (menuType.HasValue)
                 {
                     menu = _menuItemRepository.GetMenuItemsByMenuType(menuType.Value);
 
+                    // If no items were found for the category in this menu type, return empty menu (to show empty state in view)
                     if ((menu == null || menu.MenuItems.Count == 0) && category != null)
                     {
-                        menu = new Menu(); // show empty state
+                        menu = new Menu();
                     }
                     else if (category != null)
                     {
@@ -85,37 +88,40 @@ namespace ChapeauHerkansing.Services
             if (line.MenuItem.StockAmount < line.Amount)
                 throw new InvalidOperationException("Not enough stock available to add this item.");
 
+            // Check if same item with same note already exists (make new orderline if orderline with note exists)
             OrderLine existingLine = line.Order.OrderLines
                 .FirstOrDefault(l => l.MenuItem.MenuItemID == line.MenuItem.MenuItemID && l.Note == line.Note);
 
             if (existingLine != null)
             {
+                // If found, increase quantity
                 int newAmount = existingLine.Amount + line.Amount;
                 _orderRepository.UpdateOrderLineAmount(existingLine.OrderLineID, newAmount);
             }
             else
             {
+                // Else, add new orderLine
                 _orderRepository.AddMenuItemToOrder(line.Order, line.MenuItem, line.Staff, line.Amount, line.OrderStatus);
             }
 
             _menuItemRepository.UpdateStock(line.MenuItem.MenuItemID, -line.Amount);
         }
 
-        public void RemoveOrderLine(int orderLineId, int menuItemId, int amount, bool removeAll)
+        public void RemoveOrderLine(OrderLineUpdateViewModel model)
         {
-            if (amount <= 0)
+            if (model.Amount <= 0)
             {
                 throw new ArgumentException("Invalid item amount.");
             }
-            if (removeAll || amount == 1)
+            if (model.RemoveAll || model.Amount == 1)
             {
-                _orderRepository.RemoveOrderLine(orderLineId);
-                _menuItemRepository.UpdateStock(menuItemId, amount);
+                _orderRepository.RemoveOrderLine(model.OrderLineId);
+                _menuItemRepository.UpdateStock(model.MenuItemId, model.Amount);
             }
             else
             {
-                _orderRepository.UpdateOrderLineAmount(orderLineId, amount - 1);
-                _menuItemRepository.UpdateStock(menuItemId, 1);
+                _orderRepository.UpdateOrderLineAmount(model.OrderLineId, model.Amount - 1);
+                _menuItemRepository.UpdateStock(model.MenuItemId, 1);
             }
         }
 

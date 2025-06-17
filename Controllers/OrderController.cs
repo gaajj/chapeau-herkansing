@@ -68,7 +68,7 @@ namespace ChapeauHerkansing.Controllers
         {
             try
             {
-                _orderService.RemoveOrderLine(model.OrderLineId, model.MenuItemId, model.Amount, model.RemoveAll);
+                _orderService.RemoveOrderLine(model);
                 TempData["Message"] = model.RemoveAll ? "Items removed from order." : "Item removed from order.";
             }
             catch

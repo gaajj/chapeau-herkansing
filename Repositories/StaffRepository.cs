@@ -9,17 +9,18 @@ namespace ChapeauHerkansing.Repositories
     {
         public StaffRepository(IConfiguration configuration) : base(configuration) { }
 
-        // Haalt alle medewerkers op (optioneel inclusief gedeactiveerden)
-        public List<Staff> GetAllStaff(bool includeDeleted = false)
+        // Haalt alle medewerkers op, inclusief gedeactiveerde (isDeleted = 1)
+        public List<Staff> GetAllStaff()
         {
             List<Staff> staffList = new();
             using SqlConnection connection = CreateConnection();
 
-            string query = "SELECT ID, firstName, lastName, username, password, role, isDeleted FROM dbo.staff";
-            if (!includeDeleted)
-                query += " WHERE isDeleted = 0";
+            string query = @"
+                SELECT ID, firstName, lastName, username, password, role, isDeleted
+                FROM dbo.staff";
 
             using SqlCommand command = new(query, connection);
+
             try
             {
                 connection.Open();
@@ -39,6 +40,8 @@ namespace ChapeauHerkansing.Repositories
             return staffList;
         }
 
+
+
         // Haalt één medewerker op via ID
         public Staff GetStaffById(int id)
         {
@@ -52,7 +55,15 @@ namespace ChapeauHerkansing.Repositories
             {
                 conn.Open();
                 using SqlDataReader reader = cmd.ExecuteReader();
-                return reader.Read() ? StaffReader.Read(reader) : null;
+
+                if (reader.Read())
+                {
+                    return StaffReader.Read(reader);
+                }
+                else
+                {
+                    throw new Exception("No staff member found with the given ID.");
+                }
             }
             catch (SqlException sqlEx)
             {
@@ -63,6 +74,7 @@ namespace ChapeauHerkansing.Repositories
                 throw new Exception("Unexpected error while retrieving staff by ID.", ex);
             }
         }
+
 
         // Voegt nieuwe medewerker toe aan de database
         public void AddStaff(Staff staff)

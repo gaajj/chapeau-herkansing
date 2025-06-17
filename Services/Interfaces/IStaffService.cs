@@ -6,7 +6,7 @@ namespace ChapeauHerkansing.Services.Interfaces
 {
     public interface IStaffService
     {
-        List<Staff> GetAllStaff(bool includeDeleted = false);
+        List<Staff> GetAllStaff();
         Staff GetStaffById(int id);
         void AddStaff(StaffCreateViewModel model);
         void UpdateStaff(int id, StaffEditViewModel model);

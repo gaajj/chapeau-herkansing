@@ -44,7 +44,7 @@
         </form>
     </div>
 
-    <!-- Category Filter -->
+    <!-- Category Filter (Only when menu is open) -->
     @if (Model.Menu != null)
     {
         <form method="get" asp-action="Index" class="d-flex justify-content-center mb-3">
@@ -61,20 +61,24 @@
     }
 
     <div id="contentSection">
+        @* <!-- If no order exists --> *@
         @if (Model?.Order == null)
         {
             <div class="alert alert-danger text-center" role="alert">
                 Unable to load order details. Please try again later.
             </div>
         }
+        @* <!-- If no menu type selected, show current order --> *@
         else if (Model.Menu == null)
         {
             <partial name="_OrderView" model="Model.Order" />
         }
+        @* <!-- If menu and menu items exist, show menu view --> *@
         else if (Model.Menu?.MenuItems?.Any() == true)
         {
             <partial name="_MenuView" model="Model" />
         }
+        @* <!-- If menu is selected but no items are available in the category --> *@
         else
         {
             <div class="alert alert-warning text-center" role="alert">
