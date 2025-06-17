@@ -14,33 +14,33 @@ public class LoginController : Controller
     // GET /Login/Index
     public IActionResult Index()
     {
-        // Als je al ingelogd bent: direct doorsturen naar de juiste pagina
+      
         return User.Identity?.IsAuthenticated == true
             ? RedirectBasedOnRole(User.FindFirstValue(ClaimTypes.Role))
-            : View();   // anders: gewoon het login-formulier tonen
+            : View();   
     }
 
-    // POST /Login/Index
+  
     [HttpPost]
     public async Task<IActionResult> Index(LoginViewModel vm)
     {
-        // Basisvalidatie: lege velden tegenhouden
+      
         if (string.IsNullOrWhiteSpace(vm.Username) || string.IsNullOrWhiteSpace(vm.Password))
         {
             ViewBag.Error = "Username en password verplicht";
             return View();
         }
          
-        // Laat de AuthService het zware werk doen
+        
         var principal = await auth.TryLoginAsync(vm.Username, vm.Password);
 
-        if (principal == null)   // Mislukt? Terug naar login met foutmelding
+        if (principal == null)   
         {
             ViewBag.Error = "Invalid credentials";
             return View();
         }
 
-        // Gelukt: doorschakelen op basis van rol, zoeken naar de eerst waarde uit de claims wat type is (role)
+        
         return RedirectBasedOnRole(principal.FindFirstValue(ClaimTypes.Role));
     }
 
@@ -48,11 +48,11 @@ public class LoginController : Controller
     [HttpPost]
     public async Task<IActionResult> Logout()
     {
-        await auth.SignOutAsync();       // Cookie weg, klaar
+        await auth.SignOutAsync();       
         return RedirectToAction(nameof(Index)); // terug naar de loginpagina
     }
 
-    // Bepaalt welke pagina bij welke rol hoort
+    
     private IActionResult RedirectBasedOnRole(string? role) => role switch
     {
         nameof(Role.Waiter) => RedirectToAction("Index", "TableOverview"),
