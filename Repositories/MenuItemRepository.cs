@@ -10,12 +10,7 @@ namespace ChapeauHerkansing.Repositories
 {
     public class MenuItemRepository : BaseRepository, IMenuItemRepository
     {
-        private readonly string _connectionString;
-
-        public MenuItemRepository(IConfiguration configuration) : base(configuration)
-        {
-            _connectionString = configuration.GetConnectionString("ChapeauDatabase");
-        }
+        public MenuItemRepository(IConfiguration configuration) : base(configuration) {}
 
         // Haal alle menu-items op (inclusief soft-deleted)
         public Menu GetAllMenuItems()
@@ -44,9 +39,9 @@ namespace ChapeauHerkansing.Repositories
         {
             List<MenuItem> items = new();
 
-            using (SqlConnection connection = new(_connectionString))
+            using SqlConnection conn = CreateConnection();
             {
-                SqlCommand command = new(query, connection);
+                SqlCommand command = new(query, conn);
 
                 if (menuType.HasValue)
                     command.Parameters.AddWithValue("@menuType", (int)menuType.Value);
@@ -55,7 +50,7 @@ namespace ChapeauHerkansing.Repositories
                     ? DBNull.Value
                     : category.Value.ToString().ToLower());
 
-                connection.Open();
+                conn.Open();
                 SqlDataReader reader = command.ExecuteReader();
 
                 while (reader.Read())
@@ -70,7 +65,7 @@ namespace ChapeauHerkansing.Repositories
         {
             try
             {
-                using (SqlConnection conn = new(_connectionString))
+                using SqlConnection conn = CreateConnection();
                 {
                     conn.Open();
 
@@ -106,7 +101,7 @@ namespace ChapeauHerkansing.Repositories
                 FROM menuItems
                 WHERE id = @id";
 
-            using (SqlConnection conn = new(_connectionString))
+            using SqlConnection conn = CreateConnection();
             {
                 SqlCommand cmd = new(query, conn);
                 cmd.Parameters.AddWithValue("@id", id);
@@ -126,7 +121,7 @@ namespace ChapeauHerkansing.Repositories
         {
             try
             {
-                using (SqlConnection conn = new(_connectionString))
+                using SqlConnection conn = CreateConnection();
                 {
                     conn.Open();
 
@@ -157,7 +152,7 @@ namespace ChapeauHerkansing.Repositories
         // Toggle soft delete
         public bool ToggleActive(int id)
         {
-            using (SqlConnection conn = new(_connectionString))
+            using SqlConnection conn = CreateConnection();
             {
                 conn.Open();
 
