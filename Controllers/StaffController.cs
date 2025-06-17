@@ -15,21 +15,18 @@ namespace ChapeauHerkansing.Controllers
             _staffService = staffService;
         }
 
-        // Laat alle medewerkers zien (ook gedeactiveerde)
         public IActionResult Index()
         {
-            List<Staff> staffList = _staffService.GetAllStaff(includeDeleted: true);
+            List<Staff> staffList = _staffService.GetAllStaff();
             return View(staffList);
         }
 
-        // Toont het formulier om een nieuwe medewerker toe te voegen
         [HttpGet]
         public IActionResult Create()
         {
             return View(new StaffCreateViewModel());
         }
 
-        // Verwerkt het formulier en voegt de medewerker toe
         [HttpPost]
         public IActionResult Create(StaffCreateViewModel model)
         {
@@ -58,11 +55,10 @@ namespace ChapeauHerkansing.Controllers
             }
         }
 
-        // Toont het formulier om een medewerker te bewerken (zonder wachtwoord)
         [HttpGet]
-        public IActionResult Edit(int staffId)
+        public IActionResult Edit(int id)
         {
-            Staff staff = _staffService.GetStaffById(staffId);
+            Staff staff = _staffService.GetStaffById(id);
             if (staff == null)
                 return NotFound();
 
@@ -72,7 +68,6 @@ namespace ChapeauHerkansing.Controllers
                 FirstName = staff.FirstName,
                 LastName = staff.LastName,
                 Username = staff.Username,
-                // Password wordt niet meegegeven!
                 Role = staff.Role,
                 IsDeleted = staff.IsDeleted
             };
@@ -80,9 +75,8 @@ namespace ChapeauHerkansing.Controllers
             return View(model);
         }
 
-        // Verwerkt de bewerking van een medewerker
         [HttpPost]
-        public IActionResult Edit(int staffId, StaffEditViewModel model)
+        public IActionResult Edit(int id, StaffEditViewModel model)
         {
             if (!ModelState.IsValid)
             {
@@ -92,28 +86,17 @@ namespace ChapeauHerkansing.Controllers
 
             try
             {
-                Staff existingStaff = _staffService.GetStaffById(staffId);
+                Staff existingStaff = _staffService.GetStaffById(id);
                 if (existingStaff == null)
                     return NotFound();
 
-                // Gebruik het bestaande wachtwoord als er geen nieuw is opgegeven
-                string finalPassword;
-
-                if (string.IsNullOrWhiteSpace(model.Password))
-                {
-                    // Geen nieuw wachtwoord ingevuld = gebruik het oude
-                    finalPassword = existingStaff.Password;
-                }
-                else
-                {
-                    // Nieuw wachtwoord ingevuld = gebruik het nieuwe
-                    finalPassword = model.Password;
-                }
-
+                string finalPassword = string.IsNullOrWhiteSpace(model.Password)
+                    ? existingStaff.Password
+                    : BCrypt.Net.BCrypt.HashPassword(model.Password);
 
                 StaffEditViewModel updatedModel = new()
                 {
-                    Id = staffId,
+                    Id = id,
                     FirstName = model.FirstName,
                     LastName = model.LastName,
                     Username = model.Username,
@@ -122,7 +105,7 @@ namespace ChapeauHerkansing.Controllers
                     IsDeleted = model.IsDeleted
                 };
 
-                _staffService.UpdateStaff(staffId, updatedModel);
+                _staffService.UpdateStaff(id, updatedModel);
                 TempData["Message"] = "Staff member successfully updated.";
                 return RedirectToAction("Index");
             }
@@ -133,7 +116,6 @@ namespace ChapeauHerkansing.Controllers
             }
         }
 
-        // Zet medewerker aan of uit (soft delete)
         public IActionResult ToggleActive(int id)
         {
             try

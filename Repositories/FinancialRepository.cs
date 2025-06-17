@@ -9,43 +9,28 @@ namespace ChapeauHerkansing.Repositories
     {
         public FinancialRepository(IConfiguration configuration) : base(configuration) { }
 
-        public List<FinancialData> GetFinancialData(DateTime fromDate, DateTime toDate, MenuType? filter)
+        public List<FinancialData> GetFinancialData(DateTime fromDate, DateTime toDate)
         {
             List<FinancialData> list = new List<FinancialData>();
 
             using SqlConnection conn = CreateConnection();
 
             string query = @"
-                SELECT 
-                    mi.menuType, 
-                    COUNT(*) AS TotalSales, 
-                    SUM(mi.price) AS Revenue,
-                    SUM(p.tip) AS Tips,
-                    SUM(mi.price + p.tip) AS TotalIncome
+            SELECT  mi.menuType, COUNT(*) AS TotalSales, 
+            SUM(mi.price) AS Revenue,
+            SUM(p.tip) AS Tips,
+            SUM(mi.price + p.tip) AS TotalIncome
                 FROM orders o
                 JOIN orderLines ol ON o.id = ol.orderId
                 JOIN menuItems mi ON ol.menuItemId = mi.id
                 JOIN payments p ON o.id = p.orderId
-                WHERE p.isDeleted = 0";
-
-            if (filter != null)
-            {
-                query += " AND mi.menuType = @menuType";
-            }
-
-            query += " GROUP BY mi.menuType";
+                WHERE p.isDeleted = 0
+                GROUP BY mi.menuType";
 
             using SqlCommand cmd = new SqlCommand(query, conn);
-            cmd.Parameters.AddWithValue("@from", fromDate);
-            cmd.Parameters.AddWithValue("@to", toDate);
-            if (filter != null)
-            {
-                cmd.Parameters.AddWithValue("@menuType", (int)filter);
-            }
-
             conn.Open();
-            using SqlDataReader reader = cmd.ExecuteReader();
 
+            using SqlDataReader reader = cmd.ExecuteReader();
             while (reader.Read())
             {
                 FinancialData data = new FinancialData
