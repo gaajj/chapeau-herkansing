@@ -10,7 +10,7 @@ namespace ChapeauHerkansing.Services.Interfaces
         Order GetOrderByTable(int tableId);
         Order GetOrderById(int orderId);
         void AddOrderLineToOrder(OrderLine line);
-        void RemoveOrderLine(int orderLineId, int menuItemId, int amount, bool removeAll);
+        void RemoveOrderLine(OrderLineUpdateViewModel model);
         void UpdateOrderLineNote(int orderLineId, string note);
         void UpdateStock(int menuItemId, int amount);
         void CreateOrderForTable(int tableId);
